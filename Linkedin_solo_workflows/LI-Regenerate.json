@@ -1,0 +1,361 @@
+{
+  "name": "LI-Regenerate",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "LI-regenerate",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -288,
+        0
+      ],
+      "id": "71aabbae-0480-499d-a300-b3a1208762db",
+      "name": "Webhook",
+      "webhookId": "881d8dbc-a44d-4ab3-b326-1260cae02ebe"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Change an existing post based on this input:\n\n{{ $json.body.data.input }}\n\nCurrent version of post:\n\n{{ $json.body.data.linkedin_content }}",
+        "options": {
+          "systemMessage": "=The result is to be exactly the post suggestion. No other text, messages or extra questions. DO respond only with the post itself.\nThis is the user specific instruction:\n\n{{ $json.body.data.actor_prompt }}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        -64,
+        0
+      ],
+      "id": "f8de1a17-7e19-48dd-8ce7-c5fc3307658d",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-5",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        -64,
+        224
+      ],
+      "id": "bcf450a4-3201-4747-8f19-622f86f6129a",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "XukdnWQa8YAEwGzI",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "LinkedIn_manager_posts",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "condition": "eq",
+              "keyValue": "={{ $('Webhook').item.json.body.post_id }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "status",
+              "fieldValue": "=REGENERATED"
+            },
+            {
+              "fieldId": "linkedIn_text",
+              "fieldValue": "={{ $json.output }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        304,
+        0
+      ],
+      "id": "d7e508fb-558b-4c98-856c-0dd032228f6a",
+      "name": "Update a row",
+      "credentials": {
+        "supabaseApi": {
+          "id": "2oNjiFHjAgVX7z4h",
+          "name": "Supabase Origamis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('Webhook').item.json.body.source.spreadsheetId }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Posts",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1nf9wkK40kH61WxccdwZqywsBRmBK-4TfaxQxd1orQsg/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "row_number": "={{ $('Webhook').item.json.body.rowNumber }}",
+            "LinkedIn_content": "={{ $json.linkedIn_text }}",
+            "Status": "={{ $json.status }}"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "Post_ID",
+              "displayName": "Post_ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Profile",
+              "displayName": "Profile",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Input",
+              "displayName": "Input",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "LinkedIn_content",
+              "displayName": "LinkedIn_content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Media_URL",
+              "displayName": "Media_URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Time",
+              "displayName": "Time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Checkbox",
+              "displayName": "Checkbox",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Result_url",
+              "displayName": "Result_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        528,
+        0
+      ],
+      "id": "58fe3cf5-87f9-4913-903c-488968fd4ab4",
+      "name": "Update row REGENERATE",
+      "alwaysOutputData": false,
+      "credentials": {
+        "googleApi": {
+          "id": "aHVI3CAM5JAErt7B",
+          "name": "Google Service Account account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "n8n.princparket.cz",
+            "user-agent": "Mozilla/5.0 (compatible; Google-Apps-Script; beanserver; +https://script.google.com; id: UAEmdDd8EfXrC5m19YVo57kuL11jje4Wpcw)",
+            "content-length": "830",
+            "accept-encoding": "gzip, deflate, br",
+            "content-type": "application/json",
+            "via": "1.1 Caddy",
+            "x-forwarded-for": "34.116.21.1",
+            "x-forwarded-host": "n8n.princparket.cz",
+            "x-forwarded-proto": "https"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "action": "Regenerate",
+            "rowNumber": 7,
+            "post_id": "5",
+            "profile": "Lenka",
+            "source": {
+              "spreadsheetId": "1nf9wkK40kH61WxccdwZqywsBRmBK-4TfaxQxd1orQsg",
+              "sheetName": "Posts"
+            },
+            "data": {
+              "input": "Zkus se víc držet tone of voice, příspěvek je velmi generický.",
+              "linkedin_content": "Nejlepší spolupráce je ta, kde se „nic nemusí zachraňovat“.  \n🔹 Jak vypadá kvalitní servis?  \n🔹 Rychlost vs. přesnost – na čem záleží více?  \n🔹 Kdo skutečně nese rizika?  \n🔹 Co můžete očekávat od partnera Oakcent?  \n\nChcete mít jistotu, že všechny důležité body máte pod kontrolou? Napište mi a pošlu vám checklist „co si vyžádat“, abyste spolupráci vždy zvládli bez stresu! 🚀  \n\n#Spolupráce #Servis #Oakcent #Checklist #BusinessTips",
+              "media_urls": [],
+              "scheduled_at": null,
+              "actor_prompt": null
+            }
+          },
+          "webhookUrl": "https://n8n.princparket.cz/webhook/LI-regenerate",
+          "executionMode": "production"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Update a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update a row": {
+      "main": [
+        [
+          {
+            "node": "Update row REGENERATE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update row REGENERATE": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "OUAMGTbjNgyrDIGY"
+  },
+  "versionId": "7166500d-4fa1-4c36-a168-e9c4bb2291b8",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "2b07eec16886132e3cd818fdfac587c65db27d72fe33b2ee54f787b58f4dff76"
+  },
+  "id": "zVc0uGTFMJIveSAJ",
+  "tags": []
+}

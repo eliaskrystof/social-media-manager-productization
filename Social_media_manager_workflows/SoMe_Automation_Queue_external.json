@@ -1,0 +1,511 @@
+{
+  "name": "SoMe_Automation_Queue_external",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "id"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -480,
+        0
+      ],
+      "id": "ae06e6f1-4163-4d19-af70-1c44955fbcc2",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "pV2vZcf6zRfZaTBh",
+          "mode": "list",
+          "cachedResultName": "SoMe_Automation_Post_Facebook_ext"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $('Get Post').item.json.id }}",
+            "user_id": "={{ $('Get Post').item.json.user_id }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "user_id",
+              "displayName": "user_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "mode": "each",
+        "options": {
+          "waitForSubWorkflow": false
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        1232,
+        -160
+      ],
+      "id": "09bfa829-be92-455f-80ee-33e4305e114c",
+      "name": "Execute Facebook Posting"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "LHawp0TtQwbyAsAp",
+          "mode": "list",
+          "cachedResultName": "SoMe_Automation_Post_Instagram_ext"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $('Get Post').item.json.id }}",
+            "user_id": "={{ $('Get Post').item.json.user_id }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "user_id",
+              "displayName": "user_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "mode": "each",
+        "options": {
+          "waitForSubWorkflow": false
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        1232,
+        48
+      ],
+      "id": "cc1047a0-9a92-4047-a22e-bdd8c67bf137",
+      "name": "Execute Instagram Posting"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "G6UDte49T7psdupP",
+          "mode": "list",
+          "cachedResultName": "SoMe_Automation_Post_LinkedIn_ext"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "user_id": "={{ $('Get Post').item.json.user_id }}",
+            "id": "={{$('Get Post').item.json.id}}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "user_id",
+              "displayName": "user_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "mode": "each",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        1232,
+        224
+      ],
+      "id": "d7a1708f-ef70-42fe-8e66-27ef8232e395",
+      "name": "Execute LinkedIn Posting"
+    },
+    {
+      "parameters": {
+        "resume": "specificTime",
+        "dateTime": "={{ $('Get Post').item.json.facebook_post_time ?? $now }}"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        944,
+        -160
+      ],
+      "id": "47591039-86fb-40af-a57e-27edf630b03b",
+      "name": "Wait until Facebook scheduled time",
+      "webhookId": "6e21b332-05d5-413b-b6d0-e54d2cfc2e21"
+    },
+    {
+      "parameters": {
+        "resume": "specificTime",
+        "dateTime": "={{ $('Get Post').item.json.instagram_post_time ?? $now }}"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        944,
+        48
+      ],
+      "id": "526e7a19-f883-4ab9-a2ba-487904ec36d9",
+      "name": "Wait until Instagram scheduled",
+      "webhookId": "ed130e3b-8be4-4012-b4a3-b8e3f68a5fab"
+    },
+    {
+      "parameters": {
+        "resume": "specificTime",
+        "dateTime": "={{ $('Get Post').item.json.linkedin_post_time ?? $now }}"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        944,
+        224
+      ],
+      "id": "684b638d-ab80-42a3-aee0-a77eaf3cfa43",
+      "name": "Wait until LinkedIn scheduled time",
+      "webhookId": "ed130e3b-8be4-4012-b4a3-b8e3f68a5fab"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Get Post').item.json.facebook_planned_date }}",
+                    "rightValue": "={{ $today.format('yyyy-MM-dd') }}",
+                    "operator": {
+                      "type": "dateTime",
+                      "operation": "equals"
+                    },
+                    "id": "3c939efd-de58-4000-af08-a604f7eb27c9"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "9a2e105d-c70a-4e44-a076-fa80f2ba33b9",
+                    "leftValue": "={{ $('Get Post').item.json.instagram_planned_date }}",
+                    "rightValue": "={{ $today.format('yyyy-MM-dd') }}",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "9d98859a-32f8-4309-8a0e-3996932e1405",
+                    "leftValue": "={{ $('Get Post').item.json.linkedin_planned_date }}",
+                    "rightValue": "={{ $today.format('yyyy-MM-dd') }}",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        624,
+        0
+      ],
+      "id": "7eb72a69-0c1c-488e-ae56-9b0e2ca80112",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "some_post_plan_selfhost_external",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "keyValue": "={{ $('When Executed by Another Workflow').item.json.id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -256,
+        0
+      ],
+      "id": "f2b1228e-6e38-4023-853b-76e7145384bb",
+      "name": "Get Post",
+      "credentials": {
+        "supabaseApi": {
+          "id": "2oNjiFHjAgVX7z4h",
+          "name": "Supabase Origamis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "numberInputs": 3
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1520,
+        48
+      ],
+      "id": "db8714ea-eb95-4453-85dc-d10a276a1c04",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "id",
+        "include": "allOtherFields",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -48,
+        0
+      ],
+      "id": "d163c90a-adec-415a-87da-12941099fa6f",
+      "name": "Split Out"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Wait until Facebook scheduled time": {
+      "main": [
+        [
+          {
+            "node": "Execute Facebook Posting",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait until Instagram scheduled": {
+      "main": [
+        [
+          {
+            "node": "Execute Instagram Posting",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait until LinkedIn scheduled time": {
+      "main": [
+        [
+          {
+            "node": "Execute LinkedIn Posting",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Get Post",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Post": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Wait until Facebook scheduled time",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait until Instagram scheduled",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait until LinkedIn scheduled time",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Facebook Posting": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Instagram Posting": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Execute LinkedIn Posting": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "NmGg5uZ3m1rjeYmB"
+  },
+  "versionId": "c34d6301-0a57-48a1-990e-61b2673570e7",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "2b07eec16886132e3cd818fdfac587c65db27d72fe33b2ee54f787b58f4dff76"
+  },
+  "id": "SUDP306141YYBy0v",
+  "tags": []
+}

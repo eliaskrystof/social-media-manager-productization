@@ -1,0 +1,164 @@
+{
+  "name": "SoMe_Automation_Progress_Log",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "message"
+            },
+            {
+              "name": "master_table_id"
+            },
+            {
+              "name": "task_type"
+            },
+            {
+              "name": "job_id"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -240,
+        0
+      ],
+      "id": "94eac7de-5df8-4d29-a2e9-b033749a2dff",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $json.master_table_id }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Log",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "message": "={{ $json.message }}",
+            "timestamp": "={{ $now.format('yyyy-MM-dd hh:mm:ss') }}",
+            "job_id": "={{ $execution.id }}",
+            "task_type": "={{ $json.task_type }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "timestamp",
+              "displayName": "timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "job_id",
+              "displayName": "job_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "task_type",
+              "displayName": "task_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "message",
+              "displayName": "message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        32,
+        0
+      ],
+      "id": "fc9aa33f-25a5-408b-b300-490cccbb5cae",
+      "name": "Update Log sheet",
+      "credentials": {
+        "googleApi": {
+          "id": "aHVI3CAM5JAErt7B",
+          "name": "Google Service Account account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "When Executed by Another Workflow": [
+      {
+        "json": {
+          "message": "Cretion of post started. Please, wait a moment.",
+          "master_table_id": "15cQZTDfZfvI5jKNLq_x5e-p7iacE2xBn9D6eoBdcKBk",
+          "task_type": "post_prep",
+          "job_id": "1760"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Update Log sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "633ef106-35a3-40bb-a941-3d7f66c4ce2d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "2b07eec16886132e3cd818fdfac587c65db27d72fe33b2ee54f787b58f4dff76"
+  },
+  "id": "6WcGcViiXxQk11Qg",
+  "tags": []
+}

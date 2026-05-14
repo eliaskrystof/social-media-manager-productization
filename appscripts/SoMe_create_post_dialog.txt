@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        padding: 12px;
+      }
+
+      h3 {
+        margin-top: 0;
+      }
+
+      h4 {
+        margin-bottom: 6px;
+      }
+
+      label {
+        display: block;
+        margin: 6px 0;
+      }
+
+      textarea {
+        width: 100%;
+        min-height: 70px;
+        margin-top: 8px;
+        box-sizing: border-box;
+      }
+
+      button {
+        margin-top: 12px;
+        margin-right: 8px;
+      }
+
+      .section {
+        margin-top: 16px;
+        padding-top: 8px;
+        border-top: 1px solid #e0e0e0;
+      }
+
+      .folder-box {
+        margin-top: 10px;
+        padding: 12px;
+        background: #f8f9fa;
+        border: 1px solid #dadce0;
+        border-radius: 8px;
+      }
+
+      .open-folder-btn {
+        display: inline-block;
+        margin-top: 8px;
+        padding: 10px 14px;
+        background: #1a73e8;
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+      }
+
+      .muted {
+        color: #666;
+        font-size: 13px;
+      }
+
+      #create-input,
+      #ready-upload-box {
+        display: none;
+        margin-top: 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <h3>Select where to perform the action:</h3>
+
+    <label><input type="radio" name="platform" value="facebook_instagram"> Facebook & Instagram</label>
+    <label><input type="radio" name="platform" value="linkedin"> LinkedIn</label>
+    <label><input type="radio" name="platform" value="all"> All</label>
+
+    <div class="section">
+      <h4>Do you have images ready?</h4>
+
+      <label><input type="radio" name="imageSource" value="yes" onchange="toggleImageMode()"> Yes</label>
+      <label><input type="radio" name="imageSource" value="no" onchange="toggleImageMode()"> No</label>
+      <label><input type="radio" name="imageSource" value="create" onchange="toggleImageMode()"> Create</label>
+
+      <div id="ready-upload-box" class="folder-box">
+        <div><b>Upload media to the prepared folder, then click Confirm.</b></div>
+        <div class="muted">The folder will open in a new tab.</div>
+        <a class="open-folder-btn" href="<?= preparedRows[0].folderUrl ?>" target="_blank">Open media folder</a>
+      </div>
+
+      <div id="create-input">
+        <textarea id="imageInput" placeholder="Describe what images to create..."></textarea>
+      </div>
+    </div>
+
+    <button onclick="submitSelection()">Confirm</button>
+    <button onclick="google.script.host.close()">Cancel</button>
+
+    <script>
+      const preparedRows = <?= JSON.stringify(preparedRows) ?>;
+
+      function toggleImageMode() {
+        const imageRadios = document.getElementsByName('imageSource');
+        let imageSource = "";
+
+        for (let r of imageRadios) {
+          if (r.checked) imageSource = r.value;
+        }
+
+        const showCreate = imageSource === "create";
+        const showReady = imageSource === "yes";
+
+        document.getElementById('create-input').style.display = showCreate ? 'block' : 'none';
+        document.getElementById('ready-upload-box').style.display = showReady ? 'block' : 'none';
+
+        if (google.script.host) {
+          if (showCreate || showReady) {
+            google.script.host.setHeight(620);
+          } else {
+            google.script.host.setHeight(520);
+          }
+        }
+      }
+
+      function submitSelection() {
+        // platform
+        const platformRadios = document.getElementsByName('platform');
+        let choice = null;
+        for (let r of platformRadios) {
+          if (r.checked) choice = r.value;
+        }
+
+        if (!choice) {
+          google.script.run.logToSheet("error", "Platform not selected in createPostDialog.", "create_dialog", "", true);
+          return;
+        }
+
+        // image source
+        const imageRadios = document.getElementsByName('imageSource');
+        let image_source = "";
+        for (let r of imageRadios) {
+          if (r.checked) image_source = r.value;
+        }
+
+        if (!image_source) {
+          google.script.run.logToSheet("error", "Image source not selected in createPostDialog.", "create_dialog", "", true);
+          return;
+        }
+
+        const imageInputEl = document.getElementById('imageInput');
+        const imageInput = imageInputEl ? imageInputEl.value.trim() : "";
+
+        if (image_source === "create" && !imageInput) {
+          google.script.run.logToSheet("error", "Missing image creation description in createPostDialog.", "create_dialog", "", true);
+          return;
+        }
+
+        google.script.run
+          .withSuccessHandler(() => google.script.host.close())
+          .withFailureHandler(err => alert(err.message || err))
+          .continueCreatePosts({
+            choice,
+            userInput: image_source === "create" ? imageInput : "",
+            image_source,
+            preparedRows
+          });
+      }
+    </script>
+  </body>
+</html>

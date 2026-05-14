@@ -1,0 +1,29 @@
+create table public.access_tokens (
+  id uuid not null default gen_random_uuid (),
+  platform text not null,
+  access_token text null,
+  page_id text null,
+  refresh_token text null,
+  token_created_at timestamp with time zone null,
+  client_id text null,
+  client_secret text null,
+  api_key text null,
+  token_type text null,
+  last_updated timestamp with time zone null,
+  constraint access_tokens_pkey primary key (id),
+  constraint access_tokens_platform_key unique (platform),
+  constraint access_tokens_platform_check check (
+    (
+      platform = any (
+        array[
+          'facebook'::text,
+          'instagram'::text,
+          'linkedin'::text,
+          'youtube'::text,
+          'tiktok'::text,
+          'x'::text
+        ]
+      )
+    )
+  )
+) TABLESPACE pg_default;

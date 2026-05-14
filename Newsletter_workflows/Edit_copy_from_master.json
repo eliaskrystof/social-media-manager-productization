@@ -1,0 +1,919 @@
+{
+  "name": "Edit_copy_from_master",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "newsletter_drafts",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "source_row",
+              "keyValue": "={{ $json.source_row }}"
+            },
+            {
+              "keyName": "language",
+              "keyValue": "={{ $json.language }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        16,
+        0
+      ],
+      "id": "9dca853d-f27d-4435-b25f-322f3339d386",
+      "name": "Get a row",
+      "credentials": {
+        "supabaseApi": {
+          "id": "XbTsqF8wuG2gSZNT",
+          "name": "Supabase account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ JSON.stringify($json.fields, null, 2) }}",
+        "options": {
+          "systemMessage": "=You are a localization copywriter and editor.\n\nYou update existing localized database texts based on edits made in a source-language version.\n\nThe target language is: {{ $(\"Trigger\").item.json.language }}.\nAll output must be written strictly in this language.\n\nInput meaning:\n- old_value = original source text\n- new_value = edited source text\n- db_value = current localized database text in {{ $(\"Trigger\").item.json.language }}\n\nYour task:\nFor each field:\n- compare old_value and new_value\n- identify exactly what changed (content, wording, structure, formatting, punctuation)\n- apply the equivalent change to db_value\n- preserve the language of db_value ({{ $(\"Trigger\").item.json.language }})\n- keep unchanged parts as close as possible to the original db_value\n\nCore requirements:\n- do NOT rewrite the entire text unless absolutely necessary\n- do NOT translate from scratch\n- do NOT improve or rephrase unrelated parts\n- do NOT add new information\n- do NOT remove information unless it was removed in the source edit\n- apply only the changes that are present between old_value and new_value\n\nFormatting rules:\n- formatting is critical and must be preserved\n- preserve existing formatting unless the source edit clearly changes it\n- reflect intentional formatting changes from the source edit\n- pay attention to:\n  - whitespace (including multiple spaces)\n  - line breaks\n  - paragraph structure\n  - indentation\n  - text blocks and section separation\n- do NOT normalize or \"clean up\" formatting automatically\n\nSpecial characters and delimiters:\n- special characters and delimiters may carry structural meaning\n- detect and replicate any changes in punctuation and delimiters between old_value and new_value\n- apply the same structural changes to db_value\n\nPay special attention to:\n- separators: | , ; : / \\ - _\n- brackets: () [] {}\n- quotation marks: \" '\n- list separators and inline structures\n- repeated characters or spacing patterns\n\nRules:\n- if a delimiter or special character is added, removed, or changed in the source edit,\n  apply the same change to db_value\n- do NOT replace or normalize delimiters unless explicitly changed\n- preserve delimiter count, type, and position unless the edit changes them\n\nStrict preservation rules:\nPreserve exactly (unless explicitly changed in the source edit):\n- HTML tags\n- markdown syntax\n- placeholders and template variables such as {name}, {0}, %s\n- URLs\n- special formatting tokens\n\nBehavior rules:\n- act as a precise editor, not a creative writer\n- focus on minimal, accurate changes\n- maintain consistency with the original db_value\n- do not explain your reasoning\n- do not add commentary\n\nOutput rules:\n- return only valid JSON\n- do not include any extra text\n- do not use markdown formatting\n\nReturn format:\n{\n    \"chenged_key_name\": \"changed key value\",\n    \"another_changed_key_name\": \"changed key value\"\n}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        464,
+        0
+      ],
+      "id": "3e379ce9-efe3-437f-97fd-bf4fe4441ae6",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "source_row",
+              "type": "any"
+            },
+            {
+              "name": "language",
+              "type": "any"
+            },
+            {
+              "name": "changed_keys",
+              "type": "any"
+            },
+            {
+              "name": "changed_values",
+              "type": "any"
+            },
+            {
+              "name": "original_values",
+              "type": "any"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -192,
+        0
+      ],
+      "id": "48599e37-a62d-4a01-8736-8f95a318da1a",
+      "name": "Trigger"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        464,
+        240
+      ],
+      "id": "0551541a-4769-45f4-b474-df16e993525d",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "HrLuvJHhWPSgTQpu",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "newsletter_drafts",
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "source_row",
+              "condition": "eq",
+              "keyValue": "={{ $('Trigger').item.json.source_row }}"
+            },
+            {
+              "keyName": "language",
+              "condition": "eq",
+              "keyValue": "={{ $('Trigger').item.json.language }}"
+            }
+          ]
+        },
+        "dataToSend": "autoMapInputData"
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1440,
+        -16
+      ],
+      "id": "f34ccce7-c622-40ac-82a0-052422e4bffd",
+      "name": "Update a row",
+      "credentials": {
+        "supabaseApi": {
+          "id": "XbTsqF8wuG2gSZNT",
+          "name": "Supabase account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "nr7rsyJ41A1ZZlez",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/nr7rsyJ41A1ZZlez",
+          "cachedResultName": "Socials Agent — Update_row_Gsheet"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "post_id": "={{ $json.post_id }}"
+          },
+          "matchingColumns": [
+            "post_id"
+          ],
+          "schema": [
+            {
+              "id": "post_id",
+              "displayName": "post_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        1616,
+        -16
+      ],
+      "id": "0078436e-bc46-48e0-aa5b-fae34879c9c7",
+      "name": "Call 'Update_row_Gsheet'"
+    },
+    {
+      "parameters": {
+        "jsCode": "const parsed = $json.parsed || {};\n\nreturn [\n  {\n    json: {\n      ...parsed\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1248,
+        -16
+      ],
+      "id": "08265f69-0198-483f-9f58-2ce0c7080d02",
+      "name": "Ascend to top level"
+    },
+    {
+      "parameters": {
+        "jsCode": "const triggerData = $('Trigger').first().json;\nconst expectedKeys = triggerData.changed_keys || [];\n\nlet raw = $json.output || '';\nraw = raw.replace(/```json|```/g, '').trim();\n\nconst currentAttempt = $json.attempt ?? 1;\nconst maxAttempts = $json.max_attempts ?? 3;\n\nconst result = {\n  valid: false,\n  parsed: null,\n  errors: [],\n  retry_message: '',\n  attempt: currentAttempt,\n  max_attempts: maxAttempts,\n};\n\nlet parsed;\n\ntry {\n  const match = raw.match(/\\{[\\s\\S]*\\}/);\n  if (!match) {\n    throw new Error('No JSON object found in output');\n  }\n\n  parsed = JSON.parse(match[0]);\n} catch (e) {\n  result.errors.push(`Invalid JSON: ${e.message}`);\n  result.retry_message =\n    `Your previous response was invalid. Return only a valid JSON object with exactly these top-level keys: ${expectedKeys.join(', ')}.`;\n  return [{ json: result }];\n}\n\nif (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {\n  result.errors.push('Parsed output is not a top-level JSON object');\n}\n\nconst actualKeys = Object.keys(parsed || {});\nconst missingKeys = expectedKeys.filter(k => !actualKeys.includes(k));\nconst extraKeys = actualKeys.filter(k => !expectedKeys.includes(k));\n\nif (missingKeys.length) result.errors.push(`Missing keys: ${missingKeys.join(', ')}`);\nif (extraKeys.length) result.errors.push(`Unexpected keys: ${extraKeys.join(', ')}`);\n\nfor (const key of expectedKeys) {\n  if (key in (parsed || {}) && typeof parsed[key] !== 'string') {\n    result.errors.push(`Key \"${key}\" must contain a string value`);\n  }\n}\n\nif (result.errors.length === 0) {\n  result.valid = true;\n  result.parsed = parsed;\n} else {\n  result.retry_message =\n    `Your previous response did not match the required schema.\\n` +\n    `Expected top-level keys: ${expectedKeys.join(', ')}.\\n` +\n    `Errors: ${result.errors.join(' | ')}.\\n` +\n    `Return only a valid JSON object with exactly those top-level keys and string values.`;\n}\n\nreturn [{ json: result }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        816,
+        0
+      ],
+      "id": "29ca1d14-9725-4854-b223-3dcacb828ac2",
+      "name": "Parse and validate"
+    },
+    {
+      "parameters": {
+        "jsCode": "const triggerData = $('Trigger').first().json;\nconst expectedKeys = triggerData.changed_keys || [];\n\nlet raw = $json.output || '';\nraw = raw.replace(/```json|```/g, '').trim();\n\nconst result = {\n  valid: false,\n  parsed: null,\n  errors: [],\n  retry_message: '',\n};\n\nlet parsed;\n\ntry {\n  const match = raw.match(/\\{[\\s\\S]*\\}/);\n  if (!match) {\n    throw new Error('No JSON object found in output');\n  }\n\n  parsed = JSON.parse(match[0]);\n} catch (e) {\n  result.errors.push(`Invalid JSON: ${e.message}`);\n  result.retry_message = `Your previous response was invalid. Return only a valid JSON object with exactly these top-level keys: ${expectedKeys.join(', ')}. Do not include markdown, explanations, or extra keys.`;\n  return [{ json: result }];\n}\n\nif (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {\n  result.errors.push('Parsed output is not a top-level JSON object');\n}\n\nconst actualKeys = Object.keys(parsed || {});\nconst missingKeys = expectedKeys.filter(k => !actualKeys.includes(k));\nconst extraKeys = actualKeys.filter(k => !expectedKeys.includes(k));\n\nif (missingKeys.length > 0) {\n  result.errors.push(`Missing keys: ${missingKeys.join(', ')}`);\n}\n\nif (extraKeys.length > 0) {\n  result.errors.push(`Unexpected keys: ${extraKeys.join(', ')}`);\n}\n\nfor (const key of expectedKeys) {\n  if (key in (parsed || {}) && typeof parsed[key] !== 'string') {\n    result.errors.push(`Key \"${key}\" does not contain a string value`);\n  }\n}\n\nif (result.errors.length === 0) {\n  result.valid = true;\n  result.parsed = parsed;\n} else {\n  result.retry_message =\n    `Your previous response did not match the required schema.\\n` +\n    `Expected top-level keys: ${expectedKeys.join(', ')}.\\n` +\n    `Errors: ${result.errors.join(' | ')}.\\n` +\n    `Return only a valid JSON object with exactly those top-level keys and string values. No markdown. No explanation.`;\n}\n\nreturn [{ json: result }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        816,
+        -192
+      ],
+      "id": "819cef0b-0d27-4089-b03d-8eb9e44f3112",
+      "name": "Parse and validate_old",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "a358d8ab-fa0e-4ad6-a0d8-59f4e86b61b7",
+              "leftValue": "={{ $json.valid }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1024,
+        0
+      ],
+      "id": "6502853d-2d95-48fd-ada8-8dabae61bd4c",
+      "name": "Valid?"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "84bad3fa-1bd7-4f31-9e6b-fceb65c668aa",
+              "leftValue": "={{ $json.attempt }}",
+              "rightValue": "={{ $json.max_attempts }}",
+              "operator": {
+                "type": "number",
+                "operation": "lt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -160,
+        400
+      ],
+      "id": "eba0cfc0-7a62-49c5-87c8-d273bb48526e",
+      "name": "Should retry?"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{\n  json: {\n    ...$json,\n    attempt: ($json.attempt ?? 1) + 1\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        16,
+        400
+      ],
+      "id": "c89befdc-2d2e-47e9-8445-c06ada63b6bd",
+      "name": "Increase attempt count"
+    },
+    {
+      "parameters": {
+        "jsCode": "const triggerData = $('Trigger').first().json;\n\nconst changedKeys = triggerData.changed_keys || [];\nconst changedValues = triggerData.changed_values || {};\nconst actualValues = triggerData.original_values || {};\n\nconst dbSource = $json.payload ?? $json;\n\nconst fields = changedKeys.map((key) => ({\n  key,\n  old_value: actualValues[key] ?? null,\n  new_value: changedValues[key] ?? null,\n  db_value: dbSource?.[key] ?? null,\n}));\n\nreturn [\n  {\n    json: {\n      fields\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        0
+      ],
+      "id": "87c1208e-d39a-420e-af3b-2723c6337f44",
+      "name": "Prepare Fields"
+    },
+    {
+      "parameters": {
+        "jsCode": "const triggerData = $('Trigger').first().json;\nconst changedKeys = triggerData.changed_keys || [];\nconst fields = $('Prepare Fields').first().json.fields;\nconst language = triggerData.language || 'target language';\n\nconst retryPrompt = `\nYour previous response was invalid.\n\nValidation errors:\n${($json.errors || []).join('\\n')}\n\nYou must regenerate the entire JSON object from the original input data.\nDo not only fix the reported missing or invalid keys.\nRe-process every required field again.\n\nTarget language: ${language}\n\nRequirements:\n- return exactly these top-level keys: ${changedKeys.join(', ')}\n- regenerate all values again from the input data\n- every value must be a string\n- every value must be written in ${language}\n- do not leave any value in the wrong language\n- do not include extra keys\n- do not include markdown\n- do not include explanations\n\nOriginal input data:\n${JSON.stringify(fields, null, 2)}\n`;\n\nreturn [{\n  json: {\n    ...$json,\n    retry_user_message: retryPrompt\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        400
+      ],
+      "id": "64baf1a6-276d-4608-8bcb-c26dfed63817",
+      "name": "Construct Retry Message"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.retry_user_message }}",
+        "options": {
+          "systemMessage": "=You are a localization copywriter and editor.\n\nYou update existing localized database texts based on edits made in a source-language version.\n\nThe target language is: {{ $(\"Trigger\").first().json.language }}.\nAll output must be written strictly in this language.\n\nInput meaning:\n- old_value = original source text\n- new_value = edited source text\n- db_value = current localized database text in {{ $(\"Trigger\").first().json.language }}\n\nYour task:\nFor each field:\n- compare old_value and new_value\n- identify exactly what changed (content, wording, structure, formatting, punctuation)\n- apply the equivalent change to db_value\n- preserve the language of db_value ({{ $(\"Trigger\").first().json.language }})\n- keep unchanged parts as close as possible to the original db_value\n\nCore requirements:\n- do NOT rewrite the entire text unless absolutely necessary\n- do NOT translate from scratch\n- do NOT improve or rephrase unrelated parts\n- do NOT add new information\n- do NOT remove information unless it was removed in the source edit\n- apply only the changes that are present between old_value and new_value\n\nFormatting rules:\n- formatting is critical and must be preserved\n- preserve existing formatting unless the source edit clearly changes it\n- reflect intentional formatting changes from the source edit\n- pay attention to:\n  - whitespace (including multiple spaces)\n  - line breaks\n  - paragraph structure\n  - indentation\n  - text blocks and section separation\n- do NOT normalize or \"clean up\" formatting automatically\n\nSpecial characters and delimiters:\n- special characters and delimiters may carry structural meaning\n- detect and replicate any changes in punctuation and delimiters between old_value and new_value\n- apply the same structural changes to db_value\n\nPay special attention to:\n- separators: | , ; : / \\ - _\n- brackets: () [] {}\n- quotation marks: \" '\n- list separators and inline structures\n- repeated characters or spacing patterns\n\nRules:\n- if a delimiter or special character is added, removed, or changed in the source edit,\n  apply the same change to db_value\n- do NOT replace or normalize delimiters unless explicitly changed\n- preserve delimiter count, type, and position unless the edit changes them\n\nStrict preservation rules:\nPreserve exactly (unless explicitly changed in the source edit):\n- HTML tags\n- markdown syntax\n- placeholders and template variables such as {name}, {0}, %s\n- URLs\n- special formatting tokens\n\nBehavior rules:\n- act as a precise editor, not a creative writer\n- focus on minimal, accurate changes\n- maintain consistency with the original db_value\n- do not explain your reasoning\n- do not add commentary\n\nOutput rules:\n- return only valid JSON\n- do not include any extra text\n- do not use markdown formatting\n\nReturn format:\n{\n    \"chenged_key_name\": \"changed key value\",\n    \"another_changed_key_name\": \"changed key value\"\n}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        464,
+        400
+      ],
+      "id": "616cafe7-0678-47c0-b61c-dd7220382858",
+      "name": "Retry Agent"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "14CkOky3jXC9rcwen1GmEy6U1ALrfHjDRD1HAjsoycQg",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 445110406,
+          "mode": "list",
+          "cachedResultName": "Návrh tabulky Newsletterů",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/14CkOky3jXC9rcwen1GmEy6U1ALrfHjDRD1HAjsoycQg/edit#gid=445110406"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "row_number": "={{ $('Trigger').first().json.source_row }}",
+            "status": "FAILED UPDATING"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "Month",
+              "displayName": "Month",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "No.",
+              "displayName": "No.",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Topic",
+              "displayName": "Topic",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Target group (databáze)",
+              "displayName": "Target group (databáze)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Subject",
+              "displayName": "Subject",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "1. blog",
+              "displayName": "1. blog",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "2. project",
+              "displayName": "2. project",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "3. color collection",
+              "displayName": "3. color collection",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "4. pattern collection",
+              "displayName": "4. pattern collection",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "5. CTA content",
+              "displayName": "5. CTA content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "5. CTA link",
+              "displayName": "5. CTA link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Vytvořit obsah",
+              "displayName": "Vytvořit obsah",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "CZ content",
+              "displayName": "CZ content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "EN content",
+              "displayName": "EN content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "PL content",
+              "displayName": "PL content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "DE content",
+              "displayName": "DE content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "date and time",
+              "displayName": "date and time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "sender",
+              "displayName": "sender",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        16,
+        624
+      ],
+      "id": "05a6d2ac-acf7-428f-8695-0d0e911e865a",
+      "name": "Error Status",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "ouZ4Cl4hWK3UY5OV",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "errorMessage": "Agent Output error"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        192,
+        624
+      ],
+      "id": "0f0dce0e-ee92-420a-8628-66698d4e0053",
+      "name": "Stop and Error"
+    },
+    {
+      "parameters": {
+        "content": "## Update error handling\n",
+        "height": 448,
+        "width": 1376,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -192,
+        304
+      ],
+      "typeVersion": 1,
+      "id": "25d58e70-5c23-434b-8c87-c8e4dc91789c",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "a358d8ab-fa0e-4ad6-a0d8-59f4e86b61b7",
+              "leftValue": "={{ $json.valid }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1008,
+        400
+      ],
+      "id": "564a4727-9b21-4574-b5dc-ccad7ee225de",
+      "name": "Now Valid?"
+    },
+    {
+      "parameters": {
+        "jsCode": "const triggerData = $('Trigger').first().json;\nconst expectedKeys = triggerData.changed_keys || [];\n\nlet raw = $json.output || '';\nraw = raw.replace(/```json|```/g, '').trim();\n\nconst retryData = $('Construct Retry Message').last().json;\nconst currentAttempt = retryData.attempt ?? 1;\nconst maxAttempts = retryData.max_attempts ?? 3;\n\nconst result = {\n  valid: false,\n  parsed: null,\n  errors: [],\n  retry_message: '',\n  attempt: currentAttempt,\n  max_attempts: maxAttempts,\n};\n\nlet parsed;\n\ntry {\n  const match = raw.match(/\\{[\\s\\S]*\\}/);\n  if (!match) {\n    throw new Error('No JSON object found in output');\n  }\n\n  parsed = JSON.parse(match[0]);\n} catch (e) {\n  result.errors.push(`Invalid JSON: ${e.message}`);\n  result.retry_message =\n    `Your previous response was invalid. Return only a valid JSON object with exactly these top-level keys: ${expectedKeys.join(', ')}.`;\n  return [{ json: result }];\n}\n\nif (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {\n  result.errors.push('Parsed output is not a top-level JSON object');\n}\n\nconst actualKeys = Object.keys(parsed || {});\nconst missingKeys = expectedKeys.filter(k => !actualKeys.includes(k));\nconst extraKeys = actualKeys.filter(k => !expectedKeys.includes(k));\n\nif (missingKeys.length) result.errors.push(`Missing keys: ${missingKeys.join(', ')}`);\nif (extraKeys.length) result.errors.push(`Unexpected keys: ${extraKeys.join(', ')}`);\n\nfor (const key of expectedKeys) {\n  if (key in (parsed || {}) && typeof parsed[key] !== 'string') {\n    result.errors.push(`Key \"${key}\" must contain a string value`);\n  }\n}\n\nif (result.errors.length === 0) {\n  result.valid = true;\n  result.parsed = parsed;\n} else {\n  result.retry_message =\n    `Your previous response did not match the required schema.\\n` +\n    `Expected top-level keys: ${expectedKeys.join(', ')}.\\n` +\n    `Errors: ${result.errors.join(' | ')}.\\n` +\n    `Return only a valid JSON object with exactly those top-level keys and string values.`;\n}\n\nreturn [{ json: result }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        800,
+        400
+      ],
+      "id": "79dd53e8-3e5e-46cd-b223-e21e24611a3c",
+      "name": "Parse and validate Retry"
+    }
+  ],
+  "pinData": {
+    "Trigger": [
+      {
+        "json": {
+          "source_row": 16,
+          "language": "english",
+          "changed_keys": [
+            "blog_title",
+            "blog_text"
+          ],
+          "changed_values": {
+            "blog_title": "Rovnováha dřeva a tepla",
+            "blog_text": "Správně navržená a instalovaná dubová podlaha na podlahovém vytápění nabízí teplo a atmosféru, kterou dlažba nedokáže reprodukovat. Nsše firma ukazuje, proč vícevrstvé podlahy, pečlivá montáž a volba systému včetně ověřených řešení jako HeatFlow zaručí trvalou krásu i pohodlí. Zajímá Vás proč?"
+          },
+          "original_values": {
+            "blog_title": "Dřevo a teplo v rovnováze",
+            "blog_text": "Správně navržená a instalovaná dubová podlaha na podlahovém vytápění nabízí teplo a atmosféru, kterou dlažba nedokáže reprodukovat. V OAKCENT vysvětlujeme, proč vícevrstvé podlahy, pečlivá montáž a volba systému včetně ověřených řešení jako HeatFlow zaručí trvalou krásu i pohodlí."
+          }
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ],
+    "Parse and validate_old": [
+      {
+        "json": {
+          "valid": false,
+          "parsed": {
+            "blog_title": "Balance of Wood and Warmth",
+            "blog_text": "A correctly installed oak floor with underfloor heating gives warmth and atmosphere that tiles cannot reproduce. Our company shows why multi-layer floors, careful installation, and the choice of system including proven solutions like HeatFlow guarantee lasting beauty and comfort. Interested in why?"
+          },
+          "errors": [],
+          "retry_message": ""
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Get a row": {
+      "main": [
+        [
+          {
+            "node": "Prepare Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Retry Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Parse and validate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update a row": {
+      "main": [
+        [
+          {
+            "node": "Call 'Update_row_Gsheet'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ascend to top level": {
+      "main": [
+        [
+          {
+            "node": "Update a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse and validate": {
+      "main": [
+        [
+          {
+            "node": "Valid?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Valid?": {
+      "main": [
+        [
+          {
+            "node": "Ascend to top level",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Should retry?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Should retry?": {
+      "main": [
+        [
+          {
+            "node": "Increase attempt count",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Error Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Increase attempt count": {
+      "main": [
+        [
+          {
+            "node": "Construct Retry Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Fields": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Construct Retry Message": {
+      "main": [
+        [
+          {
+            "node": "Retry Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Retry Agent": {
+      "main": [
+        [
+          {
+            "node": "Parse and validate Retry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Error Status": {
+      "main": [
+        [
+          {
+            "node": "Stop and Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Now Valid?": {
+      "main": [
+        [
+          {
+            "node": "Ascend to top level",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Should retry?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse and validate Retry": {
+      "main": [
+        [
+          {
+            "node": "Now Valid?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "8f6101b6-b098-4a3c-9718-a1d239b874b7",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "331d746bc1a63563201e278bbfd6be74ef21f3e48d7328285e9bf034335c85dd"
+  },
+  "id": "QCw1WnsLtjqf1eiI",
+  "tags": [
+    {
+      "updatedAt": "2026-01-14T22:03:19.715Z",
+      "createdAt": "2026-01-14T22:03:19.715Z",
+      "id": "ovTLfrcCyllneaEm",
+      "name": "Sub"
+    },
+    {
+      "updatedAt": "2026-03-16T12:38:59.514Z",
+      "createdAt": "2026-03-16T12:38:59.514Z",
+      "id": "yMGr14raWGakEGWI",
+      "name": "Edit"
+    }
+  ]
+}

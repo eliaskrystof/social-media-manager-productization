@@ -1,0 +1,174 @@
+{
+  "name": "Clear_temp_media",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "weeks"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -416,
+        -96
+      ],
+      "id": "bdd2c8c6-f6c5-417a-9688-d123aa3c9bfa",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "tableId": "LinkedIn_manager_posts",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "status",
+              "condition": "eq",
+              "keyValue": "DONE"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -208,
+        -16
+      ],
+      "id": "aafac62c-e426-44e9-8aab-a244385591dd",
+      "name": "Get many rows",
+      "credentials": {
+        "supabaseApi": {
+          "id": "2oNjiFHjAgVX7z4h",
+          "name": "Supabase Origamis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "LinkedIn_manager_posts",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "condition": "eq",
+              "keyValue": "={{ $('Get many rows').item.json.id }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "attachments",
+              "fieldValue": "={{ null }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        288,
+        -16
+      ],
+      "id": "df16801e-b63f-457c-b0e4-3c6214e7cc5d",
+      "name": "Update a row",
+      "credentials": {
+        "supabaseApi": {
+          "id": "2oNjiFHjAgVX7z4h",
+          "name": "Supabase Origamis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "command": "=p=\"{{ $json.attachments[0] }}\"\nroot=\"/files/linked-in-manager\"\n\ncase \"$p\" in\n  \"$root\"/*) ;;\n  *) echo \"Bad path: $p\" >&2; exit 1 ;;\nesac\n\nrel=\"${p#\"$root\"/}\"\ntarget=\"$root/${rel%%/*/*}\"\n\n[[ \"$target\" != \"$root\" && -d \"$target\" ]] || { echo \"Refusing: $target\" >&2; exit 1; }\n\nrm -rf -- \"$target\"\n\n"
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        48,
+        -16
+      ],
+      "id": "acc28b0c-3d81-43ab-b82d-e5808f664a68",
+      "name": "Remove each file"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -416,
+        80
+      ],
+      "id": "b7deba5d-0be7-4756-9cc0-3e1503a79732",
+      "name": "When clicking ‘Execute workflow’"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get many rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many rows": {
+      "main": [
+        [
+          {
+            "node": "Remove each file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remove each file": {
+      "main": [
+        [
+          {
+            "node": "Update a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get many rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "OUAMGTbjNgyrDIGY"
+  },
+  "versionId": "a4dfbf97-5a5d-408c-952f-a3ae97e48a2e",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "2b07eec16886132e3cd818fdfac587c65db27d72fe33b2ee54f787b58f4dff76"
+  },
+  "id": "9aadv61kSgyLHAY0",
+  "tags": []
+}

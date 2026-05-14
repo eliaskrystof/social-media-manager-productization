@@ -1,0 +1,1161 @@
+{
+  "name": "Update_row_Gsheet",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "post_id",
+              "type": "number"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "4a68452d-645c-4394-b01d-051aea566e2e",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "newsletter_drafts",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "post_id",
+              "keyValue": "={{ $json.post_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "e3fcd2ab-39c4-4cac-847d-9e85c668758c",
+      "name": "Get a row",
+      "credentials": {
+        "supabaseApi": {
+          "id": "XbTsqF8wuG2gSZNT",
+          "name": "Supabase account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "14CkOky3jXC9rcwen1GmEy6U1ALrfHjDRD1HAjsoycQg",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 445110406,
+          "mode": "list",
+          "cachedResultName": "Návrh tabulky Newsletterů",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/14CkOky3jXC9rcwen1GmEy6U1ALrfHjDRD1HAjsoycQg/edit#gid=445110406"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "row_number": "={{ $json.source_row }}",
+            "status": "={{ $json.status }}",
+            "CZ content": "=---Email Subject---\n{{ $json.email_subject }}\n\n---Blog title---\n{{ $json.blog_title }}\n\n---Blog Content---\n{{ $json.blog_text }}\n\n---Blog CTA---\n{{ $json.blog_cta_label }}\n\n---Project Title---\n{{ $json.project_title }}\n\n---Project Content---\n{{ $json.project_text }}\n\n---Project CTA---\n{{ $json.project_cta_label }}\n\n---Collection Title---\n{{ $json.collection_title }}\n\n---Collection Content---\n{{ $json.collection_text }}\n\n---Collection CTA---\n{{ $json.collection_cta }}\n\n---Pattern Title---\n{{ $json.pattern_title }}\n\n---Pattern Content---\n{{ $json.pattern_text }}\n\n---Pattern From---\n{{ $json.patternCollection_name }}\n\n---CTA Content---\n{{ $json.cta_text }}\n\n---CTA Button---\n{{ $json.cta_button }}"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "Month",
+              "displayName": "Month",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "No.",
+              "displayName": "No.",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Topic",
+              "displayName": "Topic",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Target group (databáze)",
+              "displayName": "Target group (databáze)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Subject",
+              "displayName": "Subject",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "1. blog",
+              "displayName": "1. blog",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "2. project",
+              "displayName": "2. project",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "3. color collection",
+              "displayName": "3. color collection",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "4. pattern collection",
+              "displayName": "4. pattern collection",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "5. CTA content",
+              "displayName": "5. CTA content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "5. CTA link",
+              "displayName": "5. CTA link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Vytvořit obsah",
+              "displayName": "Vytvořit obsah",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "CZ content",
+              "displayName": "CZ content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "EN content",
+              "displayName": "EN content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "PL content",
+              "displayName": "PL content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "DE content",
+              "displayName": "DE content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "date and time",
+              "displayName": "date and time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "sender",
+              "displayName": "sender",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        640,
+        -96
+      ],
+      "id": "32c2b833-43ce-4e04-b26f-8b5d8dbced2d",
+      "name": "Update row in sheet",
+      "credentials": {
+        "googleApi": {
+          "id": "O03CqHPT0yrBvxCy",
+          "name": "Google Sheets service account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.language }}",
+                    "rightValue": "czech",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "e652efb2-efd3-4f7e-a7c4-181e3eaf7987"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "ffd6ce3c-2bc8-4899-944a-7e688434052d",
+                    "leftValue": "={{ $json.language }}",
+                    "rightValue": "english",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "52114006-50ed-412c-8b01-4c16a7200a8d",
+                    "leftValue": "={{ $json.language }}",
+                    "rightValue": "german",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "0ced9744-b2b1-4b7e-aa5f-564263e832e3",
+                    "leftValue": "={{ $json.language }}",
+                    "rightValue": "polish",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        416,
+        0
+      ],
+      "id": "c1eaeb2b-7156-46bd-9c7e-a099a892e516",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "14CkOky3jXC9rcwen1GmEy6U1ALrfHjDRD1HAjsoycQg",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 445110406,
+          "mode": "list",
+          "cachedResultName": "Návrh tabulky Newsletterů",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/14CkOky3jXC9rcwen1GmEy6U1ALrfHjDRD1HAjsoycQg/edit#gid=445110406"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "row_number": "={{ $json.source_row }}",
+            "status": "={{ $json.status }}",
+            "EN content": "=---Email Subject---\n{{ $json.email_subject }}\n\n---Blog title---\n{{ $json.blog_title }}\n\n---Blog Content---\n{{ $json.blog_text }}\n\n---Blog CTA---\n{{ $json.blog_cta_label }}\n\n---Project Title---\n{{ $json.project_title }}\n\n---Project Content---\n{{ $json.project_text }}\n\n---Project CTA---\n{{ $json.project_cta_label }}\n\n---Collection Title---\n{{ $json.collection_title }}\n\n---Collection Content---\n{{ $json.collection_text }}\n\n---Collection CTA---\n{{ $json.collection_cta }}\n\n---Pattern Title---\n{{ $json.pattern_title }}\n\n---Pattern Content---\n{{ $json.pattern_text }}\n\n---Pattern From---\n{{ $json.patternCollection_name }}\n\n---CTA Content---\n{{ $json.cta_text }}\n\n---CTA Button---\n{{ $json.cta_button }}"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "Month",
+              "displayName": "Month",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "No.",
+              "displayName": "No.",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Topic",
+              "displayName": "Topic",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Target group (databáze)",
+              "displayName": "Target group (databáze)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Subject",
+              "displayName": "Subject",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "1. blog",
+              "displayName": "1. blog",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "2. project",
+              "displayName": "2. project",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "3. color collection",
+              "displayName": "3. color collection",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "4. pattern collection",
+              "displayName": "4. pattern collection",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "5. CTA content",
+              "displayName": "5. CTA content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "5. CTA link",
+              "displayName": "5. CTA link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Vytvořit obsah",
+              "displayName": "Vytvořit obsah",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "CZ content",
+              "displayName": "CZ content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "EN content",
+              "displayName": "EN content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "PL content",
+              "displayName": "PL content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "DE content",
+              "displayName": "DE content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "date and time",
+              "displayName": "date and time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "sender",
+              "displayName": "sender",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        640,
+        0
+      ],
+      "id": "5d007f6d-d6bb-42b8-a410-79dbaec36d57",
+      "name": "Update row in sheet1",
+      "credentials": {
+        "googleApi": {
+          "id": "O03CqHPT0yrBvxCy",
+          "name": "Google Sheets service account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "14CkOky3jXC9rcwen1GmEy6U1ALrfHjDRD1HAjsoycQg",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 445110406,
+          "mode": "list",
+          "cachedResultName": "Návrh tabulky Newsletterů",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/14CkOky3jXC9rcwen1GmEy6U1ALrfHjDRD1HAjsoycQg/edit#gid=445110406"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "row_number": "={{ $json.source_row }}",
+            "status": "={{ $json.status }}",
+            "DE content": "=---Email Subject---\n{{ $json.email_subject }}\n\n---Blog title---\n{{ $json.blog_title }}\n\n---Blog Content---\n{{ $json.blog_text }}\n\n---Blog CTA---\n{{ $json.blog_cta_label }}\n\n---Project Title---\n{{ $json.project_title }}\n\n---Project Content---\n{{ $json.project_text }}\n\n---Project CTA---\n{{ $json.project_cta_label }}\n\n---Collection Title---\n{{ $json.collection_title }}\n\n---Collection Content---\n{{ $json.collection_text }}\n\n---Collection CTA---\n{{ $json.collection_cta }}\n\n---Pattern Title---\n{{ $json.pattern_title }}\n\n---Pattern Content---\n{{ $json.pattern_text }}\n\n---Pattern From---\n{{ $json.patternCollection_name }}\n\n---CTA Content---\n{{ $json.cta_text }}\n\n---CTA Button---\n{{ $json.cta_button }}"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "Month",
+              "displayName": "Month",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "No.",
+              "displayName": "No.",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Topic",
+              "displayName": "Topic",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Target group (databáze)",
+              "displayName": "Target group (databáze)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Subject",
+              "displayName": "Subject",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "1. blog",
+              "displayName": "1. blog",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "2. project",
+              "displayName": "2. project",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "3. color collection",
+              "displayName": "3. color collection",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "4. pattern collection",
+              "displayName": "4. pattern collection",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "5. CTA content",
+              "displayName": "5. CTA content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "5. CTA link",
+              "displayName": "5. CTA link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Vytvořit obsah",
+              "displayName": "Vytvořit obsah",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "CZ content",
+              "displayName": "CZ content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "EN content",
+              "displayName": "EN content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "PL content",
+              "displayName": "PL content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "DE content",
+              "displayName": "DE content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "date and time",
+              "displayName": "date and time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "sender",
+              "displayName": "sender",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        640,
+        96
+      ],
+      "id": "57c6d56b-d384-477c-92a9-bb8fed13041c",
+      "name": "Update row in sheet2",
+      "credentials": {
+        "googleApi": {
+          "id": "O03CqHPT0yrBvxCy",
+          "name": "Google Sheets service account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "14CkOky3jXC9rcwen1GmEy6U1ALrfHjDRD1HAjsoycQg",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 445110406,
+          "mode": "list",
+          "cachedResultName": "Návrh tabulky Newsletterů",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/14CkOky3jXC9rcwen1GmEy6U1ALrfHjDRD1HAjsoycQg/edit#gid=445110406"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "row_number": "={{ $json.source_row }}",
+            "status": "={{ $json.status }}",
+            "PL content": "=---Email Subject---\n{{ $json.email_subject }}\n\n---Blog title---\n{{ $json.blog_title }}\n\n---Blog Content---\n{{ $json.blog_text }}\n\n---Blog CTA---\n{{ $json.blog_cta_label }}\n\n---Project Title---\n{{ $json.project_title }}\n\n---Project Content---\n{{ $json.project_text }}\n\n---Project CTA---\n{{ $json.project_cta_label }}\n\n---Collection Title---\n{{ $json.collection_title }}\n\n---Collection Content---\n{{ $json.collection_text }}\n\n---Collection CTA---\n{{ $json.collection_cta }}\n\n---Pattern Title---\n{{ $json.pattern_title }}\n\n---Pattern Content---\n{{ $json.pattern_text }}\n\n---Pattern From---\n{{ $json.patternCollection_name }}\n\n---CTA Content---\n{{ $json.cta_text }}\n\n---CTA Button---\n{{ $json.cta_button }}"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "Month",
+              "displayName": "Month",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "No.",
+              "displayName": "No.",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Topic",
+              "displayName": "Topic",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Target group (databáze)",
+              "displayName": "Target group (databáze)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Subject",
+              "displayName": "Subject",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "1. blog",
+              "displayName": "1. blog",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "2. project",
+              "displayName": "2. project",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "3. color collection",
+              "displayName": "3. color collection",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "4. pattern collection",
+              "displayName": "4. pattern collection",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "5. CTA content",
+              "displayName": "5. CTA content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "5. CTA link",
+              "displayName": "5. CTA link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Vytvořit obsah",
+              "displayName": "Vytvořit obsah",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "CZ content",
+              "displayName": "CZ content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "EN content",
+              "displayName": "EN content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "PL content",
+              "displayName": "PL content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "DE content",
+              "displayName": "DE content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "date and time",
+              "displayName": "date and time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "sender",
+              "displayName": "sender",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        640,
+        192
+      ],
+      "id": "188bfd4e-3b94-4394-8236-5d474e5fb51d",
+      "name": "Update row in sheet3",
+      "credentials": {
+        "googleApi": {
+          "id": "O03CqHPT0yrBvxCy",
+          "name": "Google Sheets service account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "When Executed by Another Workflow": [
+      {
+        "json": {
+          "post_id": 6
+        }
+      }
+    ]
+  },
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Get a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a row": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update row in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update row in sheet2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update row in sheet3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "22a74012-679a-46b2-85b6-e5965b89265c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "331d746bc1a63563201e278bbfd6be74ef21f3e48d7328285e9bf034335c85dd"
+  },
+  "id": "nr7rsyJ41A1ZZlez",
+  "tags": [
+    {
+      "updatedAt": "2026-01-14T22:03:19.715Z",
+      "createdAt": "2026-01-14T22:03:19.715Z",
+      "id": "ovTLfrcCyllneaEm",
+      "name": "Sub"
+    }
+  ]
+}

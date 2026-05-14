@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <style>
+      body { font-family: Arial, sans-serif; padding: 12px; }
+      h3 { margin-top: 0; }
+      h4 { margin-bottom: 6px; }
+      label { display: block; margin: 6px 0; }
+      textarea { width: 100%; min-height: 60px; margin-top: 8px; }
+      button { margin-top: 12px; }
+      #create-input { display: none; margin-top: 8px; }
+    </style>
+  </head>
+  <body>
+    <h3>Select where to perform the action:</h3>
+    <label><input type="radio" name="platform" value="facebook_instagram"> Facebook & Instagram</label>
+    <label><input type="radio" name="platform" value="linkedin"> LinkedIn</label>
+    <label><input type="radio" name="platform" value="all"> All</label>
+
+    <? if (showNoteField) { ?>
+      <!-- UPDATE POSTS -->
+      <div id="feedback-section">
+        <h4>What needs to change?</h4>
+        <textarea id="userInput" placeholder="Describe the required updates..."></textarea>
+      </div>
+    <? } else if (showImageField) { ?>
+      <!-- CREATE POSTS -->
+      <div id="image-section">
+        <h4>Do you have images ready?</h4>
+        <label><input type="radio" name="imageSource" value="yes" onchange="toggleCreateInput(false)"> Yes</label>
+        <label><input type="radio" name="imageSource" value="no" onchange="toggleCreateInput(false)"> No</label>
+        <label><input type="radio" name="imageSource" value="create" onchange="toggleCreateInput(true)"> Create</label>
+        <div id="create-input">
+          <textarea id="imageInput" placeholder="Describe what images to create..."></textarea>
+        </div>
+      </div>
+    <? } ?>
+
+    <button onclick="submitSelection()">Confirm</button>
+    <button onclick="google.script.host.close()">Cancel</button>
+
+    <script>
+      function toggleCreateInput(show) {
+        document.getElementById('create-input').style.display = show ? 'block' : 'none';
+        if (google.script.host) {
+          google.script.host.setHeight(show ? 520 : 400);
+        }
+      }
+
+      function submitSelection() {
+        // --- PLATFORM ---
+        const radios = document.getElementsByName('platform');
+        let choice = null;
+        for (let r of radios) if (r.checked) choice = r.value;
+        if (!choice) {
+          google.script.run.logToSheet("error", "Platform not selected in platformDialog.", "platform_dialog", "", true);
+          return;
+        }
+
+        // --- UPDATE POST: userInput field ---
+        const userTextArea = document.getElementById('userInput');
+        const userInput = userTextArea ? userTextArea.value.trim() : "";
+
+        // --- CREATE POST: image question ---
+        const imageRadios = document.getElementsByName('imageSource');
+        let image_source = "";
+        for (let r of imageRadios) if (r.checked) image_source = r.value;
+
+        const imageInput = document.getElementById('imageInput')
+          ? document.getElementById('imageInput').value.trim()
+          : "";
+
+        if (image_source === "create" && !imageInput) {
+          google.script.run.logToSheet("error", "Missing image creation description in platformDialog.", "platform_dialog", "", true);
+          return;
+        }
+
+        // --- Payload ---
+        google.script.run
+          .withSuccessHandler(() => google.script.host.close())
+          .continuePostAction({
+            choice,
+            userInput: userInput || imageInput || "",
+            image_source
+          });
+      }
+    </script>
+  </body>
+</html>

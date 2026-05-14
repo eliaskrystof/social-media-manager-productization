@@ -1,0 +1,76 @@
+{
+  "name": "Parse_content_blob",
+  "nodes": [
+    {
+      "parameters": {
+        "jsCode": "// n8n Code node (JavaScript)\n// Pevně očekává vstupní text v: $json.content\n\nconst raw = $input.first().json.content;\n\nif (typeof raw !== 'string' || !raw.trim()) {\n  throw new Error('Input field \"content\" is empty or not a string.');\n}\n\n// Mapování sekcí -> výstupní pole\nconst sectionToField = {\n  'Email Subject':'email_subject_parsed',\n  \n  'Blog title': 'blog_title_parsed',\n  'Blog Content': 'blog_text_parsed',\n  'Blog CTA': 'blog_cta_label_parsed',\n\n  'Project Title': 'project_title_parsed',\n  'Project Content': 'project_text_parsed',\n  'Project CTA': 'project_cta_label_parsed',\n\n  'Collection Title': 'collection_title_parsed',\n  'Collection Content': 'collection_text_parsed',\n  'Collection CTA': 'collection_cta_parsed',\n\n  'Pattern Title': 'pattern_title_parsed',\n  'Pattern Content': 'pattern_text_parsed',\n  'Pattern From': 'patternCollection_name_parsed',\n\n  'CTA Content': 'cta_text_parsed',\n  'CTA Button': 'cta_button_parsed',\n};\n\n// Najdi delimiter sekce\nconst sectionRegex = /^---\\s*(.+?)\\s*---\\s*$/gm;\n\nconst matches = [];\nlet m;\nwhile ((m = sectionRegex.exec(raw)) !== null) {\n  matches.push({\n    name: m[1],\n    index: m.index,\n    endOfHeader: sectionRegex.lastIndex\n  });\n}\n\n// připrav výstup\nconst parsed = {};\nfor (const key of Object.values(sectionToField)) parsed[key] = '';\n\n// vyřízni obsah sekcí\nfor (let i = 0; i < matches.length; i++) {\n  const { name, endOfHeader } = matches[i];\n  const nextStart = (i + 1 < matches.length) ? matches[i + 1].index : raw.length;\n\n  let content = raw.slice(endOfHeader, nextStart);\n  content = content.trim();\n\n  const outField = sectionToField[name];\n  if (outField) parsed[outField] = content;\n}\n\n// výstup\nreturn [{ json: parsed }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "9d532303-126d-452e-9597-dbf67cf3387b",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "content"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "562df61d-5a53-479c-87a2-e33a4c5bf51a",
+      "name": "When Executed by Another Workflow"
+    }
+  ],
+  "pinData": {
+    "When Executed by Another Workflow": [
+      {
+        "json": {
+          "content": "---Blog title---\nVzor pokládky dřevěné podlahy\n\n---Blog Content---\nV Oakcent věříme, že vzor pokládky podlahy definuje atmosféru prostoru. Kolekce Heritage (Planks, Herringbone, Chevron) ctí tradici, Squares (Dice, Fiber, Knit) spojuje přesnost s hravostí a Polygons (Cubes, Hexagone) přináší geometrickou hloubku a 3D eleganci.\n\n---Blog CTA---\nProzkoumat vzory\n\n---Project Title---\nKubínyi zámek, Vyšné Kubín\n\n---Project Content---\nRenesanční zámek v Kubínyiho parku ve Vyšné Kubíně vytváří tichou, historicky nasycenou kulisu, kde obnovované prostory respektují suverenitu místa. Hlavní atmosféru formuje restaurace Amalia zasazená v bývalých stájích a soubor útulných pokojů v podkroví, které pracují s měkkým světlem a střídmými proporcemi. Interiéry doplňují dřevěné podlahy Oakcent Honey v kastlovém vzoru, jejich medové tóny a jemná textura tlumí prostor a spojují dřevěné obklady s kamennými plochami; pozornost k řemeslnému detailu v lištách a spojích podtrhuje celistvost návrhu. Výsledkem je klidné, promyšlené prostředí, které zve k pomalému objevování.\n\n---Project CTA---\nProzkoumejte projekt\n\n---Collection Title---\nHazel\n\n---Collection Content---\nHřejivé tóny kolekce Hazel obohatily interiér o útulnou atmosféru a eleganci s přírodním charakterem.\n\n---Collection CTA---\nObjevte kolekci Hazel\n\n---Pattern Title---\nPlanks\n\n---Pattern Content---\nVzor Planks nechal vyniknout přirozenou kresbu dřeva a dodal prostoru nadčasovou eleganci s čistými liniemi.\n\n---Pattern From---\nPlanks z kolekce Heritage\n\n---CTA Content---\nHledáte autentické textury a barvy pro svůj projekt? Stáhněte si výběr vzorů Oakcent a nabídněte svým klientům vyjimečnost.\n\n---CTA Button---\nStáhnout textury"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "8e845eaa-04e6-4c8a-a021-3d159f189bb4",
+  "meta": {
+    "instanceId": "331d746bc1a63563201e278bbfd6be74ef21f3e48d7328285e9bf034335c85dd"
+  },
+  "id": "DaXSS831YejckVUq",
+  "tags": [
+    {
+      "updatedAt": "2026-01-14T22:03:19.715Z",
+      "createdAt": "2026-01-14T22:03:19.715Z",
+      "id": "ovTLfrcCyllneaEm",
+      "name": "Sub"
+    }
+  ]
+}

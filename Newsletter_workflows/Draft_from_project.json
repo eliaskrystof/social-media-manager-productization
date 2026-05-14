@@ -1,0 +1,694 @@
+{
+  "name": "Draft_from_project",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "extractHtmlContent",
+        "extractionValues": {
+          "values": [
+            {
+              "key": "heroImgProject",
+              "cssSelector": "section[data-name^=\"Realizace úvodní banner\"]",
+              "returnValue": "attribute",
+              "attribute": "data-original-src"
+            },
+            {
+              "key": "firstBlock_img",
+              "cssSelector": "section[data-name=\"Realizace obrázky + texty 1-3\"] img.o_we_custom_image",
+              "returnValue": "attribute",
+              "attribute": "src"
+            },
+            {
+              "key": "secondBlock_img",
+              "cssSelector": "section[data-name=\"Realizace obrázky + texty 2-3\"] img.o_we_custom_image",
+              "returnValue": "attribute",
+              "attribute": "src"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        1312,
+        128
+      ],
+      "id": "03a112fb-f1db-4481-bdb6-c7a07b455a28",
+      "name": "HTML_Project"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const html = String($json.data ?? $json.html_content ?? \"\");\n\n// vezmi payload z Trigger node\nconst trigger = $('Trigger').first().json;\n\nconst language = String(trigger.language ?? '').trim().toLowerCase();\nconst originalProject = String(trigger.project ?? '');\n\n// ---------- hreflang / project url ----------\nconst hreflangMap = {\n  czech: 'cs',\n  english: 'en',\n  polish: 'pl',\n  german: 'de',\n};\n\nconst wantedLang = hreflangMap[language] || 'cs';\nconst normalizedHtml = html.replace(/\\\\\"/g, '\"');\n\nconst hreflangMatches = [...normalizedHtml.matchAll(\n  /<link[^>]+rel=[\"']alternate[\"'][^>]+hreflang=[\"']([^\"']+)[\"'][^>]+href=[\"']([^\"']+)[\"'][^>]*\\/?>/gi\n)];\n\nlet project_url = '';\nlet hreflang_found = false;\n\nfor (const match of hreflangMatches) {\n  const hreflang = String(match[1] || '').toLowerCase();\n  const href = String(match[2] || '');\n\n  if (hreflang === wantedLang) {\n    project_url = href;\n    hreflang_found = true;\n    break;\n  }\n}\n\n// fallback na původní project URL z Triggeru\nif (!project_url) {\n  project_url = String($('Trigger').item.json.project ?? '');\n}\n\n// ---------- helpers ----------\nfunction stripNoContent(input) {\n  return String(input || \"\")\n    .replace(/<script\\b[\\s\\S]*?<\\/script>/gi, \" \")\n    .replace(/<style\\b[\\s\\S]*?<\\/style>/gi, \" \")\n    .replace(/<noscript\\b[\\s\\S]*?<\\/noscript>/gi, \" \")\n    .replace(/<svg\\b[\\s\\S]*?<\\/svg>/gi, \" \")\n    .replace(/<!--([\\s\\S]*?)-->/g, \" \");\n}\n\nfunction decodeBasic(text) {\n  return String(text || \"\")\n    .replace(/&nbsp;/gi, \" \")\n    .replace(/&amp;/gi, \"&\")\n    .replace(/&quot;/gi, '\"')\n    .replace(/&#0*39;/gi, \"'\")\n    .replace(/&lt;/gi, \"<\")\n    .replace(/&gt;/gi, \">\");\n}\n\nfunction clean(fragment) {\n  return decodeBasic(String(fragment || \"\"))\n    .replace(/<br\\s*\\/?>/gi, \"\\n\")\n    .replace(/<[^>]+>/g, \" \")\n    .replace(/[ \\t]+/g, \" \")\n    .replace(/\\n[ \\t]+/g, \"\\n\")\n    .replace(/\\n{3,}/g, \"\\n\\n\")\n    .trim();\n}\n\n// univerzální převod celého dokumentu na text\nfunction universalText(htmlDoc) {\n  const s = stripNoContent(htmlDoc)\n    .replace(/<header\\b[\\s\\S]*?<\\/header>/gi, \" \")\n    .replace(/<nav\\b[\\s\\S]*?<\\/nav>/gi, \" \")\n    .replace(/<footer\\b[\\s\\S]*?<\\/footer>/gi, \" \")\n    .replace(/<aside\\b[\\s\\S]*?<\\/aside>/gi, \" \");\n  const body = (s.match(/<body\\b[^>]*>([\\s\\S]*?)<\\/body>/i) || [])[1] || s;\n  return clean(body);\n}\n\n// ---------- structured extraction ----------\nlet articlePart = html;\n\nconst articleMatch = html.match(\n  /<div class=\"content com realization-detail\">([\\s\\S]*?)<section class=\"container contact text-center\"/i\n);\nif (articleMatch) articlePart = articleMatch[1];\n\nconst parts = [];\nconst mainTitleMatch = articlePart.match(/<div class=\"header-text\">\\s*<h1[^>]*>([\\s\\S]*?)<\\/h1>/i);\nif (mainTitleMatch) {\n  const t = clean(mainTitleMatch[1]);\n  if (t) parts.push(t);\n}\n\nconst sectionRegex = /<section[^>]*class=\"([^\"]*)\"[^>]*>([\\s\\S]*?)<\\/section>/gi;\nlet secMatch;\nwhile ((secMatch = sectionRegex.exec(articlePart)) !== null) {\n  const className = secMatch[1] || \"\";\n  const sectionHtml = secMatch[2];\n\n  if (/header-section/.test(className)) continue;\n  if (/wide-swiper-section/.test(className)) continue;\n\n  const headingMatch = sectionHtml.match(/<(h2|h3)[^>]*>([\\s\\S]*?)<\\/\\1>/i);\n  if (headingMatch) {\n    const title = clean(headingMatch[2]);\n    if (title) parts.push(title);\n  }\n\n  const pRegex = /<p[^>]*>([\\s\\S]*?)<\\/p>/gi;\n  let pMatch;\n  while ((pMatch = pRegex.exec(sectionHtml)) !== null) {\n    const paragraph = clean(pMatch[1]);\n    if (paragraph) parts.push(paragraph);\n  }\n}\n\n// výsledek ze strukturované části\nlet page_text = parts.join(\"\\n\\n\").trim();\n\n// ---------- fallback ----------\nconst usedFallback = !page_text || page_text.length < 300;\nif (usedFallback) {\n  page_text = universalText(html);\n}\n\nreturn {\n  ...$json,\n  project_url,\n  page_text,\n  _debug: {\n    language,\n    wantedLang,\n    hreflang_found,\n    inputLen: html.length,\n    outputLen: page_text.length,\n    usedFallback,\n  },\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1008,
+        -16
+      ],
+      "id": "125d71f9-be93-4f8b-aa8e-3965ec8a695b",
+      "name": "Extract text from project"
+    },
+    {
+      "parameters": {
+        "url": "={{ $('Trigger').item.json.project }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        800,
+        -16
+      ],
+      "id": "56f445aa-1ccf-4d36-bbb9-24164f86ef7f",
+      "name": "Get Project"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-5-mini",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        1248,
+        -48
+      ],
+      "id": "327169ce-1743-4232-baf9-335c5014931a",
+      "name": "OpenRouter Chat Model1",
+      "credentials": {
+        "openRouterApi": {
+          "id": "HrLuvJHhWPSgTQpu",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"project_title\": \"\",\n  \"project_text\": \"\",\n  \"project_cta_label\": \"\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        1392,
+        -48
+      ],
+      "id": "4dbd01c4-0652-409a-99a0-8210cbe17226",
+      "name": "Structured Output Parser1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "477bc193-3a32-42bb-92f5-cc3f5ec4a13b",
+              "name": "project_output",
+              "value": "={{ $json.output }}",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        704,
+        416
+      ],
+      "id": "d9c92c65-436e-40da-bc53-8fd755601dd9",
+      "name": "Project Output",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "project"
+            },
+            {
+              "name": "language"
+            },
+            {
+              "name": "source_row",
+              "type": "any"
+            },
+            {
+              "name": "change",
+              "type": "boolean"
+            },
+            {
+              "name": "comment"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        208,
+        -16
+      ],
+      "id": "a8507bc8-5e98-4b98-8583-0f2f6708c441",
+      "name": "Trigger"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.page_text }}\n\n{{ $('Trigger').item.json.change ? \"This is the user comment: \" + $('Trigger').item.json.comment : \"\" }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=You are a copywriter specialized in luxury interior design and architecture.\nYour task is to create short newsletter copy for the Project section of the Oakcent newsletter.\n\nYou will receive:\n\nproject_title — title detected from the project page\n\npage_text — full cleaned text extracted from the project page\n\nsections — separated structured text blocks from the page\n\nYour job is to analyze the text and distill it into one refined, continuous block of promotional copy suitable for a newsletter. Possibly translate to a different language than the source material. Including title.\n\n{{ $('Trigger').item.json.change ? \"You have been tasked to edit your previous output.\" : \"\" }}\n\nWriting Rules\n1. Output structure\n\nReturn ONLY this JSON:\n\n{\n  \"project_title\": \"\",\n  \"project_text\": \"\",\n  \"project_cta_label\": \"\"\n}\n\n\nAll fields must be filled.\n\nproject_text must be a single text block, not split into paragraphs\n\nDo not include URLs\n\nDo not include line breaks\n\nUse normal sentence spacing only\n\nThe JSON must be valid.\n\n2. Style Guidelines\n\nTone\n\nRefined\n\nCalm\n\nUnderstated luxury\n\nArchitectural and material-focused\n\nLanguage:  {{ $('Trigger').item.json.language }}.\n\nSensory but controlled\n\nNo clichés\n\nNo sales tone\n\nNo repetition\n\nAvoid technical jargon unless it adds value\n\nAlways write from a third-person, descriptive perspective\n\n3. Content Logic\n\nUse the extracted text only as raw material — do not copy sentences verbatim.\n\nThe single text block must subtly contain the following narrative flow without visible separation:\n\nIntroduction\nA high-level sense of the setting, mood, or architectural intent.\n\nKey space\nA highlight of the main living area or spatial atmosphere.\n\nMaterials\nEmphasis on Oakcent flooring, tones, textures, or the material palette.\n\nDesign detail\nA refined craft element, architectural detail, or design motif.\n\nClosing\nA soft, elegant closing line that invites exploration, without referencing a link or action.\n\nThe result should read as a cohesive, elegant editorial paragraph, not a list.\n\nKeep the whole text length to around 550 characters.\n\n4. CTA\n\nReturn a short CTA label such as:\n\n“Explore the full project”\n\n“Discover the residence”\n\n“See more”\n\n5. Formatting Rules\n\nReturn only JSON\n\nNo markdown\n\nNo commentary\n\nNo bullet points\n\nNo paragraph breaks inside project_text"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        1248,
+        -272
+      ],
+      "id": "a1058780-1e3b-4ce6-926e-4ec5545e17a0",
+      "name": "AI Agent",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://izohjxqvhacjmutgnckf.supabase.co/rest/v1/newsletter_drafts?on_conflict=language,source_row",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "language",
+              "value": "={{ $('Trigger').item.json.language }}"
+            },
+            {
+              "name": "source_row",
+              "value": "={{ $('Trigger').item.json.source_row }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        464,
+        -16
+      ],
+      "id": "fec2cd60-5625-4d63-91a2-403250bf6eb6",
+      "name": "Supabase row check",
+      "credentials": {
+        "supabaseApi": {
+          "id": "XbTsqF8wuG2gSZNT",
+          "name": "Supabase account 3"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "newsletter_drafts",
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "language",
+              "condition": "eq",
+              "keyValue": "={{ $('Trigger').first().json.language }}"
+            },
+            {
+              "keyName": "source_row",
+              "condition": "eq",
+              "keyValue": "={{ $('Trigger').first().json.source_row }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "project_title",
+              "fieldValue": "={{ $json.output.project_title }}"
+            },
+            {
+              "fieldId": "project_text",
+              "fieldValue": "={{ $json.output.project_text }}"
+            },
+            {
+              "fieldId": "project_cta_label",
+              "fieldValue": "={{ $json.output.project_cta_label }}"
+            },
+            {
+              "fieldId": "heroImgProject",
+              "fieldValue": "={{ $json.heroImgProject }}"
+            },
+            {
+              "fieldId": "firstBlock_img",
+              "fieldValue": "={{ $json.firstBlock_img }}"
+            },
+            {
+              "fieldId": "secondBlock_img",
+              "fieldValue": "={{ $json.secondBlock_img }}"
+            },
+            {
+              "fieldId": "project_url",
+              "fieldValue": "={{ $('Extract text from project').item.json.project_url }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1824,
+        -16
+      ],
+      "id": "50ce5dca-c249-46a2-966c-17ddc7e633b2",
+      "name": "Update a row",
+      "retryOnFail": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "XbTsqF8wuG2gSZNT",
+          "name": "Supabase account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "14CkOky3jXC9rcwen1GmEy6U1ALrfHjDRD1HAjsoycQg",
+          "mode": "list",
+          "cachedResultName": "Copy of OAKCENT_SOME plan",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/14CkOky3jXC9rcwen1GmEy6U1ALrfHjDRD1HAjsoycQg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 445110406,
+          "mode": "list",
+          "cachedResultName": "Návrh tabulky Newsletterů",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/14CkOky3jXC9rcwen1GmEy6U1ALrfHjDRD1HAjsoycQg/edit#gid=445110406"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "row_number": "={{ $('Trigger').item.json.source_row }}"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "Month",
+              "displayName": "Month",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "No.",
+              "displayName": "No.",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Topic",
+              "displayName": "Topic",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Target group (databáze)",
+              "displayName": "Target group (databáze)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Subject",
+              "displayName": "Subject",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "1. blog",
+              "displayName": "1. blog",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "2. project",
+              "displayName": "2. project",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "3. color collection",
+              "displayName": "3. color collection",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "4. pattern collection",
+              "displayName": "4. pattern collection",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "5. CTA content",
+              "displayName": "5. CTA content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "5. CTA link",
+              "displayName": "5. CTA link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Vytvořit obsah",
+              "displayName": "Vytvořit obsah",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "CZ content",
+              "displayName": "CZ content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "EN content",
+              "displayName": "EN content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "PL content",
+              "displayName": "PL content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "DE content",
+              "displayName": "DE content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "date and time",
+              "displayName": "date and time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "sender",
+              "displayName": "sender",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "RUN",
+              "displayName": "RUN",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2128,
+        -16
+      ],
+      "id": "d31cebe0-02cc-4348-a278-d274d2e00336",
+      "name": "Update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "ouZ4Cl4hWK3UY5OV",
+          "name": "Google Sheets account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const html = String($json.data ?? $json.html_content ?? \"\");\n\n// ---------- helpers ----------\nfunction stripNoContent(input) {\n  return String(input || \"\")\n    .replace(/<script\\b[\\s\\S]*?<\\/script>/gi, \" \")\n    .replace(/<style\\b[\\s\\S]*?<\\/style>/gi, \" \")\n    .replace(/<noscript\\b[\\s\\S]*?<\\/noscript>/gi, \" \")\n    .replace(/<svg\\b[\\s\\S]*?<\\/svg>/gi, \" \")\n    .replace(/<!--([\\s\\S]*?)-->/g, \" \");\n}\n\nfunction decodeBasic(text) {\n  return String(text || \"\")\n    .replace(/&nbsp;/gi, \" \")\n    .replace(/&amp;/gi, \"&\")\n    .replace(/&quot;/gi, '\"')\n    .replace(/&#0*39;/gi, \"'\")\n    .replace(/&lt;/gi, \"<\")\n    .replace(/&gt;/gi, \">\");\n}\n\nfunction clean(fragment) {\n  return decodeBasic(String(fragment || \"\"))\n    .replace(/<br\\s*\\/?>/gi, \"\\n\")\n    .replace(/<[^>]+>/g, \" \")\n    .replace(/[ \\t]+/g, \" \")\n    .replace(/\\n[ \\t]+/g, \"\\n\")\n    .replace(/\\n{3,}/g, \"\\n\\n\")\n    .trim();\n}\n\n// univerzální převod celého dokumentu na text\nfunction universalText(htmlDoc) {\n  const s = stripNoContent(htmlDoc)\n    .replace(/<header\\b[\\s\\S]*?<\\/header>/gi, \" \")\n    .replace(/<nav\\b[\\s\\S]*?<\\/nav>/gi, \" \")\n    .replace(/<footer\\b[\\s\\S]*?<\\/footer>/gi, \" \")\n    .replace(/<aside\\b[\\s\\S]*?<\\/aside>/gi, \" \");\n  const body = (s.match(/<body\\b[^>]*>([\\s\\S]*?)<\\/body>/i) || [])[1] || s;\n  return clean(body);\n}\n\n// ---------- your \"structured\" extraction (keep if it works) ----------\nlet articlePart = html;\n\nconst articleMatch = html.match(\n  /<div class=\"content com realization-detail\">([\\s\\S]*?)<section class=\"container contact text-center\"/i\n);\nif (articleMatch) articlePart = articleMatch[1];\n\nconst parts = [];\nconst mainTitleMatch = articlePart.match(/<div class=\"header-text\">\\s*<h1[^>]*>([\\s\\S]*?)<\\/h1>/i);\nif (mainTitleMatch) {\n  const t = clean(mainTitleMatch[1]);\n  if (t) parts.push(t);\n}\n\nconst sectionRegex = /<section[^>]*class=\"([^\"]*)\"[^>]*>([\\s\\S]*?)<\\/section>/gi;\nlet secMatch;\nwhile ((secMatch = sectionRegex.exec(articlePart)) !== null) {\n  const className = secMatch[1] || \"\";\n  const sectionHtml = secMatch[2];\n\n  if (/header-section/.test(className)) continue;\n  if (/wide-swiper-section/.test(className)) continue;\n\n  const headingMatch = sectionHtml.match(/<(h2|h3)[^>]*>([\\s\\S]*?)<\\/\\1>/i);\n  if (headingMatch) {\n    const title = clean(headingMatch[2]);\n    if (title) parts.push(title);\n  }\n\n  const pRegex = /<p[^>]*>([\\s\\S]*?)<\\/p>/gi;\n  let pMatch;\n  while ((pMatch = pRegex.exec(sectionHtml)) !== null) {\n    const paragraph = clean(pMatch[1]);\n    if (paragraph) parts.push(paragraph);\n  }\n}\n\n// výsledek ze “strukturované” části\nlet page_text = parts.join(\"\\n\\n\").trim();\n\n// ---------- fallback ----------\nif (!page_text || page_text.length < 300) {\n  page_text = universalText(html);\n}\n\n// pokud chceš “vracet pouze vyčištěný text”, nech jen toto:\nreturn {\n  ...$json,\n  page_text,\n  _debug: {\n    inputLen: html.length,\n    outputLen: page_text.length,\n    usedFallback: (!parts.length || parts.join(\"\").length < 300),\n  },\n};\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        976,
+        416
+      ],
+      "id": "6e8dbfa2-4cd2-4ece-95d2-bb9b3f162768",
+      "name": "Extract text from project1",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1664,
+        -16
+      ],
+      "id": "6f4ba7e0-60c9-47e4-a572-7565e5275c92",
+      "name": "Merge"
+    }
+  ],
+  "pinData": {
+    "Trigger": [
+      {
+        "json": {
+          "project": "https://www.oakcent.com/private-apartment-grzybowska",
+          "language": "english",
+          "source_row": 14,
+          "change": false,
+          "comment": null
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Extract text from project": {
+      "main": [
+        [
+          {
+            "node": "HTML_Project",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Project": {
+      "main": [
+        [
+          {
+            "node": "Extract text from project",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser1": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Trigger": {
+      "main": [
+        [
+          {
+            "node": "Supabase row check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase row check": {
+      "main": [
+        [
+          {
+            "node": "Get Project",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTML_Project": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Update a row": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Update a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "18b255e0-f0d2-4488-8116-4b596fc36160",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "331d746bc1a63563201e278bbfd6be74ef21f3e48d7328285e9bf034335c85dd"
+  },
+  "id": "TaR4Csa0MTPMkn37",
+  "tags": [
+    {
+      "updatedAt": "2026-01-14T22:03:19.715Z",
+      "createdAt": "2026-01-14T22:03:19.715Z",
+      "id": "ovTLfrcCyllneaEm",
+      "name": "Sub"
+    }
+  ]
+}

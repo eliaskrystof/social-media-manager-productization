@@ -1,0 +1,494 @@
+{
+  "name": "Search_Images_folder",
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://catbox.moe/user/api.php",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "reqtype",
+              "value": "fileupload"
+            },
+            {
+              "parameterType": "formBinaryData",
+              "name": "fileToUpload",
+              "inputDataFieldName": "data"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        480,
+        1184
+      ],
+      "id": "3f69814c-d308-4936-be04-d4c7b27a3932",
+      "name": "Upload Image1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "cbc531ef-879b-43cb-ad35-fcefba8d0338",
+              "leftValue": "={{ $json.name }}",
+              "rightValue": "Preview",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -208,
+        1184
+      ],
+      "id": "5ddc82fc-3080-4046-b7dc-19cf039bacd3",
+      "name": "Is media folder"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "preview_images",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        928,
+        1184
+      ],
+      "id": "b66e8db9-970b-441b-9bd9-19ebe3668564",
+      "name": "Group preview images"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3f4d0e1e-a160-4c74-9975-266cc530a276",
+              "name": "={{ $('Is media folder').item.json.name.toLowerCase() }}_img_preview",
+              "value": "={{ $json.data }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        704,
+        1184
+      ],
+      "id": "1114aaf2-6d9c-4a80-97a4-ae57027cc0f9",
+      "name": "Get Preview image url"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1861c811-8fcf-48f7-825c-5961d0c2df6d",
+              "name": "preview_folder_id",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        928,
+        1360
+      ],
+      "id": "e6e6546c-105b-4cab-8964-9930d1021ac8",
+      "name": "Preview folder ID"
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "folder_id"
+            },
+            {
+              "name": "master_table_id"
+            },
+            {
+              "name": "execution_id"
+            },
+            {
+              "name": "post_id"
+            }
+          ]
+        }
+      },
+      "id": "42623bcf-4e11-4847-b190-064694c3e768",
+      "typeVersion": 1.1,
+      "name": "Start",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        -544,
+        1184
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1168,
+        1200
+      ],
+      "id": "1a6aeecc-83ab-4373-a3a0-87c5498c4d5d",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "errorMessage": "={{$json[\"error\"][\"node\"][\"name\"]}} failed: {{$json[\"error\"][\"message\"]}}"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        560,
+        1504
+      ],
+      "id": "554c8efe-81b7-4449-a7e5-1df0424eba60",
+      "name": "Stop and Error"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "resource": "fileFolder",
+        "searchMethod": "query",
+        "queryString": "='{{ $('Start').item.json.folder_id }}' in parents",
+        "filter": {},
+        "options": {
+          "fields": [
+            "id",
+            "name"
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -368,
+        1184
+      ],
+      "id": "3325f508-6d88-48ad-b981-15a52edfd0b5",
+      "name": "Search Master Folder",
+      "credentials": {
+        "googleApi": {
+          "id": "aHVI3CAM5JAErt7B",
+          "name": "Google Service Account account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "resource": "fileFolder",
+        "searchMethod": "query",
+        "queryString": "='{{ $json.id }}' in parents",
+        "filter": {},
+        "options": {
+          "fields": [
+            "id",
+            "name",
+            "mimeType"
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        48,
+        1184
+      ],
+      "id": "f27bcc3e-3ccc-4506-bb21-b60d242cd6f8",
+      "name": "Search Media Subfolder",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleApi": {
+          "id": "aHVI3CAM5JAErt7B",
+          "name": "Google Service Account account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $('Search Media Subfolder').first().json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        272,
+        1184
+      ],
+      "id": "a0d6792b-6154-4237-9d6f-9991a10a38b3",
+      "name": "Download file",
+      "credentials": {
+        "googleApi": {
+          "id": "aHVI3CAM5JAErt7B",
+          "name": "Google Service Account account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "6WcGcViiXxQk11Qg",
+          "mode": "list",
+          "cachedResultName": "SoMe_Automation_Progress_Log"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "task_type": "post_prep",
+            "master_table_id": "={{ $('Start').item.json.master_table_id }}",
+            "job_id": "={{ $('Start').item.json.execution_id }}",
+            "message": "=Images for post {{ $('Start').item.json.post_id }} were not supplied"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "message",
+              "displayName": "message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "master_table_id",
+              "displayName": "master_table_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "task_type",
+              "displayName": "task_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "job_id",
+              "displayName": "job_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        432,
+        1504
+      ],
+      "id": "79c5fc0b-6cfc-489a-ad2a-25e5c1309e48",
+      "name": "Log_error"
+    }
+  ],
+  "pinData": {
+    "Start": [
+      {
+        "json": {
+          "folder_id": "1oqvaYGL7pAJ2-iGuNPKfTsRk91EpSmRu"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Upload Image1": {
+      "main": [
+        [
+          {
+            "node": "Get Preview image url",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Is media folder": {
+      "main": [
+        [
+          {
+            "node": "Search Media Subfolder",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Preview folder ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Group preview images": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Preview folder ID": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Get Preview image url": {
+      "main": [
+        [
+          {
+            "node": "Group preview images",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Search Master Folder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        []
+      ]
+    },
+    "Search Master Folder": {
+      "main": [
+        [
+          {
+            "node": "Is media folder",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Search Media Subfolder": {
+      "main": [
+        [
+          {
+            "node": "Download file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download file": {
+      "main": [
+        [
+          {
+            "node": "Upload Image1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Log_error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log_error": {
+      "main": [
+        [
+          {
+            "node": "Stop and Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "NmGg5uZ3m1rjeYmB"
+  },
+  "versionId": "a5162c23-8400-4996-8011-c30a5e2aee61",
+  "meta": {
+    "instanceId": "2b07eec16886132e3cd818fdfac587c65db27d72fe33b2ee54f787b58f4dff76"
+  },
+  "id": "wcZGzVKb7Xhza2BG",
+  "tags": []
+}

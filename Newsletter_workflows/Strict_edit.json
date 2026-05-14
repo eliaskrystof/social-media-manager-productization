@@ -1,0 +1,594 @@
+{
+  "name": "Strict_edit",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "strict-edit-newsletter",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "27ba32a5-66e2-442b-8eac-a5180ce3b6e8",
+      "name": "Webhook",
+      "webhookId": "6b517cd0-6bad-4b58-b87d-a082c4e160ee"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "DaXSS831YejckVUq",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/DaXSS831YejckVUq",
+          "cachedResultName": "Socials Agent — Parse_content_blob"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "content": "={{ $json.body.content_blob }}"
+          },
+          "matchingColumns": [
+            "content"
+          ],
+          "schema": [
+            {
+              "id": "content",
+              "displayName": "content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        224,
+        96
+      ],
+      "id": "023335a4-89ad-4487-b75c-7d19e6e06f94",
+      "name": "Call 'Parse_content_blob'"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "newsletter_drafts",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "source_row",
+              "keyValue": "={{ $('Webhook').item.json.body.source_row }}"
+            },
+            {
+              "keyName": "language",
+              "keyValue": "={{ $('Webhook').item.json.body.language }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        224,
+        -64
+      ],
+      "id": "04e43968-a6bd-44b2-809b-e6e08c024d0c",
+      "name": "Get a row",
+      "credentials": {
+        "supabaseApi": {
+          "id": "XbTsqF8wuG2gSZNT",
+          "name": "Supabase account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        416,
+        0
+      ],
+      "id": "09708a24-50ee-44a5-bba0-3fa7c91a7837",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "newsletter_drafts",
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "source_row",
+              "condition": "eq",
+              "keyValue": "={{ $json.source_row }}"
+            },
+            {
+              "keyName": "language",
+              "condition": "eq",
+              "keyValue": "={{ $json.language }}"
+            }
+          ]
+        },
+        "dataToSend": "autoMapInputData",
+        "inputsToIgnore": "source_row, language"
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1200,
+        -96
+      ],
+      "id": "a99df02d-0079-4fba-b682-56387422ebc9",
+      "name": "Update a row",
+      "credentials": {
+        "supabaseApi": {
+          "id": "XbTsqF8wuG2gSZNT",
+          "name": "Supabase account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "QCw1WnsLtjqf1eiI",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/QCw1WnsLtjqf1eiI",
+          "cachedResultName": "Socials Agent — Edit_copy_from_master"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "changed_values": "={{ $json.changed_fields }}",
+            "language": "={{ $json.target_languages }}",
+            "source_row": "={{ $json.source_row }}",
+            "original_values": "={{ $json.old_fields }}",
+            "changed_keys": "={{ $json.changed_keys }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "source_row",
+              "displayName": "source_row",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "language",
+              "displayName": "language",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "changed_keys",
+              "displayName": "changed_keys",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "changed_values",
+              "displayName": "changed_values",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "original_values",
+              "displayName": "original_values",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        2032,
+        -192
+      ],
+      "id": "febfa149-5946-4df1-bd43-8b9f81e623c6",
+      "name": "Call 'Edit_copy_from_master'"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "1ed38691-46f2-42e0-9496-9f8cdb71b521",
+              "leftValue": "={{ $('Webhook').item.json.body.propagate }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1360,
+        -96
+      ],
+      "id": "de8a781c-f266-47f3-b965-78936ecaaa40",
+      "name": "Propagate changes?"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "009bbd5c-4ded-41f5-8f2d-64314639e9d7",
+              "leftValue": "={{ $json.has_changes }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        832,
+        0
+      ],
+      "id": "8ac69e28-565f-4845-8c4c-663ff23b6559",
+      "name": "Changes found?"
+    },
+    {
+      "parameters": {
+        "jsCode": "const output = {\n  source_row: $json.source_row,\n  language: $json.language,\n  ...($json.changed_fields || {})\n};\n\nreturn [{ json: output }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1040,
+        -96
+      ],
+      "id": "05924320-881e-4628-b7e7-3b1df2346305",
+      "name": "Ascend changes to top level"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $json;\n\nfunction normalize(value) {\n  if (value === null || value === undefined) return '';\n  return String(value)\n    .replace(/\\r\\n/g, '\\n')\n    .replace(/\\r/g, '\\n')\n    .trim();\n}\n\nconst changed_fields = {};\nconst old_fields = {};\nconst changed_keys = [];\nconst unchanged_keys = [];\n\nfor (const key of Object.keys(input)) {\n\n  if (!key.endsWith('_parsed')) continue;\n\n  const baseKey = key.replace('_parsed', '');\n\n  if (!(baseKey in input)) continue;\n\n  const actualRaw = input[baseKey];\n  const parsedRaw = input[key];\n\n  const actualValue = normalize(actualRaw);\n  const parsedValue = normalize(parsedRaw);\n\n  if (actualValue !== parsedValue) {\n\n    changed_fields[baseKey] = parsedRaw;\n    old_fields[baseKey] = actualRaw;\n\n    changed_keys.push(baseKey);\n\n  } else {\n    unchanged_keys.push(baseKey);\n  }\n}\n\nreturn [{\n  json: {\n    source_row: input.source_row,\n    language: input.language,\n\n    has_changes: changed_keys.length > 0,\n\n    changed_keys,\n    changed_fields,\n    old_fields,\n    unchanged_keys\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        624,
+        0
+      ],
+      "id": "4b5c7e66-293a-47e4-8203-014e6beed1a6",
+      "name": "Compare changes"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "target_languages",
+        "include": "allOtherFields",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        1824,
+        -192
+      ],
+      "id": "bcc65daa-b4e0-4814-87fa-94910d714feb",
+      "name": "Split Out by language"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "383e5fcd-5115-420a-9bd7-033201c9ba18",
+              "name": "target_languages",
+              "value": "={{ $('Webhook').item.json.body.target_languages }}",
+              "type": "array"
+            },
+            {
+              "id": "5b34f7cc-895c-42f3-a1e3-3ff47feeb5db",
+              "name": "changed_fields",
+              "value": "={{ $('Compare changes').item.json.changed_fields }}",
+              "type": "object"
+            },
+            {
+              "id": "f4ea9729-3507-4068-b6d3-2c9fe11546d8",
+              "name": "=old_fields",
+              "value": "={{ $('Compare changes').item.json.old_fields }}",
+              "type": "object"
+            },
+            {
+              "id": "37183e2a-8d70-40c8-9e65-4c1fab93630a",
+              "name": "source_row",
+              "value": "={{ $json.source_row }}",
+              "type": "number"
+            },
+            {
+              "id": "22a605e0-a88e-4b8e-a2a6-ac0350709833",
+              "name": "changed_keys",
+              "value": "={{ $('Compare changes').item.json.changed_keys }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1568,
+        -192
+      ],
+      "id": "8b001c5e-1cd3-44a4-8e1f-fa6fb253a61b",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $json;\n\nfunction normalize(value) {\n  if (value === null || value === undefined) return '';\n  return String(value)\n    .replace(/\\r\\n/g, '\\n')\n    .replace(/\\r/g, '\\n')\n    .trim();\n}\n\nconst changed_fields = {};\nconst changed_keys = [];\nconst unchanged_keys = [];\n\nfor (const key of Object.keys(input)) {\n\n  if (!key.endsWith('_parsed')) continue;\n\n  const baseKey = key.replace('_parsed', '');\n\n  if (!(baseKey in input)) continue;\n\n  const actualValue = normalize(input[baseKey]);\n  const parsedValue = normalize(input[key]);\n\n  if (actualValue !== parsedValue) {\n    changed_fields[baseKey] = input[key];\n    changed_keys.push(baseKey);\n  } else {\n    unchanged_keys.push(baseKey);\n  }\n\n}\n\nreturn [{\n  json: {\n    source_row: input.source_row,\n    language: input.language,\n    has_changes: changed_keys.length > 0,\n    changed_fields,\n    changed_keys,\n    unchanged_keys\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        608,
+        208
+      ],
+      "id": "c3e81a00-e6e8-46df-a77c-1158416bc696",
+      "name": "Compare changes1",
+      "disabled": true
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "origamis.app.n8n.cloud",
+            "user-agent": "Mozilla/5.0 (compatible; Google-Apps-Script; beanserver; +https://script.google.com; id: UAEmdDd_gTpSg_Bxa2I0aChIN19Gfc8RzqA)",
+            "content-length": "2095",
+            "accept-encoding": "gzip, br",
+            "cdn-loop": "cloudflare; loops=1; subreqs=1",
+            "cf-connecting-ip": "35.243.23.227",
+            "cf-ew-via": "15",
+            "cf-ipcountry": "US",
+            "cf-ray": "9dd41c209d61fa1f-ORD",
+            "cf-visitor": "{\"scheme\":\"https\"}",
+            "cf-worker": "n8n.cloud",
+            "content-type": "application/json",
+            "x-forwarded-for": "35.243.23.227, 172.70.130.242",
+            "x-forwarded-host": "origamis.app.n8n.cloud",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "traefik-prod-users-gwc-54-864b8965c-kbwtj",
+            "x-is-trusted": "yes",
+            "x-real-ip": "35.243.23.227"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "source_row": 15,
+            "language": "czech",
+            "target_languages": [
+              "english"
+            ],
+            "content_blob": "---Email Subject---\nDřevo a teplo – podlahy pro dokonalý komfort; Oakcent v srdci Varšavy: klid kontrastů; Precizní řemeslo v každém spoji dřevěné podlahy; Harmonie světla a materiálu v bytě Ink • Smoke • Sand; Jak podlaha Oakcent mění atmosféru interiéru; Stabilní teplo a přírodní krása dřeva\n\n---Blog title---\nDřevo a topení\n\n---Blog Content---\nSprávně navržená dřevěná podlaha na podlahovém vytápění přináší příjemné a stabilní teplo bez kompromisů.\nDalší obsah. Testuji. \n\n---Blog CTA---\nDomluvit konzultaci\n\n---Project Title---\nInk, Smoke, Sand\n\n---Project Content---\nV centru Varšavy navržený byt Katarzyny Kraszewské vytváří klidnou kompozici kontrastů a jemně modulovaného světla, které formuje náladu interiéru. Hlavní obytný prostor působí sochařsky a současně intimně, s prostými objemy a pečlivě vyváženými proporcemi. Dřevěná podlaha Oakcent s matnou povrchovou úpravou tlumí odlesky, mění tón podle denního světla a propojuje zóny v harmonický celek. Precizní detaily spojů a záměrné přechody materiálů zdůrazňují řemeslnou péči. Prostor tak zůstává tichým, materiálním vyjádřením architektury, které zve k pozornému objevování.\n\n---Project CTA---\nProhlédnout realizaci!!!\n\n---Collection Title---\nSand\n\n---Collection Content---\nSvětlé odstíny kolekce Sand vnesly do realizace jemně teplé přírodní tóny a zklidňující energii dřeva v souladu s přírodou.\n\n---Collection CTA---\nObjevte kolekci Sand\n\n---Pattern Title---\nPlanks\n\n---Pattern Content---\nVzor Planks nechal vyniknout přirozenou kresbu dřeva a dodal prostoru nadčasovou eleganci s čistými liniemi.\n\n---Pattern From---\nPlanks z kolekce Heritage\n\n---CTA Content---\nHledáte autentické textury a barvy pro svůj projekt? Stáhněte si výběr vzorů Oakcent a nabídněte svým klientům vyjimečnost.\n\n---CTA Button---\nStáhnout textury",
+            "propagate": true
+          },
+          "webhookUrl": "https://origamis.app.n8n.cloud/webhook/strict-edit-newsletter",
+          "executionMode": "production"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Call 'Parse_content_blob'",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'Parse_content_blob'": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Get a row": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Compare changes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update a row": {
+      "main": [
+        [
+          {
+            "node": "Propagate changes?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Propagate changes?": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Changes found?": {
+      "main": [
+        [
+          {
+            "node": "Ascend changes to top level",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Ascend changes to top level": {
+      "main": [
+        [
+          {
+            "node": "Update a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compare changes": {
+      "main": [
+        [
+          {
+            "node": "Changes found?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out by language": {
+      "main": [
+        [
+          {
+            "node": "Call 'Edit_copy_from_master'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Split Out by language",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "d4fcb270-dbe7-4265-ad58-90b11f3bd6ec",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "331d746bc1a63563201e278bbfd6be74ef21f3e48d7328285e9bf034335c85dd"
+  },
+  "id": "I1GItM6Uc5M0QSuq",
+  "tags": [
+    {
+      "updatedAt": "2026-01-14T22:03:09.472Z",
+      "createdAt": "2026-01-14T22:03:09.472Z",
+      "id": "xLAiVS0zmvQzWdop",
+      "name": "Webhook"
+    },
+    {
+      "updatedAt": "2026-03-16T12:38:59.514Z",
+      "createdAt": "2026-03-16T12:38:59.514Z",
+      "id": "yMGr14raWGakEGWI",
+      "name": "Edit"
+    }
+  ]
+}

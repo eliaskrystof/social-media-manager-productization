@@ -1,0 +1,677 @@
+/***********************
+ * SHEET CONFIG
+ ***********************/
+const SHEET_NAME = "SoMe_content";
+const SERVICE_ACCOUNT = "krystof@uipath-krystof.iam.gserviceaccount.com";
+
+const COL = {
+  ID: 1,
+  TEXT_IG: 2,
+  CREDITS_IG: 3,
+  HASHTAGS_IG: 4,
+  TEXT_FB: 5,
+  CREDITS_FB: 6,
+  TEXT_LI: 7,
+  PHOTOS_LINK: 8,
+  IG_PLANNED_DATE: 9,
+  FB_PLANNED_DATE: 10,
+  LI_PLANNED_DATE: 11,
+  IG_POST_TIME: 12,
+  FB_POST_TIME: 13,
+  LI_POST_TIME: 14,
+  CHECKBOX: 15,
+  STATUS: 16,
+  PREVIEW: 17,
+  IMAGES: 18
+};
+
+const STATUS = {
+  DRAFT: "draft",
+  SEND_TO_SOME: "send to some",
+  CREATED: "created",
+  UPDATE: "update",
+  UPDATED: "updated",
+  SCHEDULED: "scheduled",
+  UPDATE_SCHEDULED: "update scheduled",
+  DONE: "done"
+};
+
+/***********************
+ * LOGGING HELPER
+ ***********************/
+function logToSheet(status, message, taskType = "script", jobId = "", show = false) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const logSheet = ss.getSheetByName("Log");
+  if (!logSheet) return;
+
+  logSheet.appendRow([new Date(), jobId, taskType, status, message]);
+
+  if (show) {
+    try {
+      // Try dialog first (visible when run by user directly)
+      const html = HtmlService.createHtmlOutput(
+        `<div style="
+          font-family:sans-serif;
+          padding:12px;
+          background:${status === "error" ? "#ffebee" : "#fff8e1"};
+          color:${status === "error" ? "#b71c1c" : "#6d4c41"};
+          border-left:6px solid ${status === "error" ? "#c62828" : "#fbc02d"};
+          max-width:500px;
+        ">
+          <b>${status.toUpperCase()}</b><br>${message}
+        </div>`
+      ).setWidth(500).setHeight(160);
+
+      SpreadsheetApp.getUi().showModelessDialog(html, "Notification");
+    } catch (err) {
+      // Fallback to toast for any context (works everywhere)
+      ss.toast(message, status.toUpperCase(), 8);
+    }
+  }
+}
+
+function resolveImagesBoolean(imageSource) {
+  return imageSource === "yes" || imageSource === "create";
+}
+
+function resolveImageSourceFromRow(row) {
+  return row[COL.IMAGES - 1] === true ? "yes" : "no";
+}
+
+/***********************
+ * ON OPEN MENU
+ ***********************/
+function onOpen() {
+  const ui = SpreadsheetApp.getUi();
+
+  ui.createMenu("Post Actions")
+    .addItem("Navrhnout Příspěvek", "createPosts")
+    .addItem("Upravit Příspěvek", "updatePosts")
+    .addItem("Odsouhlaseno - Naplánovat", "schedulePosts")
+    .addItem("Zobrazit Náhled", "openPreviewForCheckedRow")
+    .addItem("Upravit Naplánovaný Příspěvek", "updateScheduledPosts")
+    .addItem("Zveřejnit Dnešní Posty", "publishTodaysPosts")
+    .addToUi();
+
+  if (typeof addAccessTokensMenu === "function") addAccessTokensMenu();
+  if (typeof addUserManualMenu === "function") addUserManualMenu();
+
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  if (sheet.getName() === SHEET_NAME) setCheckboxesAndInitializeStatus();
+}
+
+/***********************
+ * FORMAT ROW VALUES
+ ***********************/
+function formatCellValue(value, tz) {
+  if (Object.prototype.toString.call(value) === "[object Date]" && !isNaN(value)) {
+    const hours = value.getHours();
+    const minutes = value.getMinutes();
+    const seconds = value.getSeconds();
+
+    if (hours === 0 && minutes === 0 && seconds === 0) {
+      return Utilities.formatDate(value, tz, "yyyy-MM-dd");
+    } else if (
+      value.getFullYear() === 1899 &&
+      value.getMonth() === 11 &&
+      value.getDate() === 30
+    ) {
+      return Utilities.formatDate(value, tz, "HH:mm:ss");
+    } else {
+      return Utilities.formatDate(value, tz, "yyyy-MM-dd'T'HH:mm:ss");
+    }
+  }
+
+  return value;
+}
+
+function buildPayloadContent(row) {
+  const tz = SpreadsheetApp.getActiveSpreadsheet().getSpreadsheetTimeZone();
+
+  return {
+    id: formatCellValue(row[COL.ID - 1], tz),
+    text_ig: formatCellValue(row[COL.TEXT_IG - 1], tz),
+    credits_ig: formatCellValue(row[COL.CREDITS_IG - 1], tz),
+    hashtags_ig: formatCellValue(row[COL.HASHTAGS_IG - 1], tz),
+
+    text_fb: formatCellValue(row[COL.TEXT_FB - 1], tz),
+    credits_fb: formatCellValue(row[COL.CREDITS_FB - 1], tz),
+
+    text_li: formatCellValue(row[COL.TEXT_LI - 1], tz),
+    photos_link: formatCellValue(row[COL.PHOTOS_LINK - 1], tz),
+
+    ig_planned_date: formatCellValue(row[COL.IG_PLANNED_DATE - 1], tz),
+    fb_planned_date: formatCellValue(row[COL.FB_PLANNED_DATE - 1], tz),
+    li_planned_date: formatCellValue(row[COL.LI_PLANNED_DATE - 1], tz),
+
+    ig_post_time: formatCellValue(row[COL.IG_POST_TIME - 1], tz),
+    fb_post_time: formatCellValue(row[COL.FB_POST_TIME - 1], tz),
+    li_post_time: formatCellValue(row[COL.LI_POST_TIME - 1], tz),
+
+    checked: formatCellValue(row[COL.CHECKBOX - 1], tz),
+    status: formatCellValue(row[COL.STATUS - 1], tz),
+    preview: formatCellValue(row[COL.PREVIEW - 1], tz),
+    images: formatCellValue(row[COL.IMAGES - 1], tz)
+  };
+}
+
+
+/***********************
+ * MEDIA FOLDER HELPERS
+ ***********************/
+function getOrCreateFolderByName(parentFolder, folderName) {
+  const folders = parentFolder.getFoldersByName(folderName);
+  if (folders.hasNext()) return folders.next();
+  return parentFolder.createFolder(folderName);
+}
+
+function ensureMediaFolderForRow(sheet, row) {
+  const lock = LockService.getScriptLock();
+  lock.waitLock(30000);
+
+  try {
+    const logicalId = row - 1;
+    const folderName = String(logicalId);
+
+    const linkCell = sheet.getRange(row, COL.PHOTOS_LINK);
+    const existingLink = linkCell.getValue();
+
+    const spreadsheetFile = DriveApp.getFileById(SpreadsheetApp.getActiveSpreadsheet().getId());
+    const parentFolder = spreadsheetFile.getParents().next();
+
+    const imagesFolder = getOrCreateFolderByName(parentFolder, "Images");
+    const postFolder = getOrCreateFolderByName(imagesFolder, folderName);
+
+    getOrCreateFolderByName(postFolder, "Facebook");
+    getOrCreateFolderByName(postFolder, "Instagram");
+    getOrCreateFolderByName(postFolder, "LinkedIn");
+    getOrCreateFolderByName(postFolder, "Preview");
+
+    if (!existingLink) {
+      linkCell.setValue(postFolder.getUrl());
+    }
+
+    return {
+      id: postFolder.getId(),
+      url: postFolder.getUrl(),
+      name: postFolder.getName(),
+      logicalId: logicalId
+    };
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+function getCheckedRows(sheet) {
+  const data = sheet.getDataRange().getValues();
+  const checkedRows = [];
+
+  for (let i = 1; i < data.length; i++) {
+    if (data[i][COL.CHECKBOX - 1] === true) {
+      checkedRows.push(i + 1); // protože data začínají od indexu 0 a row 1 je header
+    }
+  }
+
+  return checkedRows;
+}
+
+function prepareCreatePostRows() {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAME);
+  const checkedRows = getCheckedRows(sheet);
+  const preparedRows = [];
+
+  for (const rowNumber of checkedRows) {
+    const folder = ensureMediaFolderForRow(sheet, rowNumber);
+
+    preparedRows.push({
+      row: rowNumber,
+      logicalId: folder.logicalId,
+      folderId: folder.id,
+      folderUrl: folder.url,
+      folderName: folder.name
+    });
+  }
+
+  return preparedRows;
+}
+
+function getSubfolderByName(parentFolderId, subfolderName) {
+  const parentFolder = DriveApp.getFolderById(parentFolderId);
+  const folders = parentFolder.getFoldersByName(subfolderName);
+
+  if (!folders.hasNext()) {
+    throw new Error(`Missing subfolder "${subfolderName}" in media folder.`);
+  }
+
+  return folders.next();
+}
+
+function subfolderHasFiles(parentFolderId, subfolderName) {
+  const folder = getSubfolderByName(parentFolderId, subfolderName);
+  return folder.getFiles().hasNext();
+}
+
+function validateMediaFolderForCreate(folderId, imageSource, choice, row) {
+  // Platformní složky kontrolujeme jen pokud uživatel uvedl, že média má ready
+  if (imageSource !== "yes") return;
+
+  const requiredPlatformFolders = [];
+
+  if (choice === "facebook_instagram") {
+    requiredPlatformFolders.push("Facebook", "Instagram");
+  } else if (choice === "linkedin") {
+    requiredPlatformFolders.push("LinkedIn");
+  } else if (choice === "all") {
+    requiredPlatformFolders.push("Facebook", "Instagram", "LinkedIn");
+  } else {
+    throw new Error(`Unsupported platform choice: ${choice}`);
+  }
+
+  for (const folderName of requiredPlatformFolders) {
+    if (!subfolderHasFiles(folderId, folderName)) {
+      throw new Error(`Row ${row}: ${folderName} folder is empty.`);
+    }
+  }
+}
+
+/***********************
+ * GENERIC POST FUNCTION
+ ***********************/
+function postRows(action, webhookUrl, platformSelection, userInput) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName(SHEET_NAME);
+  const sheetId = ss.getId();
+  const data = sheet.getDataRange().getValues();
+  let postedCount = 0;
+  let validRows = false;
+
+  for (let i = 1; i < data.length; i++) {
+    const row = data[i];
+    const isChecked = row[COL.CHECKBOX - 1];
+
+    if (isChecked === true) {
+      validRows = true;
+      const payloadContent = buildPayloadContent(row);
+      const jobId = `${action}_${i + 1}_${Date.now()}`;
+
+      const payload = {
+        sheetId,
+        row: i + 1,
+        content: payloadContent,
+        action_name: action,
+        user_input: typeof userInput === "object" ? (userInput.user_input || "") : (userInput || ""),
+        image_source: resolveImageSourceFromRow(row),
+        action_for_facebook: platformSelection?.action_for_facebook || false,
+        action_for_instagram: platformSelection?.action_for_instagram || false,
+        action_for_linkedin: platformSelection?.action_for_linkedin || false
+      };
+
+      try {
+        const response = UrlFetchApp.fetch(webhookUrl, {
+          method: "post",
+          contentType: "application/json",
+          payload: JSON.stringify(payload)
+        });
+
+        const resultText = response.getContentText();
+        logToSheet("success", `Post ${i + 1} responded: ${resultText}`, "post_action", jobId, false);
+        sheet.getRange(i + 1, COL.CHECKBOX).setValue(false);
+        postedCount++;
+      } catch (e) {
+        logToSheet("error", `Error posting row ${i + 1}: ${e.message}`, "post_action", jobId, true);
+      }
+    }
+  }
+
+  if (validRows) {
+    logToSheet("info", `${action} performed on ${postedCount} row(s).`, "post_action", "", false);
+  } else {
+    logToSheet("info", `No checked rows found for ${action}.`, "post_action", "", true);
+  }
+}
+
+/***********************
+ * SPECIFIC POST ACTIONS
+ ***********************/
+function schedulePosts() {
+  showPlatformDialog(
+    "Schedule Posts",
+    "https://n8n.princparket.cz/webhook/ext_Schedule_Post"
+  );
+}
+
+function createPosts() {
+  try {
+    const preparedRows = prepareCreatePostRows();
+
+    if (!preparedRows.length) {
+      logToSheet("info", "No checked rows found for Create Posts.", "create_posts", "", true);
+      return;
+    }
+
+    if (preparedRows.length > 1) {
+      logToSheet("error", "Please select only one row for Create Posts.", "create_posts", "", true);
+      return;
+    }
+
+    const template = HtmlService.createTemplateFromFile("createPostDialog");
+    template.preparedRows = preparedRows;
+
+    const html = template.evaluate()
+      .setWidth(520)
+      .setHeight(520)
+      .setTitle("Create Posts");
+
+    SpreadsheetApp.getUi().showModalDialog(html, "Create Posts");
+  } catch (e) {
+    logToSheet("error", `Create Posts init failed: ${e.message}`, "create_posts", "", true);
+  }
+}
+
+function updatePosts() {
+  showPlatformDialog(
+    "Update Posts",
+    "https://n8n.princparket.cz/webhook/ext_Create_Post"
+  );
+}
+
+function updateScheduledPosts() {
+  showPlatformDialog(
+    "Update Scheduled Posts",
+    "https://n8n.princparket.cz/webhook/ext_Update_Scheduled_Post"
+  );
+}
+
+/***********************
+ * PUBLISH TODAY'S POSTS
+ ***********************/
+function publishTodaysPosts() {
+  try {
+    UrlFetchApp.fetch("https://n8n.princparket.cz/webhook/ext_Publish", { method: "get" });
+    logToSheet("info", "Publish Today's Posts webhook called successfully!", "publish", "", false);
+  } catch (e) {
+    logToSheet("error", `Error calling Publish Today's Posts webhook: ${e.message}`, "publish", "", true);
+  }
+}
+
+/***********************
+ * CHECKBOX & INITIAL STATUS
+ ***********************/
+function setCheckboxesAndInitializeStatus() {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAME);
+  const lastRow = sheet.getLastRow();
+  const lastCol = sheet.getLastColumn();
+
+  if (lastRow < 2) return;
+
+  const values = sheet.getRange(2, 1, lastRow - 1, lastCol).getValues();
+
+  for (let i = 0; i < values.length; i++) {
+    const rowNumber = i + 2;
+    const rowHasContent = values[i].some(cell => cell !== "");
+
+    if (!rowHasContent) continue;
+
+    const checkboxCell = sheet.getRange(rowNumber, COL.CHECKBOX);
+    if (!checkboxCell.getDataValidation()) {
+      const rule = SpreadsheetApp.newDataValidation().requireCheckbox().build();
+      checkboxCell.setDataValidation(rule);
+    }
+
+    const statusCell = sheet.getRange(rowNumber, COL.STATUS);
+    if (!statusCell.getValue()) {
+      statusCell.setValue(STATUS.DRAFT);
+    }
+  }
+}
+
+/***********************
+ * ON EDIT
+ ***********************/
+function onEdit(e) {
+  const sheet = e.range.getSheet();
+  const row = e.range.getRow();
+
+  // --- Log watcher for n8n messages ---
+  if (sheet.getName() === "Log" && row > 1) {
+    const taskType = sheet.getRange(row, 3).getValue();
+    const message = sheet.getRange(row, 5).getValue();
+
+    if (taskType === "post_prep" && message) {
+      const html = HtmlService.createHtmlOutput(
+        `<div style="
+          font-family:sans-serif;
+          padding:12px;
+          background:#e8f5e9;
+          color:#1b5e20;
+          border-left:6px solid #2e7d32;
+          max-width:500px;
+        ">
+          <b>POST PREPARATION</b><br>${message}
+        </div>`
+      ).setTitle("Post Preparation").setWidth(500).setHeight(160);
+
+      SpreadsheetApp.getUi().showModelessDialog(html, "Post Preparation");
+    }
+  }
+}
+
+/***********************
+ * POPUP DIALOG LOGIC
+ ***********************/
+function showPlatformDialog(actionName, webhookUrl, askForImages = false) {
+  const showNoteField = (actionName === "Update Posts");
+  const showImageField = (actionName === "Create Posts" || askForImages === true);
+
+  const template = HtmlService.createTemplateFromFile("platformDialog");
+  template.showNoteField = showNoteField;
+  template.showImageField = showImageField;
+
+  const html = template
+    .evaluate()
+    .setWidth(420)
+    .setHeight(500)
+    .setTitle("Confirm Platforms for " + actionName);
+
+  SpreadsheetApp.getUi().showModalDialog(html, "Confirm Platforms for " + actionName);
+
+  CacheService.getUserCache().put(
+    "pendingAction",
+    JSON.stringify({ actionName, webhookUrl }),
+    300
+  );
+}
+
+function continuePostAction(data) {
+  const cache = CacheService.getUserCache();
+  const pendingActionRaw = cache.get("pendingAction");
+
+  if (!pendingActionRaw) {
+    logToSheet("error", "No pending action found.", "cache", "", false);
+    return;
+  }
+
+  const pendingAction = JSON.parse(pendingActionRaw);
+  const choice = data.choice;
+  const userInput = data.userInput || "";
+  const imageSource = data.image_source || "";
+
+  let platformSelection = {
+    action_for_facebook: false,
+    action_for_instagram: false,
+    action_for_linkedin: false
+  };
+
+  if (choice === "facebook_instagram") {
+    platformSelection.action_for_facebook = true;
+    platformSelection.action_for_instagram = true;
+  } else if (choice === "linkedin") {
+    platformSelection.action_for_linkedin = true;
+  } else if (choice === "all") {
+    platformSelection = {
+      action_for_facebook: true,
+      action_for_instagram: true,
+      action_for_linkedin: true
+    };
+  }
+
+  postRows(
+    pendingAction.actionName,
+    pendingAction.webhookUrl,
+    platformSelection,
+    { user_input: userInput, image_source: imageSource }
+  );
+
+  cache.remove("pendingAction");
+}
+
+function continueCreatePosts(dialogData) {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAME);
+  let preparedRows = dialogData.preparedRows || [];
+  const imageSource = dialogData.image_source;
+  const choice = dialogData.choice;
+  const userInput = dialogData.userInput || "";
+
+  try {
+    if (typeof preparedRows === "string") {
+      preparedRows = JSON.parse(preparedRows);
+    }
+  } catch (e) {
+    throw new Error("preparedRows could not be parsed from JSON.");
+  }
+
+  if (!Array.isArray(preparedRows)) {
+    throw new Error("preparedRows is not a valid array.");
+  }
+
+  const allowedImageSources = ["yes", "no", "create"];
+  const allowedChoices = ["facebook_instagram", "linkedin", "all"];
+
+  if (!preparedRows.length) {
+    throw new Error("No prepared rows were provided.");
+  }
+
+  if (!allowedImageSources.includes(imageSource)) {
+    throw new Error(`Unsupported image_source value: ${imageSource}`);
+  }
+
+  if (!allowedChoices.includes(choice)) {
+    throw new Error(`Unsupported platform choice: ${choice}`);
+  }
+
+  for (const item of preparedRows) {
+    validateMediaFolderForCreate(item.folderId, imageSource, choice, item.row);
+  }
+
+  let platformSelection = {
+    action_for_facebook: false,
+    action_for_instagram: false,
+    action_for_linkedin: false
+  };
+
+  if (choice === "facebook_instagram") {
+    platformSelection.action_for_facebook = true;
+    platformSelection.action_for_instagram = true;
+  } else if (choice === "linkedin") {
+    platformSelection.action_for_linkedin = true;
+  } else if (choice === "all") {
+    platformSelection = {
+      action_for_facebook: true,
+      action_for_instagram: true,
+      action_for_linkedin: true
+    };
+  }
+
+  const sheetId = SpreadsheetApp.getActiveSpreadsheet().getId();
+  const lastCol = sheet.getLastColumn();
+
+  for (const item of preparedRows) {
+    if (!item || item.row == null || isNaN(item.row)) {
+      logToSheet("error", `Invalid prepared row: ${JSON.stringify(item)}`, "post_action", "", true);
+      continue;
+    }
+
+    const rowNumber = Number(item.row);
+    const row = sheet.getRange(rowNumber, 1, 1, lastCol).getValues()[0];
+
+    if (!row || !Array.isArray(row)) {
+      logToSheet("error", `Could not read row ${rowNumber}.`, "post_action", "", true);
+      continue;
+    }
+
+    const imagesBool = resolveImagesBoolean(imageSource);
+    sheet.getRange(rowNumber, COL.IMAGES).setValue(imagesBool);
+
+    const payloadContent = buildPayloadContent(row);
+    const jobId = `Create_Posts_${rowNumber}_${Date.now()}`;
+
+    const payload = {
+      sheetId,
+      row: rowNumber,
+      content: payloadContent,
+      action_name: "Create Posts",
+      user_input: userInput,
+      image_source: imageSource,
+      action_for_facebook: platformSelection.action_for_facebook,
+      action_for_instagram: platformSelection.action_for_instagram,
+      action_for_linkedin: platformSelection.action_for_linkedin
+    };
+
+    try {
+      const response = UrlFetchApp.fetch("https://n8n.princparket.cz/webhook/ext_Create_Post", {
+        method: "post",
+        contentType: "application/json",
+        payload: JSON.stringify(payload)
+      });
+
+      const resultText = response.getContentText();
+      logToSheet("success", `Post ${rowNumber} responded: ${resultText}`, "post_action", jobId, false);
+      sheet.getRange(rowNumber, COL.CHECKBOX).setValue(false);
+    } catch (e) {
+      logToSheet("error", `Error posting row ${rowNumber}: ${e.message}`, "post_action", jobId, true);
+    }
+  }
+
+  logToSheet("info", `Create Posts performed on ${preparedRows.length} row(s).`, "post_action", "", false);
+}
+
+/***********************
+ * PREVIEW POPUP
+ ***********************/
+function extractFileIdFromUrl(url) {
+  if (!url) return null;
+  const match = url.match(/[-\w]{25,}/);
+  return match ? match[0] : null;
+}
+
+function openPreviewForCheckedRow() {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAME);
+  const data = sheet.getDataRange().getValues();
+
+  for (let i = 1; i < data.length; i++) {
+    const isChecked = data[i][COL.CHECKBOX - 1];
+    if (isChecked === true) {
+      const previewFormula = sheet.getRange(i + 1, COL.PREVIEW).getFormula();
+      if (!previewFormula) {
+        logToSheet("error", "No preview formula found.", "preview", "", true);
+        return;
+      }
+      const match = previewFormula.match(/"(https:\/\/drive\.google\.com\/[^"]+)"/);
+      if (!match) {
+        logToSheet("error", "Could not extract URL from preview formula.", "preview", "", true);
+        return;
+      }
+      const fileId = extractFileIdFromUrl(match[1]);
+      if (!fileId) {
+        logToSheet("error", "Could not extract file ID from preview link.", "preview", "", true);
+        return;
+      }
+      const file = DriveApp.getFileById(fileId);
+      const htmlContent = file.getBlob().getDataAsString();
+      const htmlOutput = HtmlService.createHtmlOutput(htmlContent).setWidth(800).setHeight(1000);
+      SpreadsheetApp.getUi().showModalDialog(htmlOutput, "Post Preview");
+      return;
+    }
+  }
+  logToSheet("error", "No checked row found.", "preview", "", true);
+}

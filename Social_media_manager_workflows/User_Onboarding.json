@@ -1,0 +1,972 @@
+{
+  "name": "User_Onboarding",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "7c278f48-6ae7-48f8-b11f-e536a9402a48",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -544,
+        -320
+      ],
+      "id": "d381fef9-a19b-44c6-9a62-f49a4fc288b6",
+      "name": "Webhook",
+      "webhookId": "7c278f48-6ae7-48f8-b11f-e536a9402a48",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "action": "generate",
+        "dataPropertyName": "user_id"
+      },
+      "type": "n8n-nodes-base.crypto",
+      "typeVersion": 1,
+      "position": [
+        -240,
+        -320
+      ],
+      "id": "9ba5d1a1-f540-46e5-8702-159014808f92",
+      "name": "Crypto",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "tableId": "SoMe_user_db",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "user_name",
+              "fieldValue": "={{ $('Webhook').item.json.user_name }}"
+            },
+            {
+              "fieldId": "user_id",
+              "fieldValue": "={{ $('Crypto').item.json.user_id }}"
+            },
+            {
+              "fieldId": "reference_email",
+              "fieldValue": "={{ $('Webhook').item.json.email }}"
+            },
+            {
+              "fieldId": "master_table_id",
+              "fieldValue": "={{ $('Upload Master Table to Client drive').first().json.id }}"
+            },
+            {
+              "fieldId": "master_folder_id",
+              "fieldValue": "={{ $('Create Root').first().json.id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        432,
+        -288
+      ],
+      "id": "2976b03a-e231-4345-ba4a-bb5387c66edc",
+      "name": "Create a row",
+      "credentials": {
+        "supabaseApi": {
+          "id": "2oNjiFHjAgVX7z4h",
+          "name": "Supabase Origamis"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "resource": "folder",
+        "name": "Root",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1pM-f5VgD2dULzudV8_4xSwqoJaroZ6Av",
+          "mode": "list",
+          "cachedResultName": "n8n project",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1pM-f5VgD2dULzudV8_4xSwqoJaroZ6Av"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -64,
+        -320
+      ],
+      "id": "049970c2-a03d-4d09-a690-4adb4257d972",
+      "name": "Create Root",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "nXk2DfRv4PmQZ9s1",
+          "name": "Google Drive Oauth"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "resource": "folder",
+        "name": "data",
+        "driveId": {
+          "__rl": true,
+          "value": "My Drive",
+          "mode": "list",
+          "cachedResultName": "My Drive",
+          "cachedResultUrl": "https://drive.google.com/drive/my-drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        240,
+        -448
+      ],
+      "id": "3db4f5a1-e2a2-44ea-bf81-3409c11ac7bf",
+      "name": "Create Data",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "nXk2DfRv4PmQZ9s1",
+          "name": "Google Drive Oauth"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "copy",
+        "fileId": {
+          "__rl": true,
+          "value": "1lkVNsX-EloSPts_0r9rRwte8D7GDSuxPsdHdmU9Mdig",
+          "mode": "id"
+        },
+        "name": "=SoMe_master_{{ $('Webhook').item.json.user_name.replaceAll(\" \",\"_\") }}",
+        "sameFolder": false,
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        240,
+        -288
+      ],
+      "id": "f630a9cf-e854-44f5-82aa-55f474909397",
+      "name": "Upload Master Table to Client drive",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "nXk2DfRv4PmQZ9s1",
+          "name": "Google Drive Oauth"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "5aiRLcktFoskDGjI",
+          "mode": "list",
+          "cachedResultName": "Onboarding_send_instructions"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "user_id",
+              "displayName": "user_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        640,
+        -288
+      ],
+      "id": "04514083-925d-485c-b5bd-8491060ab4b5",
+      "name": "Execute Workflow",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "resource": "folder",
+        "name": "prompts",
+        "driveId": {
+          "__rl": true,
+          "value": "My Drive",
+          "mode": "list",
+          "cachedResultName": "My Drive",
+          "cachedResultUrl": "https://drive.google.com/drive/my-drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        432,
+        -448
+      ],
+      "id": "4de7dac8-023e-40e7-8796-f22e72cde0f5",
+      "name": "Create Prompts",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "nXk2DfRv4PmQZ9s1",
+          "name": "Google Drive Oauth"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "formTitle": "=Nastavení",
+        "formDescription": "=<div style=\"font-family: Arial, sans-serif; font-size: 16px; line-height: 1.6; color: #222;\">\n  <h2>Vítejte!</h2>\n  <p>\n    Pro začátek nám stačí, když vyplníte své <strong>jméno a e-mail</strong>.  \n    Na základě těchto údajů vám během několika vteřin automaticky vytvoříme \n    vlastní pracovní prostor na sdíleném Google Drive disku.\n  </p>\n\n  <p>\n    V tomto prostoru najdete připravenou <strong>strukturu složek</strong>:\n  </p>\n  <ul>\n    <li><strong>Hlavní tabulka s plánovačem</strong> – centrální místo pro vaše přehled s příspěvky,</li>\n    <li><strong>Images</strong> – složka určená pro obrázky, videa a další soubory,</li>\n    <li><strong>Prompts</strong> – prostor, kde můžete upravovat a ukládat vlastní podklady.</li>\n  </ul>\n\n  <p>\n    Nemusíte nic nastavovat, sdílet ani přidělovat oprávnění – vše proběhne automaticky.  \n    Jakmile bude váš prostor připraven (obvykle do několika vteřin), budete přesměrováni přímo do své osobní složky.\n  </p>\n\n  <p><em>Těšíme se, až začnete!</em></p>\n</div>\n",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "user_name",
+              "placeholder": "Vaše jméno?"
+            },
+            {
+              "fieldLabel": "user_email",
+              "placeholder": "Váš email?"
+            }
+          ]
+        },
+        "options": {
+          "appendAttribution": false,
+          "buttonLabel": "Potvrdit",
+          "path": "onboarding"
+        }
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        -688,
+        240
+      ],
+      "id": "75063035-2fae-45ae-adf8-bd9989b6fa13",
+      "name": "On form submission",
+      "webhookId": "1dbff149-22db-4cfb-a1fc-6c2c106adc2d"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        880,
+        272
+      ],
+      "id": "58da30d7-7d08-4300-8c1d-1984a845c5c7",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "operation": "completion",
+        "respondWith": "redirect",
+        "redirectUrl": "=https://drive.google.com/drive/folders/{{ $('Create Root1').item.json.id }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 1,
+      "position": [
+        2144,
+        272
+      ],
+      "id": "54572594-36ee-41c2-a48a-1f27124fabdd",
+      "name": "Form1",
+      "webhookId": "6259da76-fdad-4c41-8265-17e5e5d8c39a"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "folderId": "={{ $('Create prompts folder').item.json.id }}",
+        "title": "Prompt"
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        480,
+        368
+      ],
+      "id": "2cac896a-9309-4cfc-8a15-8e8c9214ff92",
+      "name": "Create a document",
+      "credentials": {
+        "googleApi": {
+          "id": "aHVI3CAM5JAErt7B",
+          "name": "Google Service Account account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "update",
+        "documentURL": "={{ $json.id }}",
+        "actionsUi": {
+          "actionFields": [
+            {
+              "action": "insert",
+              "text": "=# Role\n## You're a cross-platform content strategist and AI creator. \n# Task\n## Your job is to write engaging, high-performing social media posts for LinkedIn, Facebook, Instagram and also mail subject Based on this:  \n### product =  \n### tone = \n### language = you will translate the output into specific language. you will use this language Czech/CZ.\n# Output criteria for all platforms\n## Return all three posts clearly labeled by platform. And in clear and well formatted json. Provide professional and optimized subject lines for each platform for efficient social media management. Do not include hooks or unrelated content to the actual text. \n## Always manufacture well formated high qaulity well suited for czech audience subjects \n## Always asure that the subject for each platforms is at least 30 words long and well writen in a way that an average human cant tell the subjects is writen by ai agent outputed in a text block without any new lines\n#### good example:\n##### Poznejte podlahu Dubový sen — teplý dotek dřeva pro váš domov\nDubový sen je jako krok do přírody — teplý, klidný a věčný. Masivní dub s jemnou strukturou a přírodní povrchovou úpravou přináší do obývacího prostoru i ložnice pocit útulnosti a kvality. Snadná údržba, odolnost a variabilita odstínů znamenají, že se hodí k moderním i tradičním interiérům. 🌿✨\nKde byste takovou podlahu položili u vás doma? Sdílejte nápady nebo tipy — těšíme se na vaše komentáře! 👇\n#### bad example:\n##### *Nadpis* = *Poznejte podlahu Dubový sen — teplý dotek dřeva pro váš domov*\n*Popisek* = *Dubový sen je jako krok do přírody — teplý, klidný a věčný. Masivní dub s jemnou strukturou a přírodní povrchovou úpravou přináší do obývacího prostoru i ložnice pocit útulnosti a kvality. Snadná údržba, odolnost a variabilita odstínů znamenají, že se hodí k moderním i tradičním interiérům. 🌿✨\nKde byste takovou podlahu položili u vás doma? Sdílejte nápady nebo tipy — těšíme se na vaše komentáře! 👇*\n# Specifications for each platform\n## LinkedIn\n### Provide a professional and compelling subject line that reflects the essence of the product. Write a concise, human, and engaging post with minimal emojis, ending with an inspiring or reflective CTA.\n## Facebook \n### Provide a friendly and approachable subject line suitable for casual engagement. Write a casual, conversational post based on the product. End with a question or CTA encouraging comments. Use natural emoji use and a warm tone.\n## Instagram\n### Provide a creative and attention-grabbing subject line optimized for visual engagement. Write a short caption under 150 words for the product, starting with a bold or poetic first line. End with a soft CTA (like/save/share).\n## Hashtags\n### Generate 10-15 hashtags that balance discoverability and relevance, tailored to the product theme. Ensure they are a mix of specific and popular tags to maximize reach and interest within the user’s business field.\n### The hashtags must be as generic as possible but also related to the product as much as possible\n#### good example for *social media manager agent*:\n##### #AI #SociálníSítě #DigitálníMarketing #UměláInteligence #MarketingCZ #Automatizace #ObsahovýMarketing #BrandManagement\n#### bad example *social media manager agent*:\n##### #SMM #SMMM #GrowthHacking #MarTech \n# Specifications for each platform\n\n\n# Example\n## Output\n###output format:\n#### {\n  \"Subject\": \"string\",\n  \"LinkedIn\": \"string\",\n  \"Facebook\":  \"string\",\n  \"Instagram\": \"string\",\n  \"Hastags\": \"string\"\n  \n}\n###output example: \n#### \n[\n{\n\"output\": \n{\n\"LinkedIn\": \n\"Hermelín: malý sýr, velký zážitek.\\nHermelín je jednoduchý, ale univerzální produkt — ideální pro kavárny, bistra i delikatesy. Přináší výraznou chuť, snadnou přípravu (pečený, marinovaný, na grilu) a příběh lokálního řemeslné výroby, který zákazníci ocení. Nabízí příležitost zvýšit průměrnou hodnotu objednávky a oživit sezónní nabídky bez složitých investic. Přemýšlejte o něm jako o produktu, který pracuje pro vás — v menu, v marketingu i ve spolupráci s lokálními dodavateli.\\nJaké příležitosti v tom vidíte vy a kde byste hermelín nejraději uvedli do praxe?\\n— Jakub\",\n\"Facebook\": \n\"Mám slabost pro dobrý hermelín 🧀\\nRychlý tip: pečený hermelín s česnekem, bylinkami a trochou olivového oleje — zlatá kůrka, roztékající se střed. Podávejte s chlebem nebo nakládanou zeleninou, k pivu nebo vínu 🍞🍷🔥. Nebo zkuste marinovaný hermelín s medem a chilli pro kontrast chutí.\\nJak ho máte nejraději vy? Máte oblíbený recept nebo šikovný trik? Napište do komentářů, rád si je vyzkouším! 👇\",\n\"Instagram\": \n\"Roztékající se okamžik — hermelín, který zahřeje.\\nPečený, marinovaný nebo na grilu: jednoduchý sýr, nekonečné možnosti. Podávejte s chlebem, medem a sklenkou vína. Tip: péct na 180 °C 10–12 minut, dokud se krásně neroztaví.\\nLajkni, ulož nebo sdílej.\",\n\"Hastags\": \n\"#hermelín #hermelin #českýsýr #sýry #pečenýhermelín #grilování #gurmán #foodcz #cheese #foodie #lokální #farmářské #recepty #delikatesy #vino\"\n}\n}\n]"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        1312,
+        272
+      ],
+      "id": "bf448e29-3330-49da-9f37-44cd1efc72b9",
+      "name": "Update a document",
+      "credentials": {
+        "googleApi": {
+          "id": "aHVI3CAM5JAErt7B",
+          "name": "Google Service Account account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "action": "generate",
+        "dataPropertyName": "user_id"
+      },
+      "type": "n8n-nodes-base.crypto",
+      "typeVersion": 1,
+      "position": [
+        -480,
+        368
+      ],
+      "id": "d6e8fbc6-f5f9-4f94-b003-c7ce464a9600",
+      "name": "Crypto1"
+    },
+    {
+      "parameters": {
+        "tableId": "SoMe_user_db",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "master_folder_id",
+              "fieldValue": "={{ $('Create Root1').item.json.id }}"
+            },
+            {
+              "fieldId": "user_name",
+              "fieldValue": "={{ $('On form submission').item.json.user_name }}"
+            },
+            {
+              "fieldId": "reference_email",
+              "fieldValue": "={{ $('On form submission').item.json.user_email }}"
+            },
+            {
+              "fieldId": "prompts_folder_id",
+              "fieldValue": "={{ $('Create prompts folder').item.json.id }}"
+            },
+            {
+              "fieldId": "images_folder_id",
+              "fieldValue": "={{ $('Create image folder').item.json.id }}"
+            },
+            {
+              "fieldId": "master_table_id",
+              "fieldValue": "={{ $('Upload Master Table to Client drive1').item.json.id }}"
+            },
+            {
+              "fieldId": "prompt_doc_id",
+              "fieldValue": "={{ $('Create a document').item.json.id }}"
+            },
+            {
+              "fieldId": "user_id",
+              "fieldValue": "={{ $('Crypto1').item.json.user_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        2784,
+        272
+      ],
+      "id": "5c2bacc2-5b48-4bdd-9a1f-7e1517041eac",
+      "name": "Create a row1",
+      "credentials": {
+        "supabaseApi": {
+          "id": "2oNjiFHjAgVX7z4h",
+          "name": "Supabase Origamis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "SoMe_user_db",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "user_id",
+              "condition": "eq",
+              "keyValue": "={{ $('Crypto1').item.json.user_id }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "master_folder_id",
+              "fieldValue": "={{ $json.id }}"
+            },
+            {
+              "fieldId": "user_name",
+              "fieldValue": "={{ $('On form submission').item.json[\"Vaše jméno?\"] }}"
+            },
+            {
+              "fieldId": "reference_email",
+              "fieldValue": "={{ $('On form submission').item.json[\"Váš email?\"] }}"
+            },
+            {
+              "fieldId": "prompts_folder_id",
+              "fieldValue": "={{ $('Create prompts folder').item.json.id }}"
+            },
+            {
+              "fieldId": "images_folder_id",
+              "fieldValue": "={{ $('Create image folder').item.json.id }}"
+            },
+            {
+              "fieldId": "master_table_id",
+              "fieldValue": "={{ $('Copy file').item.json.id }}"
+            },
+            {
+              "fieldId": "prompt_doc_id",
+              "fieldValue": "={{ $('Create a document').item.json.id }}"
+            },
+            {
+              "fieldId": "user_id",
+              "fieldValue": "={{ $('Crypto1').item.json.user_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        2784,
+        512
+      ],
+      "id": "896fb6de-7110-47cc-b5b3-66b2a65745c0",
+      "name": "Update a row",
+      "credentials": {
+        "supabaseApi": {
+          "id": "2oNjiFHjAgVX7z4h",
+          "name": "Supabase Origamis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "folder",
+        "name": "=Root_{{ $('On form submission').item.json.user_name.replaceAll(\" \",\"_\") }}",
+        "driveId": {
+          "__rl": true,
+          "value": "My Drive",
+          "mode": "list",
+          "cachedResultName": "My Drive",
+          "cachedResultUrl": "https://drive.google.com/drive/my-drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1pM-f5VgD2dULzudV8_4xSwqoJaroZ6Av",
+          "mode": "list",
+          "cachedResultName": "n8n project",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1pM-f5VgD2dULzudV8_4xSwqoJaroZ6Av"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -320,
+        368
+      ],
+      "id": "e0c75819-4693-4fbf-adcc-0e821a9d4421",
+      "name": "Create Root1",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "nXk2DfRv4PmQZ9s1",
+          "name": "Google Drive Oauth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "folder",
+        "name": "=Prompts",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $('Create Root1').item.json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -48,
+        368
+      ],
+      "id": "b60f0272-ce61-4b52-b951-47dfb1f20cd3",
+      "name": "Create prompts folder",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "nXk2DfRv4PmQZ9s1",
+          "name": "Google Drive Oauth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "folder",
+        "name": "=Images",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $('Create Root1').item.json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        144,
+        368
+      ],
+      "id": "40e1295d-5a24-473b-a0fd-cd79ea0f366a",
+      "name": "Create image folder",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "nXk2DfRv4PmQZ9s1",
+          "name": "Google Drive Oauth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "copy",
+        "fileId": {
+          "__rl": true,
+          "value": "1HMKbP5Xw9eRccDFLrQ1uy9wR6J76sZCDfSRAp2CiKdo",
+          "mode": "id"
+        },
+        "name": "=SoMe_master_{{ $('On form submission').item.json.user_name.replaceAll(\" \",\"_\") }}",
+        "sameFolder": false,
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $('Create Root1').item.json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1712,
+        272
+      ],
+      "id": "4a1af74c-e3db-4eb7-ab19-78352710fc74",
+      "name": "Upload Master Table to Client drive1",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "nXk2DfRv4PmQZ9s1",
+          "name": "Google Drive Oauth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "folder",
+        "operation": "share",
+        "folderNoRootId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "permissionsUi": {
+          "permissionsValues": {
+            "role": "writer",
+            "type": "user",
+            "emailAddress": "={{ $('On form submission').item.json.user_email }}"
+          }
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -176,
+        368
+      ],
+      "id": "d916da11-0eb8-471f-8fb8-16116c4f0822",
+      "name": "Share folder",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "nXk2DfRv4PmQZ9s1",
+          "name": "Google Drive Oauth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "5aiRLcktFoskDGjI",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/5aiRLcktFoskDGjI",
+          "cachedResultName": "Onboarding_send_instructions"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "email": "={{ $json.reference_email }}",
+            "user_id": "={{ $json.user_id }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "user_id",
+              "displayName": "user_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        3200,
+        272
+      ],
+      "id": "8ce0654e-b705-4e39-8c54-b7f75b157186",
+      "name": "Send Welcome Email"
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "user_name": "John Doe",
+          "email": "testuser@gmail.com"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Crypto",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Crypto": {
+      "main": [
+        [
+          {
+            "node": "Create Root",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a row": {
+      "main": [
+        [
+          {
+            "node": "Execute Workflow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Root": {
+      "main": [
+        [
+          {
+            "node": "Create Data",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Upload Master Table to Client drive",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Data": {
+      "main": [
+        [
+          {
+            "node": "Create Prompts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload Master Table to Client drive": {
+      "main": [
+        [
+          {
+            "node": "Create a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Crypto1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Update a document",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Form1": {
+      "main": [
+        [
+          {
+            "node": "Create a row1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a document": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Update a document": {
+      "main": [
+        [
+          {
+            "node": "Upload Master Table to Client drive1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Crypto1": {
+      "main": [
+        [
+          {
+            "node": "Create Root1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a row1": {
+      "main": [
+        [
+          {
+            "node": "Send Welcome Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Root1": {
+      "main": [
+        [
+          {
+            "node": "Share folder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create prompts folder": {
+      "main": [
+        [
+          {
+            "node": "Create image folder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create image folder": {
+      "main": [
+        [
+          {
+            "node": "Create a document",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload Master Table to Client drive1": {
+      "main": [
+        [
+          {
+            "node": "Form1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Share folder": {
+      "main": [
+        [
+          {
+            "node": "Create prompts folder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "NmGg5uZ3m1rjeYmB"
+  },
+  "versionId": "ee28c4a1-e7cf-4cd5-867f-2cfbc723cabe",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "2b07eec16886132e3cd818fdfac587c65db27d72fe33b2ee54f787b58f4dff76"
+  },
+  "id": "ljSgehPYqOreav8k",
+  "tags": []
+}

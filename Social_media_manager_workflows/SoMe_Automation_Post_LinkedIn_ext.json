@@ -1,0 +1,775 @@
+{
+  "name": "SoMe_Automation_Post_LinkedIn_ext",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "id"
+            },
+            {
+              "name": "user_id"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -64,
+        32
+      ],
+      "id": "2ac9ed17-d124-42b7-818c-f19b8e680779",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "SoMe_user_db",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "user_id",
+              "keyValue": "={{ $json.user_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        224,
+        32
+      ],
+      "id": "cfefe901-19a4-4ec1-a548-00e8ce6b2a93",
+      "name": "Get Credentials",
+      "credentials": {
+        "supabaseApi": {
+          "id": "2oNjiFHjAgVX7z4h",
+          "name": "Supabase Origamis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "some_post_plan_selfhost_external",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "keyValue": "={{ $('When Executed by Another Workflow').item.json.id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        544,
+        32
+      ],
+      "id": "1c5c849f-1cfb-4631-881c-a874aa67072a",
+      "name": "Get a row",
+      "credentials": {
+        "supabaseApi": {
+          "id": "2oNjiFHjAgVX7z4h",
+          "name": "Supabase Origamis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "linkedin_attachments",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        1104,
+        192
+      ],
+      "id": "f0525c82-dc10-411f-b721-5b1e2f0fa5b1",
+      "name": "Split Attachments"
+    },
+    {
+      "parameters": {
+        "mode": "expression",
+        "numberOutputs": 2,
+        "output": "={{ \n(() => {\n  const arr = $('Get a row').item.json.linkedin_attachments || [];\n  // Check for any video file\n  const videoIndex = arr.findIndex(f => String(f).toLowerCase().endsWith('.mp4'));\n\n  if (videoIndex !== -1) {\n    // Case 0 → video present\n    return 0;\n  }\n\n  // Case 1 → no video, only images\n  return 1;\n})()\n}}"
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        784,
+        32
+      ],
+      "id": "094ad37d-6c48-40ec-941b-64c5e0eaf024",
+      "name": "Switch1"
+    },
+    {
+      "parameters": {
+        "fileSelector": "={{ $('Split Attachments').item.json.linkedin_attachments }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        1760,
+        192
+      ],
+      "id": "aaf4285e-e570-40e1-9de0-aea76f391b55",
+      "name": "Read/Write Files from Disk1"
+    },
+    {
+      "parameters": {
+        "fileSelector": "={{ $json.linkedin_attachments }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        1760,
+        -64
+      ],
+      "id": "befe01d5-f7c3-4e78-b28d-12c332a71215",
+      "name": "Read Video file from Disk"
+    },
+    {
+      "parameters": {
+        "amount": 10
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        2352,
+        -64
+      ],
+      "id": "4a636bbd-6a25-4b9c-a874-8d2de216b385",
+      "name": "Wait",
+      "webhookId": "5e95a769-3cf5-4ec9-890d-32c98b296749"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        64,
+        480
+      ],
+      "id": "e10928af-0d63-498e-835f-534d9e7ad395",
+      "name": "When clicking ‘Execute workflow’",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "url": "https://api.linkedin.com/v2/userinfo",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{ $json.linkedin_user_token }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        448,
+        480
+      ],
+      "id": "54e5f984-e17d-44f3-a95f-d407c39f2fb1",
+      "name": "HTTP Request3"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.linkedin.com/v2/assets?action=registerUpload",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{$('Get Credentials').item.json.linkedin_user_token}}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"registerUploadRequest\": {\n        \"recipes\": [\n            \"urn:li:digitalmediaRecipe:feedshare-image\"\n        ],\n        \"owner\": \"urn:li:person:{{ $('Get Credentials').item.json.linkedin_user_id }}\",\n        \"serviceRelationships\": [\n            {\n                \"relationshipType\": \"OWNER\",\n                \"identifier\": \"urn:li:userGeneratedContent\"\n            }\n        ]\n    }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1472,
+        192
+      ],
+      "id": "416b52b3-c701-48d9-b4e7-7b56bb9abcf5",
+      "name": "HTTP Request Register Image"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b5fbc79f-44c2-4c24-9a58-b062b4a495d7",
+              "name": "value.asset",
+              "value": "={{ $('HTTP Request Register Image').item.json.value.asset }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2240,
+        192
+      ],
+      "id": "552dc62e-05c7-4d9c-b9f0-090ff9cd3791",
+      "name": "Note Asset"
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "value.asset",
+              "renameField": true,
+              "outputFieldName": "media"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        2432,
+        192
+      ],
+      "id": "8ab95044-5984-4bbd-b1fa-c8c43056c8f9",
+      "name": "Aggregate Assets"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Grab the LinkedIn user id from \"Get Credentials\" node\nconst linkedinUserId = $node[\"Get Credentials\"].json.linkedin_user_id;\n\n// Grab the aggregated asset array (e.g. from Aggregate node)\nconst assets = $json.media || [$json.asset];  // handles array or single asset\n\n// Build the full LinkedIn post body\nreturn [\n  {\n    json: {\n      author: `urn:li:person:${linkedinUserId}`,\n      lifecycleState: \"PUBLISHED\",\n      specificContent: {\n        \"com.linkedin.ugc.ShareContent\": {\n          shareCommentary: {\n            text: $node[\"Get a row\"].json.caption_linkedin\n          },\n          shareMediaCategory: \"IMAGE\", // or VIDEO\n          media: assets.map(asset => ({\n            status: \"READY\",\n            media: asset,\n            description: { text: \"Optional description\" },\n            title: { text: \"Optional title\" }\n          }))\n        }\n      },\n      visibility: {\n        \"com.linkedin.ugc.MemberNetworkVisibility\": \"PUBLIC\"\n      }\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2640,
+        192
+      ],
+      "id": "35e67dcf-af33-4cb9-9895-9b6c2a694f14",
+      "name": "Construct Request Body"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('HTTP Request Register Image').item.json.value.uploadMechanism['com.linkedin.digitalmedia.uploading.MediaUploadHttpRequest'].uploadUrl }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{$('Get Credentials').item.json.linkedin_user_token}}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "binaryData",
+        "inputDataFieldName": "data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2032,
+        192
+      ],
+      "id": "4877d8cb-c6c9-4158-bedd-f6e1d630931d",
+      "name": "HTTP Request Upload Image",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.linkedin.com/v2/ugcPosts",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{$('Get Credentials').item.json.linkedin_user_token}}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "X-Restli-Protocol-Version",
+              "value": "2.0.0"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2848,
+        192
+      ],
+      "id": "d00fda74-4cfe-4e6c-a5f1-10e692ed251c",
+      "name": "HTTP Request Publish"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.linkedin.com/v2/assets?action=registerUpload",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{$('Get Credentials').item.json.linkedin_user_token}}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"registerUploadRequest\": {\n        \"recipes\": [\n            \"urn:li:digitalmediaRecipe:feedshare-video\"\n        ],\n        \"owner\": \"urn:li:person:{{ $('Get Credentials').item.json.linkedin_user_id }}\",\n        \"serviceRelationships\": [\n            {\n                \"relationshipType\": \"OWNER\",\n                \"identifier\": \"urn:li:userGeneratedContent\"\n            }\n        ]\n    }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1472,
+        -64
+      ],
+      "id": "a87efcad-03b1-4259-89a3-bbce52ccd701",
+      "name": "HTTP Request Register Video"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.linkedin.com/v2/ugcPosts",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{$('Get Credentials').item.json.linkedin_user_token}}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "X-Restli-Protocol-Version",
+              "value": "2.0.0"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2848,
+        -64
+      ],
+      "id": "15c21fa4-dcee-4aab-acf3-ca7fd0b16060",
+      "name": "HTTP Request Publish Video"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('HTTP Request Register Video').item.json.value.uploadMechanism['com.linkedin.digitalmedia.uploading.MediaUploadHttpRequest'].uploadUrl }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer {{$('Get Credentials').item.json.linkedin_user_token}}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "binaryData",
+        "inputDataFieldName": "data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2032,
+        -64
+      ],
+      "id": "5d2e21c3-8c20-43aa-920c-0b5f08da22d3",
+      "name": "HTTP Request Upload Video",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "// --- Inputs ---\nconst linkedinUserId = $node[\"Get Credentials\"].json.linkedin_user_id;\nconst videoAsset = $node[\"HTTP Request Register Video\"].json.value.asset; // uploaded asset URN\nconst caption = $node[\"Get a row\"].json.caption_linkedin || \"Sharing a new video update!\";\n\n// --- Build the LinkedIn UGC Post body ---\nconst body = {\n  author: `urn:li:person:${linkedinUserId}`,\n  lifecycleState: \"PUBLISHED\",\n  specificContent: {\n    \"com.linkedin.ugc.ShareContent\": {\n      shareCommentary: {\n        text: caption\n      },\n      shareMediaCategory: \"VIDEO\",\n      media: [\n        {\n          status: \"READY\",\n          media: videoAsset,\n          description: { text: \"Video post\" },\n          title: { text: \"LinkedIn Video Upload\" }\n        }\n      ]\n    }\n  },\n  visibility: {\n    \"com.linkedin.ugc.MemberNetworkVisibility\": \"PUBLIC\"\n  }\n};\n\n// --- Output to next node ---\nreturn [{ json: body }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2640,
+        -64
+      ],
+      "id": "a546e290-13dc-4c18-8ac9-ed71bc059a33",
+      "name": "Construct Video Publish request body"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "some_post_plan_selfhost_external",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "condition": "eq",
+              "keyValue": "={{ $('When Executed by Another Workflow').item.json.id }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "publish_li",
+              "fieldValue": "done"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        3280,
+        -48
+      ],
+      "id": "df855efa-d8c7-473a-9ef5-e7031753532f",
+      "name": "Update a row",
+      "credentials": {
+        "supabaseApi": {
+          "id": "2oNjiFHjAgVX7z4h",
+          "name": "Supabase Origamis"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        3120,
+        -48
+      ],
+      "id": "a75a5dca-e6c9-49a2-bdd6-7d6b91bbf55d",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "fc151190-5720-4ea5-a91b-086e35f7242f",
+              "name": "id",
+              "value": "={{ $('When Executed by Another Workflow').item.json.id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3440,
+        -48
+      ],
+      "id": "3df77769-09e9-405a-baa2-1ed5a5ef7692",
+      "name": "Output"
+    }
+  ],
+  "pinData": {
+    "When Executed by Another Workflow": [
+      {
+        "json": {
+          "id": "080f7192-e4e0-464d-9b99-a1cd0d46a12f",
+          "user_id": "48186f68-15d4-48fb-b717-068c4ed7a0c9"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Get Credentials",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Credentials": {
+      "main": [
+        [
+          {
+            "node": "Get a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a row": {
+      "main": [
+        [
+          {
+            "node": "Switch1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Attachments": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request Register Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request Register Video",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Split Attachments",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read/Write Files from Disk1": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request Upload Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Video file from Disk": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request Upload Video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Construct Video Publish request body",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        []
+      ]
+    },
+    "HTTP Request Register Image": {
+      "main": [
+        [
+          {
+            "node": "Read/Write Files from Disk1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Note Asset": {
+      "main": [
+        [
+          {
+            "node": "Aggregate Assets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate Assets": {
+      "main": [
+        [
+          {
+            "node": "Construct Request Body",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Construct Request Body": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request Publish",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request Upload Image": {
+      "main": [
+        [
+          {
+            "node": "Note Asset",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request Register Video": {
+      "main": [
+        [
+          {
+            "node": "Read Video file from Disk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request Upload Video": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Construct Video Publish request body": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request Publish Video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update a row": {
+      "main": [
+        [
+          {
+            "node": "Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Update a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request Publish Video": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request Publish": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "NmGg5uZ3m1rjeYmB"
+  },
+  "versionId": "f3656064-1732-4634-b5e1-22a1cec01a54",
+  "meta": {
+    "instanceId": "2b07eec16886132e3cd818fdfac587c65db27d72fe33b2ee54f787b58f4dff76"
+  },
+  "id": "G6UDte49T7psdupP",
+  "tags": []
+}

@@ -1,0 +1,424 @@
+{
+  "name": "LI_Search_media_folder",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "source_row",
+              "type": "number"
+            },
+            {
+              "name": "profile"
+            },
+            {
+              "name": "post_id"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -128,
+        -16
+      ],
+      "id": "6433e614-67e5-4f1f-ad08-a69d4d50f2d7",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "1KtIOd0ZfnblMdG0",
+          "mode": "list",
+          "cachedResultName": "LI_Donwload_each_file"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "file_id": "={{ $json.id }}",
+            "file_name": "={{ $json.name }}",
+            "mimeType": "={{ $json.mimeType }}",
+            "post_id": "={{ $('When Executed by Another Workflow').item.json.post_id }}",
+            "profile": "={{ $('When Executed by Another Workflow').item.json.profile }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "file_id",
+              "displayName": "file_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "file_name",
+              "displayName": "file_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "mimeType",
+              "displayName": "mimeType",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "post_id",
+              "displayName": "post_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "profile",
+              "displayName": "profile",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "mode": "each",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        912,
+        -16
+      ],
+      "id": "2adc4954-ca20-4f63-91b1-d88d1dd48754",
+      "name": "Execute Workflow"
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "fileName"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        1088,
+        -16
+      ],
+      "id": "88da9c98-9fde-424c-b3c0-47c4ee1f49c5",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "searchMethod": "query",
+        "queryString": "='{{ $json.id }}' in parents ",
+        "returnAll": true,
+        "filter": {},
+        "options": {
+          "fields": [
+            "name",
+            "id",
+            "mimeType"
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        544,
+        -16
+      ],
+      "id": "9ce692b6-3655-456a-aa98-aa3d62e19eec",
+      "name": "Search Post Folder",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "nXk2DfRv4PmQZ9s1",
+          "name": "Google Drive Oauth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "searchMethod": "query",
+        "queryString": "='{{ $json.media_folder_id }}' in parents ",
+        "returnAll": true,
+        "filter": {},
+        "options": {
+          "fields": [
+            "id",
+            "name"
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        208,
+        -16
+      ],
+      "id": "0192de86-7295-41f2-937f-73b1d6bf3da8",
+      "name": "Search Media Folder for Profile",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "nXk2DfRv4PmQZ9s1",
+          "name": "Google Drive Oauth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "LinkedIn_manager_profiles",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "profile",
+              "keyValue": "={{ $json.profile }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        48,
+        -16
+      ],
+      "id": "a8f3b601-c053-4c2c-b423-24f183b321e8",
+      "name": "Get Profile",
+      "credentials": {
+        "supabaseApi": {
+          "id": "2oNjiFHjAgVX7z4h",
+          "name": "Supabase Origamis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "5a6164cb-f056-4db7-92b4-2a6ba3cb411f",
+              "leftValue": "={{$json.name}}",
+              "rightValue": "={{$('When Executed by Another Workflow').item.json.post_id.toString() }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        368,
+        -16
+      ],
+      "id": "eea0c3cd-0e17-4130-94e1-5b7e18c245c6",
+      "name": "Filter by source row"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "LinkedIn_manager_posts",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "condition": "eq",
+              "keyValue": "={{ $('When Executed by Another Workflow').item.json.post_id }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "attachments",
+              "fieldValue": "={{ $json.fileName }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1248,
+        -16
+      ],
+      "id": "ce101661-cd07-404c-89a5-1a7c216dd814",
+      "name": "Update Post row",
+      "credentials": {
+        "supabaseApi": {
+          "id": "2oNjiFHjAgVX7z4h",
+          "name": "Supabase Origamis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sortFieldsUi": {
+          "sortField": [
+            {
+              "fieldName": "name"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.sort",
+      "typeVersion": 1,
+      "position": [
+        720,
+        -16
+      ],
+      "id": "7c883144-d8d0-4564-a52c-aaecb2f30323",
+      "name": "Sort"
+    }
+  ],
+  "pinData": {
+    "When Executed by Another Workflow": [
+      {
+        "json": {
+          "source_row": 6,
+          "profile": "Lenka",
+          "post_id": "20"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Get Profile",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Workflow": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search Post Folder": {
+      "main": [
+        [
+          {
+            "node": "Sort",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search Media Folder for Profile": {
+      "main": [
+        [
+          {
+            "node": "Filter by source row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Profile": {
+      "main": [
+        [
+          {
+            "node": "Search Media Folder for Profile",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter by source row": {
+      "main": [
+        [
+          {
+            "node": "Search Post Folder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Update Post row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sort": {
+      "main": [
+        [
+          {
+            "node": "Execute Workflow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "OUAMGTbjNgyrDIGY"
+  },
+  "versionId": "d1977b76-0fab-45bb-aca6-44ae234a5877",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "2b07eec16886132e3cd818fdfac587c65db27d72fe33b2ee54f787b58f4dff76"
+  },
+  "id": "SE5Eat1VGHIaOcty",
+  "tags": []
+}

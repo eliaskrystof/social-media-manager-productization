@@ -1,0 +1,674 @@
+{
+  "name": "Draft_from_blog",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "blog"
+            },
+            {
+              "name": "language"
+            },
+            {
+              "name": "source_row",
+              "type": "any"
+            },
+            {
+              "name": "change",
+              "type": "boolean"
+            },
+            {
+              "name": "comment"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        208,
+        -16
+      ],
+      "id": "e681dfe5-8740-4cc1-bd4f-2eb2d5bec885",
+      "name": "Trigger"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://izohjxqvhacjmutgnckf.supabase.co/rest/v1/newsletter_drafts?on_conflict=language,source_row",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "language",
+              "value": "={{ $('Trigger').item.json.language }}"
+            },
+            {
+              "name": "source_row",
+              "value": "={{ $('Trigger').item.json.source_row }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        464,
+        -16
+      ],
+      "id": "7cf99c58-1147-4be7-97a8-34b4cd06dc15",
+      "name": "Supabase row check",
+      "credentials": {
+        "supabaseApi": {
+          "id": "XbTsqF8wuG2gSZNT",
+          "name": "Supabase account 3"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "newsletter_drafts",
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "language",
+              "condition": "eq",
+              "keyValue": "={{ $('Trigger').first().json.language }}"
+            },
+            {
+              "keyName": "source_row",
+              "condition": "eq",
+              "keyValue": "={{ $('Trigger').first().json.source_row }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "blog_title",
+              "fieldValue": "={{ $json.output.magazine_title }}"
+            },
+            {
+              "fieldId": "blog_text",
+              "fieldValue": "={{ $json.output.magazine_text }}"
+            },
+            {
+              "fieldId": "blog_cta_label",
+              "fieldValue": "={{ $json.output.cta_label }}"
+            },
+            {
+              "fieldId": "heroImgBlog",
+              "fieldValue": "={{ $json.heroImgBlog.split('url(')[1].split(')')[0].replace(/[\"']/g,'') }}"
+            },
+            {
+              "fieldId": "sideImgBlog_1",
+              "fieldValue": "={{ $json.sideImgBlog[0] }}"
+            },
+            {
+              "fieldId": "sideImgBlog_2",
+              "fieldValue": "={{ $json.sideImgBlog[1] }}"
+            },
+            {
+              "fieldId": "galleryImgBlog",
+              "fieldValue": "={{ $json.galleryImgBlog }}"
+            },
+            {
+              "fieldId": "blog_url",
+              "fieldValue": "={{ $('Extract text from blog').item.json.blog_url }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        2144,
+        -16
+      ],
+      "id": "0647f9d7-1455-4110-bd55-ad58e8258a73",
+      "name": "Update a row",
+      "retryOnFail": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "XbTsqF8wuG2gSZNT",
+          "name": "Supabase account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "14CkOky3jXC9rcwen1GmEy6U1ALrfHjDRD1HAjsoycQg",
+          "mode": "list",
+          "cachedResultName": "Copy of OAKCENT_SOME plan",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/14CkOky3jXC9rcwen1GmEy6U1ALrfHjDRD1HAjsoycQg/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 445110406,
+          "mode": "list",
+          "cachedResultName": "Návrh tabulky Newsletterů",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/14CkOky3jXC9rcwen1GmEy6U1ALrfHjDRD1HAjsoycQg/edit#gid=445110406"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "row_number": "={{ $('Trigger').item.json.source_row }}"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "Month",
+              "displayName": "Month",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "No.",
+              "displayName": "No.",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Topic",
+              "displayName": "Topic",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Target group (databáze)",
+              "displayName": "Target group (databáze)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Subject",
+              "displayName": "Subject",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "1. blog",
+              "displayName": "1. blog",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "2. project",
+              "displayName": "2. project",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "3. color collection",
+              "displayName": "3. color collection",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "4. pattern collection",
+              "displayName": "4. pattern collection",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "5. CTA content",
+              "displayName": "5. CTA content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "5. CTA link",
+              "displayName": "5. CTA link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Vytvořit obsah",
+              "displayName": "Vytvořit obsah",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "CZ content",
+              "displayName": "CZ content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "EN content",
+              "displayName": "EN content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "PL content",
+              "displayName": "PL content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "DE content",
+              "displayName": "DE content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "date and time",
+              "displayName": "date and time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "sender",
+              "displayName": "sender",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "RUN",
+              "displayName": "RUN",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2336,
+        -16
+      ],
+      "id": "d7f15aea-4c0e-430f-a7d0-4f3e9f08b45c",
+      "name": "Update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "ouZ4Cl4hWK3UY5OV",
+          "name": "Google Sheets account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const html = String($json.html_content ?? $json.data ?? \"\");\nconst language = String($('Trigger').item.json.language ?? '').trim().toLowerCase();\n\n// 0) pevné mapování n8n language -> hreflang\nconst hreflangMap = {\n  czech: 'cs',\n  english: 'en',\n  polish: 'pl',\n  german: 'de',\n};\n\nconst wantedLang = hreflangMap[language] || 'cs';\n\n// 0.1) pokud je HTML escapované jako \\\"\nconst normalizedHtml = html.replace(/\\\\\"/g, '\"');\n\n// 0.2) najdi správný alternate hreflang link\nconst hreflangMatches = [...normalizedHtml.matchAll(\n  /<link[^>]+rel=[\"']alternate[\"'][^>]+hreflang=[\"']([^\"']+)[\"'][^>]+href=[\"']([^\"']+)[\"'][^>]*\\/?>/gi\n)];\n\nlet blog_url = '';\n\nfor (const match of hreflangMatches) {\n  const hreflang = String(match[1] || '').toLowerCase();\n  const href = String(match[2] || '');\n\n  if (hreflang === wantedLang) {\n    blog_url = href;\n    break;\n  }\n}\n\n// fallback na původní blog URL z Triggeru\nif (!blog_url) {\n  blog_url = String($('Trigger').item.json.blog ?? '');\n}\n\n// 1) vyhoď věci, co jen nafukují tokeny\nlet s = html\n  .replace(/<script\\b[\\s\\S]*?<\\/script>/gi, \" \")\n  .replace(/<style\\b[\\s\\S]*?<\\/style>/gi, \" \")\n  .replace(/<noscript\\b[\\s\\S]*?<\\/noscript>/gi, \" \")\n  .replace(/<svg\\b[\\s\\S]*?<\\/svg>/gi, \" \")\n  .replace(/<!--([\\s\\S]*?)-->/g, \" \");\n\n// 2) hrubě pryč s navigací / patičkou / cookie lištami\ns = s\n  .replace(/<header\\b[\\s\\S]*?<\\/header>/gi, \" \")\n  .replace(/<nav\\b[\\s\\S]*?<\\/nav>/gi, \" \")\n  .replace(/<footer\\b[\\s\\S]*?<\\/footer>/gi, \" \")\n  .replace(/<aside\\b[\\s\\S]*?<\\/aside>/gi, \" \")\n  .replace(/cookie(s)?|privacy|gdpr|consent|preferences|analytics|marketing/gi, \" \");\n\n// 3) převod na text s rozumnými oddělovači\ns = s\n  .replace(/<br\\s*\\/?>/gi, \"\\n\")\n  .replace(/<\\/(p|div|section|article|main|h1|h2|h3|h4|li|ul|ol)>/gi, \"\\n\")\n  .replace(/<[^>]+>/g, \" \");\n\n// 4) decode základních HTML entit\ns = s\n  .replace(/&nbsp;/gi, \" \")\n  .replace(/&amp;/gi, \"&\")\n  .replace(/&quot;/gi, '\"')\n  .replace(/&#0*39;/gi, \"'\")\n  .replace(/&lt;/gi, \"<\")\n  .replace(/&gt;/gi, \">\");\n\n// 5) normalizace whitespace\nconst page_text = s\n  .replace(/[ \\t]+/g, \" \")\n  .replace(/\\n[ \\t]+/g, \"\\n\")\n  .replace(/\\n{3,}/g, \"\\n\\n\")\n  .trim();\n\nreturn {\n  ...$json,\n  blog_url,\n  page_text,\n  _debug: {\n    language,\n    wantedLang,\n    hreflangFound: !!blog_url,\n    inputLen: html.length,\n    outputLen: page_text.length,\n  },\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1008,
+        -16
+      ],
+      "id": "97e5f553-d6af-47de-9d3e-be33670c5725",
+      "name": "Extract text from blog"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-5-mini",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        1408,
+        -48
+      ],
+      "id": "644d0261-5f9b-4357-9989-e8d8fb0939dd",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "HrLuvJHhWPSgTQpu",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n\"email_title\": \"\",\n\"magazine_title\": \"\",\n\"magazine_text\": \"\",\n\"cta_label\": \"\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        1552,
+        -48
+      ],
+      "id": "8d1d0295-cc1b-484e-94e5-12393e80416e",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "operation": "extractHtmlContent",
+        "extractionValues": {
+          "values": [
+            {
+              "key": "heroImgBlog",
+              "cssSelector": "#title .o_record_cover_component.o_record_cover_image",
+              "returnValue": "attribute",
+              "attribute": "style"
+            },
+            {
+              "key": "sideImgBlog",
+              "cssSelector": "#o_wblog_post_content section[data-snippet=\"s_product_list\"] .o_grid_item_image.g-col-lg-6 img.o_we_custom_image",
+              "returnValue": "attribute",
+              "attribute": "src",
+              "returnArray": true
+            },
+            {
+              "key": "galleryImgBlog",
+              "cssSelector": "#o_wblog_post_content section[data-snippet=\"s_product_list\"] .o_grid_item_image.g-col-lg-6[style*=\" / 7 / \"] img.o_we_custom_image",
+              "returnValue": "attribute",
+              "attribute": "src"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        1488,
+        144
+      ],
+      "id": "7c8e7129-4202-4e8f-ad24-a63f82783c7c",
+      "name": "HTML_Blog"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.blog }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        704,
+        -16
+      ],
+      "id": "9fa65a91-42f6-4ae7-b498-46ee08cb978c",
+      "name": "Get Blog"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.page_text }}\n\n{{ $('Trigger').item.json.change ? \"This is the user comment: \" + $('Trigger').item.json.comment : \"\" }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=You are an expert copywriter for a premium oak flooring brand called Oakcent.\nYou receive the full text of a blog article and must create short newsletter copy for the Magazine block only.\n\nYour task:\n\nRead and understand the blog article text.\n\nBased only on this article, write:\n\nAn email subject line\n\nA magazine block title\n\nOne cohesive teaser text block that reads like 2–3 elegant sentences\n\nA short CTA label (2–4 words)\n\n{{ $('Trigger').item.json.change ? \"You have been tasked to change your previous result.\" : \"\" }}\n\nBrand & tone guidelines:\n\nLanguage: {{ $('Trigger').item.json.language }}.\n\nTone: calm, premium, design-driven, elegant, confident.\n\nStyle: minimal, no hype, no exclamation marks unless really justified.\n\nFocus on architecture, interior design, craftsmanship, and atmosphere, not generic marketing fluff.\n\nWrite as Oakcent (use “we” and “you” naturally if needed).\n\nTeaser formatting rules:\n\nmagazine_text must be a single continuous block of text (not split into lines or paragraphs)\n\nIt should read as 2–3 flowing sentences total\n\nKeep it short and layout-friendly (aim roughly 260 characters)\n\nDo not add extra line breaks, bullets, markdown, or HTML\n\nImportant constraints:\n\nBase everything only on the content of the provided article text\n\nDo not invent collections, products, patterns, or technical claims that are not mentioned\n\nDo not mention prices, discounts, or time-limited offers\n\nOutput rules:\n\nOutput must be valid JSON, with double quotes around all keys and string values\n\nDo not include any commentary, explanation, or markdown — JSON only\n\nDo not include URLs\n\nExpected JSON structure:\n\n{\n\"email_title\": \"string\",\n\"magazine_title\": \"string\",\n\"magazine_text\": \"string\",\n\"cta_label\": \"string\"\n}\n\nReturn ONLY the JSON:\n\n\n{\n\"email_title\": \"\",\n\"magazine_title\": \"\",\n\"magazine_text\": \"\",\n\"cta_label\": \"\"\n}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        1408,
+        -272
+      ],
+      "id": "4d094fb8-6e0e-4d86-8f5a-cd94cfa975b6",
+      "name": "AI Agent",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const html = String($json.html_content ?? $json.data ?? \"\");\n\n// 1) vyhoď věci, co jen nafukují tokeny\nlet s = html\n  .replace(/<script\\b[\\s\\S]*?<\\/script>/gi, \" \")\n  .replace(/<style\\b[\\s\\S]*?<\\/style>/gi, \" \")\n  .replace(/<noscript\\b[\\s\\S]*?<\\/noscript>/gi, \" \")\n  .replace(/<svg\\b[\\s\\S]*?<\\/svg>/gi, \" \")\n  .replace(/<!--([\\s\\S]*?)-->/g, \" \");\n\n// 2) hrubě pryč s navigací / patičkou / cookie lištami (tagy i běžné fráze)\ns = s\n  .replace(/<header\\b[\\s\\S]*?<\\/header>/gi, \" \")\n  .replace(/<nav\\b[\\s\\S]*?<\\/nav>/gi, \" \")\n  .replace(/<footer\\b[\\s\\S]*?<\\/footer>/gi, \" \")\n  .replace(/<aside\\b[\\s\\S]*?<\\/aside>/gi, \" \")\n  // cookie/privacy boilerplate (často obří EN blok)\n  .replace(/cookie(s)?|privacy|gdpr|consent|preferences|analytics|marketing/gi, \" \");\n\n// 3) převod na text s “rozumnými” oddělovači\ns = s\n  .replace(/<br\\s*\\/?>/gi, \"\\n\")\n  .replace(/<\\/(p|div|section|article|main|h1|h2|h3|h4|li|ul|ol)>/gi, \"\\n\")\n  .replace(/<[^>]+>/g, \" \");\n\n// 4) decode základních entit (stačí na většinu webů)\ns = s\n  .replace(/&nbsp;/gi, \" \")\n  .replace(/&amp;/gi, \"&\")\n  .replace(/&quot;/gi, '\"')\n  .replace(/&#0*39;/gi, \"'\")\n  .replace(/&lt;/gi, \"<\")\n  .replace(/&gt;/gi, \">\");\n\n// 5) normalizace whitespace\nconst page_text = s\n  .replace(/[ \\t]+/g, \" \")\n  .replace(/\\n[ \\t]+/g, \"\\n\")\n  .replace(/\\n{3,}/g, \"\\n\\n\")\n  .trim();\n\nreturn {\n  ...$json,\n  page_text,\n  _debug: {\n    inputLen: html.length,\n    outputLen: page_text.length,\n  },\n};\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1008,
+        304
+      ],
+      "id": "6edfb2b6-29c0-4b0e-bc03-ea26df584bfb",
+      "name": "Extract text from blog1"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1936,
+        -16
+      ],
+      "id": "e210417c-17d3-4550-b6a5-6fd6987b9b23",
+      "name": "Merge"
+    }
+  ],
+  "pinData": {
+    "Trigger": [
+      {
+        "json": {
+          "blog": "https://www.oakcent.com/blog/blogove-18/pravda-o-podlahovem-vytapeni-drevenych-podlahach-31",
+          "language": "english",
+          "source_row": 14,
+          "change": false,
+          "comment": null
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Trigger": {
+      "main": [
+        [
+          {
+            "node": "Supabase row check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase row check": {
+      "main": [
+        [
+          {
+            "node": "Get Blog",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update a row": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract text from blog": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "HTML_Blog",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Blog": {
+      "main": [
+        [
+          {
+            "node": "Extract text from blog",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTML_Blog": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Update a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "d7fe8387-b640-4ef2-96ff-9bb98d08d0bb",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "331d746bc1a63563201e278bbfd6be74ef21f3e48d7328285e9bf034335c85dd"
+  },
+  "id": "ZQsRZ5F5SAulrXLn",
+  "tags": [
+    {
+      "updatedAt": "2026-01-14T22:03:19.715Z",
+      "createdAt": "2026-01-14T22:03:19.715Z",
+      "id": "ovTLfrcCyllneaEm",
+      "name": "Sub"
+    }
+  ]
+}

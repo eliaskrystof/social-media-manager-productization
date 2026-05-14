@@ -1,0 +1,46 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+Desktop.ini
+.vscode/
+.idea/
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+*.local
+*.key
+*.pem
+
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Next.js / frontend build outputs
+.next/
+out/
+dist/
+build/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Runtime data
+tmp/
+temp/
+.cache/
+
+# Local database/runtime volumes
+postgres-data/
+supabase/
+n8n-data/
+
+# Generated exports / local artifacts
+exports/
+artifacts/
+

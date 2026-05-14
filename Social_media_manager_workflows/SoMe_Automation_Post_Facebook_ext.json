@@ -1,0 +1,1010 @@
+{
+  "name": "SoMe_Automation_Post_Facebook_ext",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "id"
+            },
+            {
+              "name": "user_id"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -16,
+        -64
+      ],
+      "id": "45ca176f-870e-47d6-8317-1363af9c28bd",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -480,
+        240
+      ],
+      "id": "3ddbeb14-3355-4fad-9292-09e6259243b3",
+      "name": "When clicking ‘Test workflow’",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "SoMe_user_db",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "user_id",
+              "keyValue": "={{ $json.user_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        224,
+        -64
+      ],
+      "id": "fbf8635e-93e9-4333-b0b1-4c17b292f313",
+      "name": "Get Credentials",
+      "credentials": {
+        "supabaseApi": {
+          "id": "2oNjiFHjAgVX7z4h",
+          "name": "Supabase Origamis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "facebook_attachments",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        672,
+        -64
+      ],
+      "id": "971adeba-24bb-44bc-9d8a-85d5846f9765",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/v22.0/{{ $('Get Credentials').item.json.fb_page_id}}/photos",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/x-www-form-urlencoded"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "access_token",
+              "value": "={{ $('Get Credentials').item.json.fb_access_token }}"
+            },
+            {
+              "name": "url",
+              "value": "={{ $json.file_url }}"
+            },
+            {
+              "name": "published",
+              "value": "false"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1792,
+        288
+      ],
+      "id": "c78b718b-d91c-4884-830a-98b1a31f0f03",
+      "name": "FACEBOOK Publish photos"
+    },
+    {
+      "parameters": {
+        "jsCode": "const ids = $input.all().map(item => item.json.id);\nconst access_token = $('Get Credentials').first().json.fb_access_token;\nconst row = $('Get a row').first().json;\n\nlet message = row.caption_facebook || '';\n\nif (row.hashtags) {\n  message += `\\n\\n${row.hashtags}`;\n}\n\nif (row.credits_facebook) {\n  message += `\\n\\n${row.credits_facebook}`;\n}\n\n// Build the URL-encoded string\nlet bodyString = `access_token=${encodeURIComponent(access_token)}&message=${encodeURIComponent(message)}`;\n\n// Add attached media dynamically\nids.forEach((id, index) => {\n  const mediaParam = JSON.stringify({ media_fbid: id });\n  bodyString += `&attached_media[${index}]=${encodeURIComponent(mediaParam)}`;\n});\n\nreturn [{\n  json: {\n    body: bodyString\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2000,
+        288
+      ],
+      "id": "f1445561-8c07-4b6b-9dd0-2dd70d68f89d",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/v22.0/{{ $('Get Credentials').first().json.fb_page_id}}/feed",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "specifyBody": "string",
+        "body": "={{ $json.body }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2224,
+        288
+      ],
+      "id": "f56ae1ba-4d6e-4412-be10-74ffda46907f",
+      "name": "FACEBOOK PUBLISH FEED"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "14CkOky3jXC9rcwen1GmEy6U1ALrfHjDRD1HAjsoycQg",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "INSTAGRAM_content",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/14CkOky3jXC9rcwen1GmEy6U1ALrfHjDRD1HAjsoycQg/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Status": "done",
+            "row_number": "={{ $item(\"0\").$node[\"Get a row\"].json[\"source_row\"] }}"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "DATUM",
+              "displayName": "DATUM",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "FEED/ STORIES",
+              "displayName": "FEED/ STORIES",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "-",
+              "displayName": "-",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "TEXT IG",
+              "displayName": "TEXT IG",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": " CREDITS INSTAGRAM",
+              "displayName": " CREDITS INSTAGRAM",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "HASHTAGS INSTAGRAM",
+              "displayName": "HASHTAGS INSTAGRAM",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "TEXT FB",
+              "displayName": "TEXT FB",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "CREDITS FACEBOOK",
+              "displayName": "CREDITS FACEBOOK",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Odkaz na fotky",
+              "displayName": "Odkaz na fotky",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Instagram planned date",
+              "displayName": "Instagram planned date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Facebook planned date",
+              "displayName": "Facebook planned date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Instagram post time",
+              "displayName": "Instagram post time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Facebook post time",
+              "displayName": "Facebook post time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Zpracovat?",
+              "displayName": "Zpracovat?",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "output",
+              "displayName": "output",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        2560,
+        -496
+      ],
+      "id": "f419699a-85ae-4133-b01c-0b6ea2cdd160",
+      "name": "Update row in sheet",
+      "credentials": {
+        "googleApi": {
+          "id": "aHVI3CAM5JAErt7B",
+          "name": "Google Service Account account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "some_post_plan_selfhost_external",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "keyValue": "={{ $('When Executed by Another Workflow').item.json.id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        448,
+        -64
+      ],
+      "id": "81f51120-0083-47f9-a5ba-690540132def",
+      "name": "Get a row",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "2oNjiFHjAgVX7z4h",
+          "name": "Supabase Origamis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "expression",
+        "output": "={{\n(() => {\n  const arr = $('Get a row').item.json.facebook_attachments || [];   // original array (strings)\n  const total = arr.length;\n  const hasVideo = arr.some(s => String(s).includes('/video'));      // does the array contain any video?\n  const cur = String($json.facebook_attachments || '');              // current item (string from Split Out)\n\n  return (hasVideo && cur.includes('/video')) ? 0        // Case 1: array has video AND this item is video  → Out 1\n       : (!hasVideo && total === 1) ? 1                  // Case 2: array has no video AND length = 1      → Out 2\n       : (!hasVideo && total > 1) ? 2                    // Case 3: array has no video AND length > 1      → Out 3\n       : 3;                                              // Fallback (e.g., image in mixed set)             → Out 4\n})()\n}}\n"
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        880,
+        -80
+      ],
+      "id": "842b50b4-1d2c-4b3d-ba40-c3acf87012b9",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "myeskH2bF31TDHUM",
+          "mode": "list",
+          "cachedResultName": "SoMe_Automation_Upload_to_Bucket_ext"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "filePath": "={{ $json.facebook_attachments }}"
+          },
+          "matchingColumns": [
+            "filePath"
+          ],
+          "schema": [
+            {
+              "id": "filePath",
+              "displayName": "filePath",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        1280,
+        -96
+      ],
+      "id": "293c3c17-0304-4b98-9da2-bb6fc1c5119a",
+      "name": "UploadVideo"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "myeskH2bF31TDHUM",
+          "mode": "list",
+          "cachedResultName": "SoMe_Automation_Upload_to_Bucket_ext"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "filePath": "={{ $json.facebook_attachments }}"
+          },
+          "matchingColumns": [
+            "filePath"
+          ],
+          "schema": [
+            {
+              "id": "filePath",
+              "displayName": "filePath",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        1280,
+        80
+      ],
+      "id": "0ffe0884-d9b7-453b-9eee-bb2235df771a",
+      "name": "Upload Single Image"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "myeskH2bF31TDHUM",
+          "mode": "list",
+          "cachedResultName": "SoMe_Automation_Upload_to_Bucket_ext"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "filePath": "={{ $json.facebook_attachments }}"
+          },
+          "matchingColumns": [
+            "filePath"
+          ],
+          "schema": [
+            {
+              "id": "filePath",
+              "displayName": "filePath",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "mode": "each",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        1280,
+        288
+      ],
+      "id": "bfef388f-dff7-41c0-9ef8-d73514c3b76e",
+      "name": "Upload Multiple Images"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph-video.facebook.com/v22.0/{{ $('Get Credentials').item.json.fb_page_id}}/videos",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "access_token",
+              "value": "={{ $('Get Credentials').item.json.fb_access_token }}"
+            },
+            {
+              "name": "file_url",
+              "value": "={{ $json.file_url }}"
+            },
+            {
+              "name": "published",
+              "value": "true"
+            },
+            {
+              "name": "description",
+              "value": "={{ String($('Get a row').first().json.caption_facebook || '')\n     .trim()\n     .split('\\n')\n     .slice(1)\n     .join('\\n')\n     .trim() }}\n\n{{ $('Get a row').first().json.credits_facebook }}"
+            },
+            {
+              "name": "title",
+              "value": "=•{{ String($('Get a row').first().json.caption_facebook || '')\n     .trim()\n     .split('\\n')[0]\n     .replace(/^\\s*•\\s*(.*?)\\s*•\\s*$/u, '$1')\n     .trim() }}•"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1568,
+        -96
+      ],
+      "id": "d0163506-c110-4847-add7-f19846010ba9",
+      "name": "FACEBOOK Post video"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/v22.0/{{ $('Get Credentials').item.json.fb_page_id}}/photos",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "access_token",
+              "value": "={{ $('Get Credentials').item.json.fb_access_token }}"
+            },
+            {
+              "name": "url",
+              "value": "={{ $json.file_url }}"
+            },
+            {
+              "name": "published",
+              "value": "true"
+            },
+            {
+              "name": "caption",
+              "value": "={{ $('Get a row').first().json.caption_facebook}}\n\n{{ $('Get a row').first().json.hashtags }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1568,
+        80
+      ],
+      "id": "7da2adbe-7bdb-45c6-82b0-f5609c8aff81",
+      "name": "FACEBOOK Post Photo"
+    },
+    {
+      "parameters": {
+        "sortFieldsUi": {
+          "sortField": [
+            {
+              "fieldName": "file_url"
+            }
+          ]
+        },
+        "options": {
+          "disableDotNotation": false
+        }
+      },
+      "type": "n8n-nodes-base.sort",
+      "typeVersion": 1,
+      "position": [
+        1568,
+        288
+      ],
+      "id": "7d3dc581-bada-4b38-b07f-45add3b0e8cc",
+      "name": "Sort"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "=https://docs.google.com/spreadsheets/d/1ALKHp4TX5LUaHtX1NRPssE_oqZfXq9zS37_7XQfLeyA/edit?gid=0#gid=0{{ $('Get Credentials').item.json.master_table_id }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "SoMe_content",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        3232,
+        64
+      ],
+      "id": "49e4b1be-0fa2-4df4-b25a-74955b6263ec",
+      "name": "Write post to Master table2",
+      "credentials": {
+        "googleApi": {
+          "id": "aHVI3CAM5JAErt7B",
+          "name": "Google Service Account account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const ids = $input.all().map(item => item.json.id);\nconst access_token = $('Get Credentials').first().fb_json.access_token;\nconst row = $('Get a row').first().json;\n\nlet message = row.caption_facebook || '';\n\nif (row.credits_facebook) {\n  message += `\\n\\n${row.credits_facebook}`;\n}\n\n// Build the URL-encoded string\nlet bodyString = `access_token=${encodeURIComponent(access_token)}&message=${encodeURIComponent(message)}`;\n\n// Add attached media dynamically\nids.forEach((id, index) => {\n  const mediaParam = JSON.stringify({ media_fbid: id });\n  bodyString += `&attached_media[${index}]=${encodeURIComponent(mediaParam)}`;\n});\n\nreturn [{\n  json: {\n    body: bodyString\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2384,
+        -416
+      ],
+      "id": "96e2e6cf-6916-4629-9c67-a3dcd8866ba1",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "content": "## **2. Postovaní na socialmí média**\nNahraje fotku a popisky na facebook",
+        "height": 1060,
+        "width": 1716,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1168,
+        -208
+      ],
+      "typeVersion": 1,
+      "id": "dd0dd3ec-f689-41ce-9f08-a994fd88d437",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "content": "## **1. Init**\nInicializace a nastavení\n",
+        "height": 340,
+        "width": 1260,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -96,
+        -208
+      ],
+      "typeVersion": 1,
+      "id": "65e86871-d088-4391-97f5-122b7920eb8c",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "jsCode": "const ids = $input.all().map(item => item.json.id);\nconst access_token = $('Get Credentials1').first().fb_json.access_token;\nconst row = $('Get a row1').first().json;\n\nlet message = row.caption_facebook || '';\n\nif (row.credits_facebook) {\n  message += `\\n\\n${row.credits_facebook}`;\n}\n\n// Build the URL-encoded string\nlet bodyString = `access_token=${encodeURIComponent(access_token)}&message=${encodeURIComponent(message)}`;\n\n// Add attached media dynamically\nids.forEach((id, index) => {\n  const mediaParam = JSON.stringify({ media_fbid: id });\n  bodyString += `&attached_media[${index}]=${encodeURIComponent(mediaParam)}`;\n});\n\nreturn [{\n  json: {\n    body: bodyString\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3168,
+        528
+      ],
+      "id": "92201c7d-fab3-4f7a-915e-0294b8e6e776",
+      "name": "Code3"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "some_post_plan_selfhost_external",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "condition": "eq",
+              "keyValue": "={{ $('When Executed by Another Workflow').item.json.id }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "publish_fb",
+              "fieldValue": "done"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        2528,
+        16
+      ],
+      "id": "525ef99f-6d8c-4d13-b0ad-d303a40d4862",
+      "name": "Update a row",
+      "credentials": {
+        "supabaseApi": {
+          "id": "2oNjiFHjAgVX7z4h",
+          "name": "Supabase Origamis"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        2368,
+        16
+      ],
+      "id": "02cfdf4c-e51a-4d2f-b573-5e12e352694d",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "fc151190-5720-4ea5-a91b-086e35f7242f",
+              "name": "id",
+              "value": "={{ $('When Executed by Another Workflow').item.json.id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2688,
+        16
+      ],
+      "id": "1fe709ee-a96d-482a-9f5e-b38138554080",
+      "name": "Output"
+    }
+  ],
+  "pinData": {
+    "When Executed by Another Workflow": [
+      {
+        "json": {
+          "id": "901a8747-800b-40f1-b220-e89a0f6acbd0",
+          "user_id": "2b6a1df1-8e44-47ac-bee3-0161586ce72b"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Get Credentials",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Credentials": {
+      "main": [
+        [
+          {
+            "node": "Get a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FACEBOOK Publish photos": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "FACEBOOK PUBLISH FEED",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FACEBOOK PUBLISH FEED": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a row": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "UploadVideo",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Upload Single Image",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Upload Multiple Images",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload Single Image": {
+      "main": [
+        [
+          {
+            "node": "FACEBOOK Post Photo",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload Multiple Images": {
+      "main": [
+        [
+          {
+            "node": "Sort",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "UploadVideo": {
+      "main": [
+        [
+          {
+            "node": "FACEBOOK Post video",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FACEBOOK Post video": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FACEBOOK Post Photo": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sort": {
+      "main": [
+        [
+          {
+            "node": "FACEBOOK Publish photos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Update a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update a row": {
+      "main": [
+        [
+          {
+            "node": "Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "NmGg5uZ3m1rjeYmB"
+  },
+  "versionId": "bacb3b05-8d49-4496-8abd-7f0f00a4da30",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "2b07eec16886132e3cd818fdfac587c65db27d72fe33b2ee54f787b58f4dff76"
+  },
+  "id": "pV2vZcf6zRfZaTBh",
+  "tags": []
+}

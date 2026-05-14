@@ -1,0 +1,271 @@
+{
+  "name": "LI-Edit",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "LI-edit",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -288,
+        0
+      ],
+      "id": "8c87c059-0e71-4ae2-a5eb-164fab8997fd",
+      "name": "Webhook",
+      "webhookId": "72e7443a-32a3-40bf-9562-b4393dfb8949"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "LinkedIn_manager_posts",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "condition": "eq",
+              "keyValue": "={{ $('Webhook').item.json.body.post_id }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "profile",
+              "fieldValue": "={{ $('Webhook').item.json.body.profile }}"
+            },
+            {
+              "fieldId": "status",
+              "fieldValue": "=EDITED"
+            },
+            {
+              "fieldId": "linkedIn_text",
+              "fieldValue": "={{ $json.body.data.linkedin_content }}"
+            },
+            {
+              "fieldId": "scheduled_at",
+              "fieldValue": "={{ $json.body.data.scheduled_at }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -16,
+        0
+      ],
+      "id": "b97a5289-24dc-494a-871e-5cf24d58d1d8",
+      "name": "Update a row",
+      "credentials": {
+        "supabaseApi": {
+          "id": "2oNjiFHjAgVX7z4h",
+          "name": "Supabase Origamis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('Webhook').item.json.body.source.spreadsheetId }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Posts",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1nf9wkK40kH61WxccdwZqywsBRmBK-4TfaxQxd1orQsg/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "row_number": "={{ $('Webhook').item.json.body.rowNumber }}",
+            "Status": "={{ $json.status }}"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "Post_ID",
+              "displayName": "Post_ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Profile",
+              "displayName": "Profile",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Input",
+              "displayName": "Input",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "LinkedIn_content",
+              "displayName": "LinkedIn_content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Media_URL",
+              "displayName": "Media_URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Time",
+              "displayName": "Time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Checkbox",
+              "displayName": "Checkbox",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Result_url",
+              "displayName": "Result_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        272,
+        0
+      ],
+      "id": "1bdf4b6d-b43a-44e7-b2c1-0af6a154ef1c",
+      "name": "Update row Edit",
+      "alwaysOutputData": false,
+      "credentials": {
+        "googleApi": {
+          "id": "aHVI3CAM5JAErt7B",
+          "name": "Google Service Account account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Update a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update a row": {
+      "main": [
+        [
+          {
+            "node": "Update row Edit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update row Edit": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "OUAMGTbjNgyrDIGY"
+  },
+  "versionId": "56e0e488-ebcf-4f78-a244-065e34bb85ca",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "2b07eec16886132e3cd818fdfac587c65db27d72fe33b2ee54f787b58f4dff76"
+  },
+  "id": "yRgRqkMhw7kFUrRO",
+  "tags": []
+}

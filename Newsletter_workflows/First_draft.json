@@ -1,0 +1,437 @@
+{
+  "name": "First_draft",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "Newsletter",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -528,
+        32
+      ],
+      "id": "cb5ce3f8-a77b-4458-a9c5-947377a54fd4",
+      "name": "Webhook",
+      "webhookId": "4fb7a961-bad2-467f-9b6f-6a89fd5d197e"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "body.newsletters[0].languages",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -80,
+        32
+      ],
+      "id": "e8094020-8e6c-4f4a-97a8-fb7834eebfaf",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "Bsauh8A9GrYVS2N7",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/Bsauh8A9GrYVS2N7",
+          "cachedResultName": "Socials Agent — Newsletter_Each_draft_w/sub"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "language": "={{ $json.language }}",
+            "collection_title": "={{ $json.collection.title }}",
+            "collection_cta": "={{ $json.collection.cta }}",
+            "collection_body": "={{ $json.collection.body }}",
+            "pattern_title": "={{ $json.pattern.name }}",
+            "pattern_collectionName": "={{ $json.pattern.collectionName }}",
+            "pattern_collectionUrl": "={{ $json.pattern.collectionUrl }}",
+            "pattern_body": "={{ $json.pattern.body }}",
+            "pattern_cta": "={{ $json.pattern.cta }}",
+            "cta_text": "={{ $json.ctaContent }}",
+            "cta_button": "={{ $json.ctaButton }}",
+            "collection_url": "={{ $json.collection.url }}",
+            "blog": "={{ $json.blog1 }}",
+            "project": "={{ $json.project2 }}",
+            "source_row": "={{ $('Webhook').item.json.body.newsletters[0].rowNumber }}",
+            "subject": "={{ $json.subject }}",
+            "month": "={{ $json.month }}",
+            "targetGroup": "={{ $json.targetGroup }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "source_row",
+              "displayName": "source_row",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number",
+              "removed": false
+            },
+            {
+              "id": "blog",
+              "displayName": "blog",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "project",
+              "displayName": "project",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "language",
+              "displayName": "language",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "collection_title",
+              "displayName": "collection_title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "collection_cta",
+              "displayName": "collection_cta",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "collection_body",
+              "displayName": "collection_body",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "collection_url",
+              "displayName": "collection_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "pattern_title",
+              "displayName": "pattern_title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "pattern_collectionName",
+              "displayName": "pattern_collectionName",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "pattern_collectionUrl",
+              "displayName": "pattern_collectionUrl",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "pattern_body",
+              "displayName": "pattern_body",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "pattern_cta",
+              "displayName": "pattern_cta",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "cta_text",
+              "displayName": "cta_text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "cta_button",
+              "displayName": "cta_button",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "subject",
+              "displayName": "subject",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "month",
+              "displayName": "month",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "targetGroup",
+              "displayName": "targetGroup",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "mode": "each",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        144,
+        32
+      ],
+      "id": "fcaea237-07c8-40f7-a638-67e4957ea9b0",
+      "name": "Call 'Newsletter_Each_draft_w/sub'"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "=Zpracovávám požadavek. Vytvářím post pro jazyky: {{ ($json.body.newsletters?.[0]?.languages || []).map(l => l.language).join(', ') }}\n\nGenerování zabere cca 1 minutu pro každý jazyk.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        -320,
+        32
+      ],
+      "id": "5ab2abc3-40e5-481d-9458-dc4795a0296a",
+      "name": "Respond to Webhook",
+      "alwaysOutputData": true
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "origamis.app.n8n.cloud",
+            "user-agent": "Mozilla/5.0 (compatible; Google-Apps-Script; beanserver; +https://script.google.com; id: UAEmdDd_gTpSg_Bxa2I0aChIN19Gfc8RzqA)",
+            "content-length": "2251",
+            "accept-encoding": "gzip, br",
+            "cdn-loop": "cloudflare; loops=1; subreqs=1",
+            "cf-connecting-ip": "34.116.28.104",
+            "cf-ew-via": "15",
+            "cf-ipcountry": "US",
+            "cf-ray": "9d1f4dc306e1afb3-ATL",
+            "cf-visitor": "{\"scheme\":\"https\"}",
+            "cf-worker": "n8n.cloud",
+            "content-type": "application/json",
+            "x-forwarded-for": "34.116.28.104, 172.71.22.81",
+            "x-forwarded-host": "origamis.app.n8n.cloud",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "traefik-prod-users-gwc-54-58b646fcb5-cdgwt",
+            "x-is-trusted": "yes",
+            "x-real-ip": "34.116.28.104"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "newsletters": [
+              {
+                "rowNumber": 7,
+                "languages": [
+                  {
+                    "month": "December",
+                    "targetGroup": "Architects & Designers",
+                    "subject": "Testujeme_subject",
+                    "blog1": "https://www.oakcent.com/blog/blogove-18/vzor-pokladky-drevenych-podlah-33",
+                    "project2": "https://www.oakcent.com/kastiel-kubinyi",
+                    "collection": {
+                      "name": "Sand",
+                      "title": "Sand",
+                      "body": "Světlé odstíny kolekce Sand vnesly do realizace jemně teplé přírodní tóny a zklidňující energii dřeva v souladu s přírodou.",
+                      "img1": "https://drive.google.com/file/d/1I_6z-pmk4PyWngNELDOLPvc8xzDQ-BG7/view?usp=sharing",
+                      "img2": "",
+                      "cta": "Objevte kolekci Sand",
+                      "url": "https://www.oakcent.cz/kolekce-podlah/sand"
+                    },
+                    "pattern": {
+                      "name": "Planks",
+                      "title": "Planks",
+                      "collectionName": "Planks z kolekce Heritage",
+                      "body": "Vzor Planks nechal vyniknout přirozenou kresbu dřeva a dodal prostoru nadčasovou eleganci s čistými liniemi.",
+                      "img1": "https://drive.google.com/file/d/1kr--XA8A0kDTlildJ9CfarMkuwe8ONDL/view?usp=sharing",
+                      "img2": "",
+                      "cta": "Prozkoumejte Planks",
+                      "collectionUrl": "https://www.oakcent.cz/kolekce-heritage"
+                    },
+                    "ctaContent": "Hledáte autentické textury a barvy pro svůj projekt? Stáhněte si výběr vzorů Oakcent a nabídněte svým klientům vyjimečnost.",
+                    "ctaButton": "Stáhnout textury",
+                    "language": "czech"
+                  },
+                  {
+                    "month": "December",
+                    "targetGroup": "Architects & Designers",
+                    "subject": "Testujeme_subject",
+                    "blog1": "https://www.oakcent.com/blog/blogove-18/vzor-pokladky-drevenych-podlah-33",
+                    "project2": "https://www.oakcent.com/kastiel-kubinyi",
+                    "collection": {
+                      "name": "Sand",
+                      "title": "Sand",
+                      "body": "The light shades of the Sand collection bring gentle, warm natural tones and the calming energy of oak, in harmony with nature.",
+                      "img1": "",
+                      "img2": "",
+                      "cta": "Discover the Sand collection",
+                      "url": "https://www.oakcent.com/floor-collection/sand"
+                    },
+                    "pattern": {
+                      "name": "Planks",
+                      "title": "",
+                      "collectionName": "Planks from the Heritage collection",
+                      "body": "The Planks pattern highlights the natural grain of wood, adding timeless elegance with clean lines.",
+                      "img1": "",
+                      "img2": "",
+                      "cta": "Explore Planks",
+                      "collectionUrl": "https://www.oakcent.com/collection-heritage"
+                    },
+                    "ctaContent": "Seeking distinctive oak textures and tones for your next design project? Download our curated textures.",
+                    "ctaButton": "Download textures",
+                    "language": "english"
+                  }
+                ]
+              }
+            ]
+          },
+          "webhookUrl": "https://origamis.app.n8n.cloud/webhook/Newsletter",
+          "executionMode": "production"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Call 'Newsletter_Each_draft_w/sub'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond to Webhook": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "763d180b-da39-4b15-bffd-29b0e84261b5",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "331d746bc1a63563201e278bbfd6be74ef21f3e48d7328285e9bf034335c85dd"
+  },
+  "id": "9MH1Zek9LQPbyBQq",
+  "tags": [
+    {
+      "updatedAt": "2026-01-14T22:03:09.472Z",
+      "createdAt": "2026-01-14T22:03:09.472Z",
+      "id": "xLAiVS0zmvQzWdop",
+      "name": "Webhook"
+    }
+  ]
+}

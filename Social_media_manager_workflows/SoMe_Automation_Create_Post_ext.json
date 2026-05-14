@@ -1,0 +1,1292 @@
+{
+  "name": "SoMe_Automation_Create_Post_ext",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## **1. Init**\nInicializace a nastavení\n",
+        "height": 640,
+        "width": 1060,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1536,
+        1120
+      ],
+      "typeVersion": 1,
+      "id": "e2fc85b2-0a6e-4860-a302-f4398b3c8f39",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "content": "## **3. Vytvoření popisků pro posty**\nVytvoří popisky do postu pro všechny sociální sítě a pošle je uživateli",
+        "height": 640,
+        "width": 1280,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        688,
+        1120
+      ],
+      "typeVersion": 1,
+      "id": "01368ed6-fb74-40e6-b1d4-e6aed960308d",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## **2. Získání obrázku**\nVytvoří návrhové obrázky na základě uživatelových obrázků",
+        "height": 640,
+        "width": 1092,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -496,
+        1120
+      ],
+      "typeVersion": 1,
+      "id": "a28e35c6-4668-4347-8ee8-6b030e3ceca8",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ext_Create_Post",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -1504,
+        1360
+      ],
+      "id": "ee993005-3145-4e58-9cc8-0db91870a85f",
+      "name": "Webhook",
+      "webhookId": "05cb99f4-59a0-4d35-9966-2200f3810371"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Get Credentials').item.json.reference_email }}",
+        "subject": "=New post idea for {{ $('Get Credentials').item.json.user_name }}",
+        "message": "=<!DOCTYPE html> <html lang=\"cs\"> <head>     <meta charset=\"UTF-8\">     <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">     <title>Combined Social Media Posts</title>     <link href=\"https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap\" rel=\"stylesheet\">     <style>         body {             font-family: 'Inter', sans-serif;             background-color: #f0f2f5;             padding: 20px;         }         .outer-box {             /* Reduced max-width to make it smaller than the Instagram post */             max-width: 450px;             margin: 20px auto;             background-color: #fff;             border-radius: 8px;             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);         }         .outer-box-header {             background-color: #1877f2;             color: #fff;             font-size: 16px;             font-weight: 700;             padding: 16px;             border-top-left-radius: 8px;             border-top-right-radius: 8px;         }         .post-container {             padding: 16px;         }         .post-header {             display: flex;             align-items: flex-start;             margin-bottom: 12px;         }         .header-left {             display: flex;             align-items: center;             flex: 1;         }         .profile-pic {             width: 40px;             height: 40px;             border-radius: 50%;             margin-right: 12px;         }         .header-text h1 {             font-size: 15px;             font-weight: 600;             color: #050505;             margin: 0;             line-height: 1;         }         .header-text p {             font-size: 13px;             color: #65676b;             margin: 0;             line-height: 1;         }         .header-right {             flex: 1;             text-align: right;             line-height: 0;         }         .header-right img {             width: 50px;             max-width: 150px;         }         .post-body p {             /* Reverted font size to original value */             font-size: 15px;             color: #050505;             line-height: 1.4;             margin: 0 0 12px 0;             white-space: pre-line;         }         .post-image {             width: 100%;             border-radius: 8px;             margin-top: 12px;         }         .instagram-outer-box {             /* Increased max-width to make it bigger than the Facebook post */             max-width: 700px;             margin: 20px auto;         }         .instagram-header {             background-image: linear-gradient(135deg, #4c68d7, #e81d72);             padding: 15px 20px;             color: #fff;             font-weight: bold;             border-top-left-radius: 8px;             border-top-right-radius: 8px;         }         .instagram-header h1 {             font-size: 16px;             margin: 0;         }         .instagram-post-table {             background-color: #fff;             border-radius: 8px;             border: 1px solid #dbdbdb;             overflow: hidden;             width: 100%;             /* Increased max-width here as well to match the outer box */             max-width: 700px;             margin: 0 auto;         }         /* Adjusted font sizes for better readability at the larger width */         .instagram-post-table span {           font-size: 14px !important;         }         .instagram-post-table p {           font-size: 12px !important;         }         .instagram-post-table td {           padding: 10px !important;         }     </style> </head> <body>  <!-- Facebook Post --> <div class=\"outer-box\">     <div class=\"outer-box-header\">         Facebook     </div>     <div class=\"post-container\">         <!-- Post Header Section -->         <div class=\"post-header\">             <div class=\"header-left\">                 <img class=\"profile-pic\" src=\"https://i.imgur.com/MrXNpIk.png\" alt=\"Profile Picture\">                 <div class=\"header-text\">                     <h1>your_page</h1>                     <p>Zveřejněno your_app</p>                 </div>             </div>             <div class=\"header-right\">                 <img src=\"https://i.imgur.com/cDXxJq8.png\" alt=\"Replaced content\">             </div>         </div>                  <!-- Post Text Section -->         <div class=\"post-body\">             <p>                 <!-- Start of Post Text -->                 {{ $json.output.Facebook }}  {{ $json.output.Hastags }}                 <!-- End of Post Text -->             </p>         </div>                  <!-- Main Post Image Section -->         <img class=\"post-image\" src=\"{{ $('Pass input').item.json.facebook_img_preview }}\" alt=\"Main Post Image\">          <!-- Section below the main image, replaced by a single image from Imgur -->         <img src=\"https://i.imgur.com/0KOVuGd.png\" alt=\"Replaced content\" style=\"width: 100%; margin-top: 12px;\">      </div> </div>  <!-- Instagram Post --> <div class=\"instagram-outer-box\">     <div class=\"instagram-header\">         <h1>Instagram</h1>     </div>     <table role=\"presentation\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\">         <tr>             <td align=\"center\" style=\"padding: 0;\">                 <table role=\"presentation\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"background-color: #fff; border-radius: 8px; border: 1px solid #dbdbdb; overflow: hidden;\">                     <tr>                         <!-- Left Side - Post Image (2/3 of width) -->                         <td width=\"88%\" style=\"padding: 0;\">                             <img src=\"{{ $('Pass input').item.json.instagram_img_preview }}\" alt=\"Instagram Post Image\" style=\"width: 100%; height: auto; display: block;\">                         </td>                                                  <!-- Right Side - Instagram Interface (1/3 of width) -->                         <td width=\"12%\" valign=\"bottom\" style=\"background-color: #fff; padding: 10px; color: #262626;\">                             <!-- Header -->                             <table role=\"presentation\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\">                                 <tr>                                     <td style=\"padding-bottom: 5px; font-size: 0;\">                                         <table role=\"presentation\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\">                                             <tr>                                                 <td style=\"padding-right: 5px;\">                                                     <img src=\"https://i.imgur.com/fL430WU.png\" alt=\"Profile icon\" width=\"24\" height=\"24\" style=\"border-radius: 50%;\">                                                 </td>                                                 <td valign=\"middle\">                                                     <span style=\"font-weight: 600; font-size: 14px;\">your_profile</span>                                                 </td>                                                 <td style=\"padding: 0; text-align: right;\">                                                     <img src=\"https://i.imgur.com/jqV4fyT.png\" alt=\"Options\" width=\"24\" height=\"24\">                                                 </td>                                             </tr>                                         </table>                                     </td>                                 </tr>                             </table>                                                          <!-- Full-width separator -->                             <div style=\"height: 1px; background-color: #efefef; margin: 5px 0;\"></div>                                                          <!-- Post Content -->                             <div style=\"font-size: 12px; line-height: 1.4; padding: 5px 0;\">                                 <p style=\"color: #262626; margin: 0;\">{{ $json.output.Instagram }}<br><br>{{ $json.output.Hastags }}</p>                             </div>                                                          <div style=\"padding: 5px 0;\">                                 <img src=\"https://i.imgur.com/DgzB8rm.png\" alt=\"Combined bottom icons\" style=\"width: 191px; height: auto; display: block;\">                             </div>                         </td>                     </tr>                 </table>             </td>         </tr>     </table> </div>  </body> </html>",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        -1488,
+        2000
+      ],
+      "id": "fbf747cd-cdd9-41d6-aa81-1bba2e4b529e",
+      "name": "Send a message",
+      "webhookId": "2180bb40-3bc3-4b69-b65a-81606e72351f",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "uw1TRsYWazbTRe5e",
+          "name": "Gmail account Oauth"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b3342ea5-c3b9-4efc-b253-294c1dca3ab8",
+              "name": "preview_file",
+              "value": "=<!DOCTYPE html>\n<html lang=\"cs\">\n<head>\n  <meta charset=\"UTF-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n  <title>Combined Social Media Posts</title>\n  <link href=\"https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap\" rel=\"stylesheet\">\n  <style>\n    body {\n      font-family: 'Inter', sans-serif;\n      background-color: #f0f2f5;\n      padding: 20px;\n    }\n\n    .outer-box {\n      max-width: 450px;\n      margin: 20px auto;\n      background-color: #fff;\n      border-radius: 8px;\n      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);\n    }\n\n    .outer-box-header {\n      background-color: #1877f2;\n      color: #fff;\n      font-size: 16px;\n      font-weight: 700;\n      padding: 16px;\n      border-top-left-radius: 8px;\n      border-top-right-radius: 8px;\n    }\n\n    .post-container {\n      padding: 16px;\n    }\n\n    .post-header {\n      display: flex;\n      align-items: flex-start;\n      margin-bottom: 12px;\n    }\n\n    .header-left {\n      display: flex;\n      align-items: center;\n      flex: 1;\n    }\n\n    .profile-pic {\n      width: 40px;\n      height: 40px;\n      border-radius: 50%;\n      margin-right: 12px;\n    }\n\n    .header-text h1 {\n      font-size: 15px;\n      font-weight: 600;\n      color: #050505;\n      margin: 0;\n      line-height: 1;\n    }\n\n    .header-text p {\n      font-size: 13px;\n      color: #65676b;\n      margin: 0;\n      line-height: 1;\n    }\n\n    .header-right {\n      flex: 1;\n      text-align: right;\n      line-height: 0;\n    }\n\n    .header-right img {\n      width: 50px;\n      max-width: 150px;\n    }\n\n    .post-body p {\n      font-size: 15px;\n      color: #050505;\n      line-height: 1.4;\n      margin: 0 0 12px 0;\n      white-space: pre-line;\n    }\n\n    .post-image {\n      width: 100%;\n      border-radius: 8px;\n      margin-top: 12px;\n    }\n\n    /* Instagram */\n    .instagram-outer-box {\n      max-width: 700px;\n      margin: 20px auto;\n    }\n\n    .instagram-header {\n      background-image: linear-gradient(135deg, #4c68d7, #e81d72);\n      padding: 15px 20px;\n      color: #fff;\n      font-weight: bold;\n      border-top-left-radius: 8px;\n      border-top-right-radius: 8px;\n    }\n\n    .instagram-header h1 {\n      font-size: 16px;\n      margin: 0;\n    }\n\n    .instagram-post-table {\n      background-color: #fff;\n      border-radius: 8px;\n      border: 1px solid #dbdbdb;\n      overflow: hidden;\n      width: 100%;\n      max-width: 700px;\n      margin: 0 auto;\n    }\n\n    .instagram-post-table span {\n      font-size: 14px !important;\n    }\n\n    .instagram-post-table p {\n      font-size: 12px !important;\n    }\n\n    .instagram-post-table td {\n      padding: 10px !important;\n    }\n\n    /* LinkedIn */\n    .linkedin-outer-box {\n      max-width: 650px;\n      margin: 40px auto;\n      background-color: #ffffff;\n      border-radius: 8px;\n      border: 1px solid #d0d7de;\n      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);\n    }\n\n    .linkedin-header {\n      background-color: #0a66c2;\n      color: #fff;\n      padding: 14px 20px;\n      font-weight: 700;\n      border-top-left-radius: 8px;\n      border-top-right-radius: 8px;\n    }\n\n    .linkedin-body {\n      padding: 20px;\n    }\n\n    .linkedin-body h2 {\n      font-size: 15px;\n      font-weight: 600;\n      color: #1d2226;\n      margin: 0 0 8px 0;\n    }\n\n    .linkedin-body p {\n      font-size: 14px;\n      color: #1d2226;\n      line-height: 1.5;\n      white-space: pre-line;\n      margin-bottom: 10px;\n    }\n\n    .linkedin-image {\n      width: 100%;\n      border-radius: 8px;\n      margin-top: 12px;\n    }\n\n    .linkedin-footer {\n      font-size: 12px;\n      color: #666;\n      border-top: 1px solid #ddd;\n      padding-top: 8px;\n      margin-top: 8px;\n    }\n  </style>\n</head>\n<body>\n\n  <!-- Facebook Post -->\n  <div class=\"outer-box\">\n    <div class=\"outer-box-header\">Facebook</div>\n    <div class=\"post-container\">\n      <div class=\"post-header\">\n        <div class=\"header-left\">\n          <img class=\"profile-pic\" src=\"https://i.imgur.com/MrXNpIk.png\" alt=\"Profile Picture\">\n          <div class=\"header-text\">\n            <h1>your_page</h1>\n            <p>Zveřejněno your_app</p>\n          </div>\n        </div>\n        <div class=\"header-right\">\n          <img src=\"https://i.imgur.com/cDXxJq8.png\" alt=\"Replaced content\">\n        </div>\n      </div>\n\n      <div class=\"post-body\">\n        <p>{{ $json.output.Facebook }}<br><br>{{ $json.output.Hastags }}</p>\n      </div>\n\n      <img class=\"post-image\" src=\"{{ $('Merge').item.json.preview_images[1].facebook_img_preview }}\" alt=\"Main Post Image\">\n      <img src=\"https://i.imgur.com/0KOVuGd.png\" alt=\"Replaced content\" style=\"width: 100%; margin-top: 12px;\">\n    </div>\n  </div>\n\n  <!-- Instagram Post -->\n  <div class=\"instagram-outer-box\">\n    <div class=\"instagram-header\">\n      <h1>Instagram</h1>\n    </div>\n    <table role=\"presentation\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\">\n      <tr>\n        <td align=\"center\" style=\"padding: 0;\">\n          <table role=\"presentation\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" style=\"background-color: #fff; border-radius: 8px; border: 1px solid #dbdbdb; overflow: hidden;\">\n            <tr>\n              <td width=\"88%\" style=\"padding: 0;\">\n                <img src=\"{{ $('Merge').item.json.preview_images[0].instagram_img_preview }}\" alt=\"Instagram Post Image\" style=\"width: 100%; height: auto; display: block;\">\n              </td>\n              <td width=\"12%\" valign=\"bottom\" style=\"background-color: #fff; padding: 10px; color: #262626;\">\n                <div style=\"font-size: 12px; line-height: 1.4; padding: 5px 0;\">\n                  <p style=\"color: #262626; margin: 0;\">{{ $json.output.Instagram }}<br><br>{{ $json.output.Hastags }}</p>\n                </div>\n                <div style=\"padding: 5px 0;\">\n                  <img src=\"https://i.imgur.com/DgzB8rm.png\" alt=\"Combined bottom icons\" style=\"width: 191px; height: auto; display: block;\">\n                </div>\n              </td>\n            </tr>\n          </table>\n        </td>\n      </tr>\n    </table>\n  </div>\n\n  <!-- LinkedIn Post -->\n  <div class=\"linkedin-outer-box\">\n    <div class=\"linkedin-header\">LinkedIn</div>\n    <div class=\"linkedin-body\">\n      <h2>your_company • Sponsored</h2>\n      <p>{{ $json.output.LinkedIn }}</p>\n      <img class=\"linkedin-image\" src=\"{{ $('Merge').item.json.preview_images[0].linkedin_img_preview }}\" alt=\"LinkedIn Post Image\">\n      <div class=\"linkedin-footer\">\n        {{ $json.output.Hastags }}\n      </div>\n    </div>\n  </div>\n\n</body>\n</html>\n",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1056,
+        1360
+      ],
+      "id": "d4d001eb-6d8d-49cd-8a1f-ac79de3dfbbb",
+      "name": "Construct HTML body"
+    },
+    {
+      "parameters": {
+        "name": "=Post_{{ $('Webhook').first().json.body.row -1}}_preview_{{$now.format('yyMMddhhmmss')}}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $('Merge').first().json.preview_folder_id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1488,
+        1360
+      ],
+      "id": "64fe6404-e808-4bc9-91a8-b2ab03e8be8f",
+      "name": "Upload Preview to Folder",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "nXk2DfRv4PmQZ9s1",
+          "name": "Google Drive Oauth"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Input: JSON field with key \"preview_file\"\nconst htmlContent = $json.preview_file;\n\nreturn [\n  {\n    json: {},\n    binary: {\n      data: {\n        data: Buffer.from(htmlContent, \"utf8\").toString(\"base64\"),\n        mimeType: \"text/html\",\n        fileName: \"preview.html\"\n      }\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1280,
+        1360
+      ],
+      "id": "19acb35e-8e97-4880-84bc-5ce2e164167d",
+      "name": "Create HTML file"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "SoMe_user_db",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "master_table_id",
+              "keyValue": "={{ $('Webhook').item.json.body.sheetId }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -1168,
+        1360
+      ],
+      "id": "e66f1844-1a25-43ff-adac-54f98feb03de",
+      "name": "Get Credentials",
+      "credentials": {
+        "supabaseApi": {
+          "id": "2oNjiFHjAgVX7z4h",
+          "name": "Supabase Origamis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('Get Credentials').item.json.master_table_id }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1176512037,
+          "mode": "list",
+          "cachedResultName": "Settings",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/15cQZTDfZfvI5jKNLq_x5e-p7iacE2xBn9D6eoBdcKBk/edit#gid=1176512037"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        -1008,
+        1360
+      ],
+      "id": "448b193b-3743-49bf-bae2-af9c150451a8",
+      "name": "Get Settings",
+      "credentials": {
+        "googleApi": {
+          "id": "aHVI3CAM5JAErt7B",
+          "name": "Google Service Account account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const webhookData = $('Webhook').first().json.body;       // Incoming payload\nconst settings = $('Get Settings').first().json;          // Settings object\n\n// Determine assignment type\nlet assignmentSegment = \"\";\nif (webhookData.action_name === \"Create Posts\") {\n  assignmentSegment = \"Your assignment is to create complete, engaging post content for the given topic. Write new posts from scratch that align with the brand voice and current campaign context.\";\n} else if (webhookData.action_name === \"Update Posts\") {\n  assignmentSegment = \"Your assignment is to update existing post content based on user feedback or new information. Improve clarity, tone, or structure while maintaining the core idea and brand style.\";\n} else {\n  assignmentSegment = \"Your assignment is to produce social media content as per provided context.\";\n}\n\n// Build dynamic per-platform constraints\nconst platformInstructions = [];\n\nif (webhookData.action_for_instagram === false) {\n  platformInstructions.push(\"- Do **not** write Instagram content; leave the 'Instagram' field empty but keep the key present in JSON.\");\n}\nif (webhookData.action_for_facebook === false) {\n  platformInstructions.push(\"- Do **not** write Facebook content; leave the 'Facebook' field empty but keep the key present in JSON.\");\n}\nif (webhookData.action_for_linkedin === false) {\n  platformInstructions.push(\"- Do **not** write LinkedIn content; leave the 'LinkedIn' field empty but keep the key present in JSON.\");\n}\n\n// Build final prompt\nconst prompt = `\n# Role\nYou are a professional Social Media Copywriter specializing in crafting high-quality posts for Instagram, Facebook, and LinkedIn.  \nYour goal is to produce complete, engaging, and brand-consistent text content for these platforms.\n\n---\n\n## Assignment\n${assignmentSegment}\n\n---\n\n## Platform Behaviour\n- Instagram and Facebook posts share identical text and hashtags.  \n- LinkedIn post is distinct, written in a more professional, insight-driven tone.  \n- Keep formatting natural for each platform (no hashtags in LinkedIn text).\n\n${\n  platformInstructions.length > 0\n    ? `\\n### Platform-Specific Instructions\\n${platformInstructions.join('\\n')}\\n`\n    : ''\n}\n\n---\n\n## Style and Tone\n**Instagram/Facebook Prompt:** ${settings.prompt_instagram || \"\"}\n**LinkedIn Prompt:** ${settings.prompt_linkedin || \"\"}\n**Tone of Voice:** ${settings.tone_of_voice || \"\"}\n**Target Audience:** ${settings.target_audience || \"\"}\n**Product / Topic:** ${settings.product || \"\"}\n**Language:** ${settings.language || \"\"}\n\n---\n\n## Formatting Rules\n- Write naturally, without emojis unless clearly appropriate.  \n- Use clear paragraphs for readability.  \n- Ensure professional grammar and coherence.  \n- Avoid meta explanations, markdown, or system notes — output pure text content.  \n\n---\n\n## Output JSON Structure\nReturn the result **only** in this JSON format. No other fields. No follow up question. Answer to the best of your ability in **only** the expected format:\n\n\\`\\`\\`json\n{\n  \"Facebook\": \"string\",\n  \"Instagram\": \"string\",\n  \"LinkedIn\": \"string\",\n  \"Hashtags\": \"Hashtag1, Hashtag2, Hashtag3\"\n}\n\\`\\`\\`\n\n- The keys **must always be present** in the JSON output.  \n- If any \"action_for_<platform>\" value is false, output an empty string (\"\") for that platform's value.  \n- The JSON must be valid and parsable.\n`;\n\n// Return to n8n\nreturn [\n  {\n    json: {\n      system_prompt: prompt.trim(),\n      action_name: webhookData.action_name,\n    },\n  },\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -704,
+        1360
+      ],
+      "id": "08a97c8c-159e-4b31-82e3-49c716a5e81c",
+      "name": "Compile System message"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Webhook').first().json.body.image_source }}",
+                    "rightValue": "yes",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "7c513d27-bc0e-467d-8ddb-efe1ed28c2d8"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "ba9a4c3a-e482-4918-921a-b4493b3f9359",
+                    "leftValue": "={{ $('Webhook').first().json.body.image_source }}",
+                    "rightValue": "no",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "c4485cbb-c120-422e-b5b0-994472a4ef4d",
+                    "leftValue": "={{ $('Webhook').first().json.body.image_source }}",
+                    "rightValue": "create",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -400,
+        1360
+      ],
+      "id": "634cc129-409f-416f-bd8c-ac66bb56567b",
+      "name": "Use image or create"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "efd013dc-5e4c-447c-8499-59016ee09ea1",
+              "name": "preview_images",
+              "value": "={\n\"instagram_img_preview\":\"\",\n\"facebook_img_preview\":\"\",\n\"linkedin_img_preview\":\"\"\n}",
+              "type": "object"
+            },
+            {
+              "id": "b0c10001-8283-439e-a366-9059a2600526",
+              "name": "preview_folder_id",
+              "value": "={{ $json.name === 'Preview' ? $json.id : '' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        256,
+        1360
+      ],
+      "id": "e25878b9-3311-4aa1-b9e7-4172ad93462f",
+      "name": "No images"
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "searchMethod": "query",
+        "queryString": "='{{ $('Webhook').first().json.body.content.photos_link.match(/\\/folders\\/([^?]+)/)[1] }}' in parents",
+        "filter": {},
+        "options": {
+          "fields": [
+            "id",
+            "name"
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -128,
+        1360
+      ],
+      "id": "11a0f2f3-2670-4715-8637-693efa4e941d",
+      "name": "Search files and folders",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "nXk2DfRv4PmQZ9s1",
+          "name": "Google Drive Oauth"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        480,
+        1360
+      ],
+      "id": "6522f730-2418-4bad-9e56-a48838cef751",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "wcZGzVKb7Xhza2BG",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/wcZGzVKb7Xhza2BG",
+          "cachedResultName": "Search_Images_folder"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "folder_id": "={{ $('Webhook').first().json.body.content.photos_link.match(/\\/folders\\/([^?]+)/)[1] }}",
+            "master_table_id": "={{ $('Webhook').item.json.body.sheetId }}",
+            "execution_id": "={{ $execution.id }}",
+            "post_id": "={{ $('Webhook').item.json.body.row.toString() -1 }}"
+          },
+          "matchingColumns": [
+            "body_content_firstItem"
+          ],
+          "schema": [
+            {
+              "id": "folder_id",
+              "displayName": "folder_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "master_table_id",
+              "displayName": "master_table_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "execution_id",
+              "displayName": "execution_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "post_id",
+              "displayName": "post_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        -64,
+        1168
+      ],
+      "name": "Search Image folders",
+      "id": "564e74c6-4a54-42b5-a9e6-f61b8d369b12"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "wuBpeRRW0VTWasLv",
+          "mode": "list",
+          "cachedResultName": "SoMe_Automation_Get_Prompts"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "instagram_prompt_id",
+              "displayName": "instagram_prompt_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "facebook_prompt_id",
+              "displayName": "facebook_prompt_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "linkedin_prompt_id",
+              "displayName": "linkedin_prompt_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        -1488,
+        1824
+      ],
+      "id": "e92fe5bf-da85-4bb4-acc8-391b1ac18149",
+      "name": "Get Prompts",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "content": "**Nastavené nody**",
+        "height": 420
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1536,
+        1760
+      ],
+      "typeVersion": 1,
+      "id": "b7bcd373-a25d-4fda-a660-72f2d6f2ae8e",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "ckD4lFPMVFRnixHp",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/ckD4lFPMVFRnixHp",
+          "cachedResultName": "SoMe_Create_Image"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "post_idea": "={{ $('Webhook').item.json.body.content.text_ig }}",
+            "user_notes": "={{ $('Webhook').item.json.body.user_input }}",
+            "folder_id": "={{ $('Webhook').first().json.body.content.photos_link.match(/\\/folders\\/([^?]+)/)[1] }}",
+            "master_table_id": "={{ $('Webhook').item.json.body.sheetId }}",
+            "row_id": "={{ $('Webhook').item.json.body.row.toString() -1 }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "post_idea",
+              "displayName": "post_idea",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "user_notes",
+              "displayName": "user_notes",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "folder_id",
+              "displayName": "folder_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "master_table_id",
+              "displayName": "master_table_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "row_id",
+              "displayName": "row_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        -64,
+        1568
+      ],
+      "id": "279312a9-230d-416d-9735-2f054d33459b",
+      "name": "Generate Images"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"LinkedIn\": \"string\",\n  \"Facebook\":  \"string\",\n  \"Instagram\": \"string\",\n  \"Hastags\": \"Hashtag1, Hashtag2, Hashtag3\" \n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        832,
+        1584
+      ],
+      "id": "331734b8-0e55-40b0-9133-f28c038b3d8f",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-4o",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        720,
+        1584
+      ],
+      "id": "7c6a496f-7bad-4451-a865-5a11a12e516a",
+      "name": "GPT 5",
+      "credentials": {
+        "openRouterApi": {
+          "id": "XukdnWQa8YAEwGzI",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Webhook').first().json.body.action_name === 'Create Posts' ? 'Create a post based on this input' : 'Update the current post:' }}\n\n{{ $('Webhook').first().json.body.action_name === 'Update Posts' ? 'Instagram content: '+ $('Webhook').first().json.body.content.text_ig : $('Webhook').first().json.body.content.text_ig }}\n\n{{ $('Webhook').first().json.body.action_name === 'Update Posts' ? 'Hashtags: '+ $('Webhook').first().json.body.content.hashtags_ig : null }}\n\n{{ $('Webhook').first().json.body.action_name === 'Update Posts' ? 'Facebook content: '+ $('Webhook').first().json.body.content.text_fb : null }}\n\n{{ $('Webhook').first().json.body.action_name === 'Update Posts' ? 'LinkedIn content: '+ $('Webhook').first().json.body.content.text_li : null }}\n\n{{ $('Webhook').first().json.body.action_name === 'Update Posts' ? 'These are the user comments: '+ $('Webhook').first().json.body.user_input : null }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "={{ $('Compile System message').item.json.system_prompt }}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.8,
+      "position": [
+        688,
+        1360
+      ],
+      "id": "8f5c9ce9-f9a8-44e2-a1f2-20bd390555cd",
+      "name": "SUBJECT WRITER AGENT",
+      "alwaysOutputData": false,
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('Get Credentials').first().json.master_table_id }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "SoMe_content",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "row_number": "={{ $('Webhook').first().json.body.row}}",
+            "ŘÁDEK": "={{ $('Webhook').first().json.body.row -1}}",
+            "INSTAGRAM TEXT": "={{ $('SUBJECT WRITER AGENT').first().json.output.Facebook }}",
+            "HASHTAGS # IG": "={{ $('SUBJECT WRITER AGENT').first().json.output.Hastags.join(',') || null  }}",
+            "FACEBOOK TEXT": "={{ $('SUBJECT WRITER AGENT').first().json.output.Facebook }}",
+            "LINKEDIN TEXT": "={{ $('SUBJECT WRITER AGENT').first().json.output.LinkedIn }}",
+            "NÁHLED ": "==HYPERLINK(\"https://drive.google.com/uc?export=download&id={{$('Upload Preview to Folder').item.json.id}}\",\"Stáhnout Náhled\")",
+            "ČAS POSTU INSTAGRAM": "={{ \n  $json.body.content.ig_post_time && String($json.body.content.ig_post_time).trim()\n    ? $json.body.content.ig_post_time\n    : $json.body.action_name === 'Create Posts'\n      ? $('Get Settings').first().json['default_post_time_instagram']\n      : ''\n}}",
+            "ČAS POSTU FACEBOOK": "={{ \n  $json.body.content.fb_post_time && String($json.body.content.fb_post_time).trim()\n    ? $json.body.content.fb_post_time\n    : $json.body.action_name === 'Create Posts'\n      ? $('Get Settings').first().json['default_post_time_facebook']\n      : ''\n}}",
+            "ČAS POSTU LINKEDIN": "={{ \n  $json.body.content.li_post_time && String($json.body.content.li_post_time).trim()\n    ? $json.body.content.li_post_time\n    : $json.body.action_name === 'Create Posts'\n      ? $('Get Settings').first().json['default_post_time_linkedin']\n      : ''\n}}",
+            "FÁZE PLÁNOVÁNÍ": "={{ $('Webhook').first().json.body.action_name === 'Create Posts' ? 'created' : 'updated' }} ({{ $now.format('dd/MM/yy hh:mm:ss') }})"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "ŘÁDEK",
+              "displayName": "ŘÁDEK",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "INSTAGRAM TEXT",
+              "displayName": "INSTAGRAM TEXT",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "KREDITY IG: FOTO/VIDEO/JINÉ ",
+              "displayName": "KREDITY IG: FOTO/VIDEO/JINÉ ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "HASHTAGS # IG",
+              "displayName": "HASHTAGS # IG",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "FACEBOOK TEXT",
+              "displayName": "FACEBOOK TEXT",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "KREDITY FB: FOTO/VIDEO/JINÉ ",
+              "displayName": "KREDITY FB: FOTO/VIDEO/JINÉ ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "LINKEDIN TEXT",
+              "displayName": "LINKEDIN TEXT",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "ODKAZ NA FOTO/VIDEO PŘÍSPĚVKŮ",
+              "displayName": "ODKAZ NA FOTO/VIDEO PŘÍSPĚVKŮ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "DATUM POSTU - INSTAGRAM",
+              "displayName": "DATUM POSTU - INSTAGRAM",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "DATUM POSTU - FACEBOOK",
+              "displayName": "DATUM POSTU - FACEBOOK",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "DATUM POSTU - LINKEDIN",
+              "displayName": "DATUM POSTU - LINKEDIN",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "ČAS POSTU INSTAGRAM",
+              "displayName": "ČAS POSTU INSTAGRAM",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "ČAS POSTU FACEBOOK",
+              "displayName": "ČAS POSTU FACEBOOK",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "ČAS POSTU LINKEDIN",
+              "displayName": "ČAS POSTU LINKEDIN",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Checkbox",
+              "displayName": "Checkbox",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "FÁZE PLÁNOVÁNÍ",
+              "displayName": "FÁZE PLÁNOVÁNÍ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "NÁHLED ",
+              "displayName": "NÁHLED ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Obrázky",
+              "displayName": "Obrázky",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        1760,
+        1360
+      ],
+      "id": "58687415-add4-4236-8193-1e9824393157",
+      "name": "Write post to Master table",
+      "credentials": {
+        "googleApi": {
+          "id": "aHVI3CAM5JAErt7B",
+          "name": "Google Service Account account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "6WcGcViiXxQk11Qg",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/6WcGcViiXxQk11Qg",
+          "cachedResultName": "SoMe_Automation_Progress_Log"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "master_table_id": "={{ $('Webhook').item.json.body.sheetId }}",
+            "task_type": "post_prep",
+            "job_id": "={{ $execution.id }}",
+            "message": "=Cretion of post started. Please, wait a moment."
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "message",
+              "displayName": "message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "master_table_id",
+              "displayName": "master_table_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "task_type",
+              "displayName": "task_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "job_id",
+              "displayName": "job_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        -1344,
+        1360
+      ],
+      "id": "7f4d2158-3caf-412c-902a-9ccb97b93db2",
+      "name": "Log_init"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        64,
+        1360
+      ],
+      "id": "34556229-71ec-45fa-8966-f4e0a9bf54d9",
+      "name": "Aggregate"
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "n8n.princparket.cz",
+            "user-agent": "Mozilla/5.0 (compatible; Google-Apps-Script; beanserver; +https://script.google.com; id: UAEmdDd_5NVPsrLm33vDxP5DnoxE3Di6Wulc)",
+            "content-length": "589",
+            "accept-encoding": "gzip, deflate, br",
+            "content-type": "application/json",
+            "via": "1.1 Caddy",
+            "x-forwarded-for": "35.187.134.110",
+            "x-forwarded-host": "n8n.princparket.cz",
+            "x-forwarded-proto": "https"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "sheetId": "1JOya4Be0BD1FC0bA8nYgbIm7thSsYfjd01EGR7gnsgM",
+            "row": 5,
+            "content": {
+              "id": "",
+              "text_ig": "Test",
+              "credits_ig": "",
+              "hashtags_ig": "",
+              "text_fb": "",
+              "credits_fb": "",
+              "text_li": "",
+              "photos_link": "https://drive.google.com/drive/folders/1bo0WMaYdV7HhrdjANGJzFprBLnGNFoUF",
+              "ig_planned_date": "",
+              "fb_planned_date": "",
+              "li_planned_date": "",
+              "ig_post_time": "",
+              "fb_post_time": "",
+              "li_post_time": "",
+              "checked": true,
+              "status": "draft",
+              "preview": "",
+              "images": ""
+            },
+            "action_name": "Create Posts",
+            "user_input": "",
+            "image_source": "no",
+            "action_for_facebook": true,
+            "action_for_instagram": true,
+            "action_for_linkedin": false
+          },
+          "webhookUrl": "https://n8n.princparket.cz/webhook/ext_Create_Post",
+          "executionMode": "production"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Log_init",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        []
+      ]
+    },
+    "Construct HTML body": {
+      "main": [
+        [
+          {
+            "node": "Create HTML file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload Preview to Folder": {
+      "main": [
+        [
+          {
+            "node": "Write post to Master table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create HTML file": {
+      "main": [
+        [
+          {
+            "node": "Upload Preview to Folder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Credentials": {
+      "main": [
+        [
+          {
+            "node": "Get Settings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Settings": {
+      "main": [
+        [
+          {
+            "node": "Compile System message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compile System message": {
+      "main": [
+        [
+          {
+            "node": "Use image or create",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Use image or create": {
+      "main": [
+        [
+          {
+            "node": "Search Image folders",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Search files and folders",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Generate Images",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search files and folders": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "No images": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "SUBJECT WRITER AGENT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search Image folders": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Prompts": {
+      "main": [
+        []
+      ]
+    },
+    "Generate Images": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "SUBJECT WRITER AGENT",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GPT 5": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "SUBJECT WRITER AGENT",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SUBJECT WRITER AGENT": {
+      "main": [
+        [
+          {
+            "node": "Construct HTML body",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log_init": {
+      "main": [
+        [
+          {
+            "node": "Get Credentials",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "No images",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "NmGg5uZ3m1rjeYmB"
+  },
+  "versionId": "fd6f80b7-e7b6-4d7a-9a2a-0a49e5516ee2",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "2b07eec16886132e3cd818fdfac587c65db27d72fe33b2ee54f787b58f4dff76"
+  },
+  "id": "RbvtB1X4426mYJkJ",
+  "tags": []
+}

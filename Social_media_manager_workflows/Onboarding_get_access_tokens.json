@@ -1,0 +1,150 @@
+{
+  "name": "Onboarding_get_access_tokens",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "Access Tokens",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Facebook access token",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Instagram access token",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Facebook page ID",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Instagram user ID",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {
+          "appendAttribution": false,
+          "path": "access_tokens"
+        }
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        -176,
+        32
+      ],
+      "id": "24b518d1-c18f-4e12-82b3-131a57bb1da5",
+      "name": "On form submission",
+      "webhookId": "6e727c42-cd3f-4305-a64c-757b746699b9"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "SoMe_user_db",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "user_id",
+              "condition": "eq",
+              "keyValue": "={{ $json.formQueryParameters.user_id }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "fb_access_token",
+              "fieldValue": "={{ $json[\"Facebook access token\"] }}"
+            },
+            {
+              "fieldId": "ig_access_token",
+              "fieldValue": "={{ $json[\"Instagram access token\"] }}"
+            },
+            {
+              "fieldId": "fb_page_id",
+              "fieldValue": "={{ $json[\"Facebook page ID\"] }}"
+            },
+            {
+              "fieldId": "ig_user_id",
+              "fieldValue": "={{ $json[\"Instagram user ID\"] }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        48,
+        32
+      ],
+      "id": "227d9f98-27df-49c0-b07a-021fb4c77f82",
+      "name": "Update a row",
+      "credentials": {
+        "supabaseApi": {
+          "id": "2oNjiFHjAgVX7z4h",
+          "name": "Supabase Origamis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## **1. Přihlašovacích údajů**\nPřidání uživatelových přihlašovacích údajů do databáze",
+        "height": 380,
+        "width": 780,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -416,
+        -128
+      ],
+      "typeVersion": 1,
+      "id": "6f784951-f023-401c-9f2c-8ebcaeb76872",
+      "name": "Sticky Note6"
+    }
+  ],
+  "pinData": {
+    "On form submission": [
+      {
+        "json": {
+          "Facebook access token": "ads",
+          "Instagram access token": "asd",
+          "Facebook page ID": "asd",
+          "Instagram user ID": "asd",
+          "Jméno": "as",
+          "submittedAt": "2025-09-24T16:15:13.917+02:00",
+          "formMode": "production",
+          "formQueryParameters": {
+            "user_id": "a494702b-a2c5-489f-b852-be07256444e8"
+          }
+        }
+      }
+    ]
+  },
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Update a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "e226be87-ca3a-4d8d-9840-43369b4ea53b",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "2b07eec16886132e3cd818fdfac587c65db27d72fe33b2ee54f787b58f4dff76"
+  },
+  "id": "Kff3jCeWi2uHbfL1",
+  "tags": []
+}

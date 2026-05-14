@@ -1,0 +1,365 @@
+{
+  "name": "LI-Confirm",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "LI-confirm",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -288,
+        0
+      ],
+      "id": "b128879d-060e-4268-a60b-b9ff5788bc5c",
+      "name": "Webhook",
+      "webhookId": "c98ef276-ade2-43ce-b333-94e0bf5062ed"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "LinkedIn_manager_posts",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "condition": "eq",
+              "keyValue": "={{ $('Webhook').item.json.body.post_id }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "status",
+              "fieldValue": "=CONFIRMED"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "ed2b5a75-561a-42ba-98ab-c806736d6cf0",
+      "name": "Update a row",
+      "credentials": {
+        "supabaseApi": {
+          "id": "2oNjiFHjAgVX7z4h",
+          "name": "Supabase Origamis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('Webhook').item.json.body.source.spreadsheetId }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "={{ $('Webhook').item.json.body.source.sheetName }}",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "row_number": "={{ $('Webhook').item.json.body.rowNumber }}",
+            "Status": "={{ $json.status }}"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "Post_ID",
+              "displayName": "Post_ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Profile",
+              "displayName": "Profile",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Input",
+              "displayName": "Input",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "LinkedIn_content",
+              "displayName": "LinkedIn_content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "URN",
+              "displayName": "URN",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Media_URL",
+              "displayName": "Media_URL",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Time",
+              "displayName": "Time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Checkbox",
+              "displayName": "Checkbox",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Result_url",
+              "displayName": "Result_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        480,
+        0
+      ],
+      "id": "24e5ab37-a224-425f-a4be-5ad3e5ded017",
+      "name": "Update row Confirm",
+      "alwaysOutputData": false,
+      "credentials": {
+        "googleApi": {
+          "id": "aHVI3CAM5JAErt7B",
+          "name": "Google Service Account account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "SE5Eat1VGHIaOcty",
+          "mode": "list",
+          "cachedResultName": "LI_Search_media_folder"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "source_row": "={{ $json.body.rowNumber }}",
+            "post_id": "={{ $json.body.post_id }}",
+            "profile": "={{ $json.body.profile }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "source_row",
+              "displayName": "source_row",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number"
+            },
+            {
+              "id": "profile",
+              "displayName": "profile",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "post_id",
+              "displayName": "post_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        -64,
+        0
+      ],
+      "id": "30e56101-13e6-4ee4-b027-55f68e64d1be",
+      "name": "Execute Workflow"
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "n8n.princparket.cz",
+            "user-agent": "Mozilla/5.0 (compatible; Google-Apps-Script; beanserver; +https://script.google.com; id: UAEmdDd8EfXrC5m19YVo57kuL11jje4Wpcw)",
+            "content-length": "930",
+            "accept-encoding": "gzip, deflate, br",
+            "content-type": "application/json",
+            "via": "1.1 Caddy",
+            "x-forwarded-for": "34.116.22.107",
+            "x-forwarded-host": "n8n.princparket.cz",
+            "x-forwarded-proto": "https"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "action": "Confirm",
+            "rowNumber": 11,
+            "post_id": "14",
+            "profile": "Lenka",
+            "source": {
+              "spreadsheetId": "1nf9wkK40kH61WxccdwZqywsBRmBK-4TfaxQxd1orQsg",
+              "sheetName": "Posts"
+            },
+            "data": {
+              "input": "Zkus vymyslet delší text.",
+              "linkedin_content": "Testovací příspěvek #2: Dnes probíhá větší zkouška nových funkcí a vychytávek. Zkouším různé formáty příspěvků, plánování, ankety i práci s oznámeními – chci zjistit, co funguje nejlépe a co má smysl používat častěji.\n\nVidíš tenhle post? Dej mi prosím vědět: stačí, krátký komentář nebo sdílení. Napiš také, jaký typ obsahu tě tady baví nejvíc a co bys chtěl/a vidět příště (tipy, návody, zákulisí, novinky).\n\nKaždá reakce mi pomůže doladit obsah i frekvenci publikování. Pokud něco nefunguje nebo se zobrazuje divně, klidně napiš. Děkuju za podporu během testování! #test #novinky",
+              "media_urls": [],
+              "scheduled_at": null
+            }
+          },
+          "webhookUrl": "https://n8n.princparket.cz/webhook/LI-confirm",
+          "executionMode": "production"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Execute Workflow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update a row": {
+      "main": [
+        [
+          {
+            "node": "Update row Confirm",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update row Confirm": {
+      "main": [
+        []
+      ]
+    },
+    "Execute Workflow": {
+      "main": [
+        [
+          {
+            "node": "Update a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "OUAMGTbjNgyrDIGY"
+  },
+  "versionId": "7634e4bb-f1a4-471c-81bd-420e179afb43",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "2b07eec16886132e3cd818fdfac587c65db27d72fe33b2ee54f787b58f4dff76"
+  },
+  "id": "S9EHeumgGkglehUJ",
+  "tags": []
+}

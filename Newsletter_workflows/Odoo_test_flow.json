@@ -1,0 +1,865 @@
+{
+  "name": "Odoo_test_flow",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1024,
+        1504
+      ],
+      "id": "4cba1030-c204-4d62-856a-e931e7865568",
+      "name": "When clicking ‘Test workflow’"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://princparket-test.odoo.com/xmlrpc/2/object",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "text/xml"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "text/xml",
+        "body": "=<?xml version=\"1.0\"?>\n<methodCall>\n  <methodName>execute_kw</methodName>\n  <params>\n    <!-- Database name -->\n    <param><value><string>jumperscz-princparket-18staging-23587400</string></value></param>\n\n    <!-- UID from authenticate -->\n    <param><value><int>519</int></value></param>\n\n    <!-- Password -->\n    <param><value><string>PrinceParket12</string></value></param>\n\n    <!-- Model -->\n    <param><value><string>res.partner</string></value></param>\n\n    <!-- Method -->\n    <param><value><string>search_read</string></value></param>\n\n    <!-- Domain (empty = all partners) -->\n    <param>\n      <value>\n        <array>\n          <data>\n            <value>\n              <array><data></data></array>\n            </value>\n          </data>\n        </array>\n      </value>\n    </param>\n\n    <!-- Kwargs: fields + limit -->\n    <param>\n      <value>\n        <struct>\n          <member>\n            <name>fields</name>\n            <value>\n              <array>\n                <data>\n                  <value><string>id</string></value>\n                  <value><string>name</string></value>\n                  <value><string>email</string></value>\n                  <value><string>phone</string></value>\n                </data>\n              </array>\n            </value>\n          </member>\n          <member>\n            <name>limit</name>\n            <value><int>50</int></value>\n          </member>\n        </struct>\n      </value>\n    </param>\n  </params>\n</methodCall>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -240,
+        384
+      ],
+      "id": "ae09dc89-f7dd-4e4e-8ab0-fcc9959b597f",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.xml",
+      "typeVersion": 1,
+      "position": [
+        -128,
+        384
+      ],
+      "id": "134b24b4-a659-480d-9185-e6f0c4a13ded",
+      "name": "XML"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Input: the JSON you pasted\n// Output: clean array of contacts\n\nfunction parseValue(v) {\n  if (v.int) return parseInt(v.int, 10);\n  if (v.string) return v.string;\n  if (v.boolean) return v.boolean === \"1\" ? true : null; // treat \"0\" as null\n  return null;\n}\n\nconst values = items[0].json.methodResponse.params.param.value.array.data.value;\n\nconst contacts = values.map(v => {\n  const obj = {};\n  v.struct.member.forEach(m => {\n    obj[m.name] = parseValue(m.value);\n  });\n  return obj;\n});\n\nreturn contacts.map(c => ({ json: c }));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        0,
+        384
+      ],
+      "id": "ad03e937-42f9-48f6-ad61-76b1e1c13a1b",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"methodCall\": {\n    \"methodName\": \"execute_kw\",\n    \"params\": {\n      \"param\": [\n        { \"value\": { \"string\": \"YOUR_DB_NAME\" } },\n        { \"value\": { \"int\": \"YOUR_UID\" } },\n        { \"value\": { \"string\": \"YOUR_PASSWORD\" } },\n        { \"value\": { \"string\": \"mail.mail\" } },\n        { \"value\": { \"string\": \"create\" } },\n        { \"value\": {\n            \"array\": {\n              \"data\": {\n                \"value\": {\n                  \"struct\": {\n                    \"member\": [\n                      { \"name\": \"subject\", \"value\": { \"string\": \"Test Email\" } },\n                      { \"name\": \"body_html\", \"value\": { \"string\": \"<p>Hello!</p>\" } },\n                      { \"name\": \"email_to\", \"value\": { \"string\": \"you@example.com\" } }\n                    ]\n                  }\n                }\n              }\n            }\n          }\n        }\n      ]\n    }\n  }\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        64,
+        560
+      ],
+      "id": "09ec15ab-0eee-4927-81ab-27406f53f2c8",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "mode": "jsonToxml",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.xml",
+      "typeVersion": 1,
+      "position": [
+        240,
+        560
+      ],
+      "id": "046e41cf-de5a-4817-83b9-1328caed69e2",
+      "name": "XML1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "49008af3-46fb-4dce-a6ae-ac0501dc142b",
+              "name": "api_key",
+              "value": "00c7777f12cffbfe7762b03edfcda1378c10e4c8",
+              "type": "string"
+            },
+            {
+              "id": "d7a1b1b7-eb39-49a5-84f2-06b45a8bcd9e",
+              "name": "db_name",
+              "value": "jumperscz-princparket-18staging-23587400",
+              "type": "string"
+            },
+            {
+              "id": "0297218b-5d4e-4aee-bd3c-ba2060a3c61b",
+              "name": "user_name",
+              "value": "pavel.urbann@gmail.com",
+              "type": "string"
+            },
+            {
+              "id": "9aedfacc-10f5-4cda-895a-164e384f14ef",
+              "name": "user_password",
+              "value": "PrinceParket12",
+              "type": "string"
+            },
+            {
+              "id": "85a9629e-e45f-483e-9a5e-501a71e50ba8",
+              "name": "odoo_domain",
+              "value": "https://princparket-test.odoo.com",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -688,
+        128
+      ],
+      "id": "23c9eb61-cfa6-4f4e-a880-33cae7eb8959",
+      "name": "Odoo XML creds"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.odoo_domain }}/xmlrpc/2/common ",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "text/xml"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "text/xml",
+        "body": "=<?xml version=\"1.0\"?>\n<methodCall>\n  <methodName>authenticate</methodName>\n  <params>\n    <param><value><string>{{ $json.db_name }}</string></value></param>\n    <param><value><string>{{ $json.user_name }}</string></value></param>\n    <param><value><string>{{ $json.user_password }}</string></value></param>\n    <param><value><array><data></data></array></value></param>\n  </params>\n</methodCall>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -528,
+        128
+      ],
+      "id": "c0df3d07-d7dc-471b-95cb-4642dcc917f6",
+      "name": "Odoo Authenticate"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.xml",
+      "typeVersion": 1,
+      "position": [
+        -384,
+        128
+      ],
+      "id": "a1fb9c09-6627-44d0-9e4f-a723c8977425",
+      "name": "Parse UID"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "339292ce-3ddc-4fa3-876d-984ad4cde6e2",
+              "name": "UID",
+              "value": "={{ $json.methodResponse.params.param.value.int }}",
+              "type": "string"
+            },
+            {
+              "id": "06a457a8-51fb-4b4a-bdc1-0e9e16a3245c",
+              "name": "api_key",
+              "value": "={{ $('Odoo XML creds').item.json.api_key }}",
+              "type": "string"
+            },
+            {
+              "id": "9de9cec1-2776-4e1e-96c8-331f604646f9",
+              "name": "db_name",
+              "value": "={{ $('Odoo XML creds').item.json.db_name }}",
+              "type": "string"
+            },
+            {
+              "id": "dd5fbdb7-ead4-4a83-888b-02ac8f6b60a9",
+              "name": "user_name",
+              "value": "={{ $('Odoo XML creds').item.json.user_name }}",
+              "type": "string"
+            },
+            {
+              "id": "2f1c51fc-0577-4633-89ca-61f428ad0e16",
+              "name": "user_password",
+              "value": "={{ $('Odoo XML creds').item.json.user_password }}",
+              "type": "string"
+            },
+            {
+              "id": "7539078d-52d1-4d71-8acc-da790f42cb12",
+              "name": "odoo_domain",
+              "value": "={{ $('Odoo XML creds').item.json.odoo_domain }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -224,
+        128
+      ],
+      "id": "a810bb0e-3fb3-423f-a19d-ca1c2aa55c31",
+      "name": "Full credentials"
+    },
+    {
+      "parameters": {
+        "content": "## Get contacts with parsing\n \n",
+        "height": 300,
+        "width": 560
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -928,
+        368
+      ],
+      "id": "0f446e7f-6c1f-4473-9244-18465b09f53e",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.odoo_domain }}/xmlrpc/2/object",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "text/xml"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "text/xml",
+        "body": "=<?xml version=\"1.0\"?>\n<methodCall>\n  <methodName>execute_kw</methodName>\n  <params>\n    <param><value><string>{{ $json.db_name }}</string></value></param>\n    <param><value><int>{{ $json.UID }}</int></value></param>\n    <param><value><string>{{ $json.user_password }}</string></value></param>\n    <param><value><string>mail.mail</string></value></param>\n    <param><value><string>create</string></value></param>\n    <param>\n      <value>\n        <array><data>\n          <value>\n            <struct>\n              <member>\n                <name>subject</name>\n                <value><string>API Test Email</string></value>\n              </member>\n              <member>\n                <name>body_html</name>\n                <value><string><![CDATA[<p>Hello, this is a test from XML-RPC!</p>]]></string></value>\n              </member>\n              <member>\n                <name>email_to</name>\n                <value><string>eliaskrystof1@gmail.com</string></value>\n              </member>\n            </struct>\n          </value>\n        </data></array>\n      </value>\n    </param>\n  </params>\n</methodCall>\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        32,
+        128
+      ],
+      "id": "72cd1ea0-d83d-46ee-8bd4-a7129c52c97b",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.xml",
+      "typeVersion": 1,
+      "position": [
+        240,
+        128
+      ],
+      "id": "459e7b12-902f-4756-a4f7-8fba3cf5650b",
+      "name": "XML2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Full credentials').item.json.odoo_domain }}/xmlrpc/2/object",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "text/xml"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "text/xml",
+        "body": "=<?xml version=\"1.0\"?>\n<methodCall>\n  <methodName>execute_kw</methodName>\n  <params>\n    <param><value><string>{{ $('Full credentials').item.json.db_name }}</string></value></param>\n    <param><value><int>{{ $('Full credentials').item.json.UID }}</int></value></param>\n    <param><value><string>{{ $('Full credentials').item.json.user_password }}</string></value></param>\n    <param><value><string>mail.mail</string></value></param>\n    <param><value><string>send</string></value></param>\n    <param>\n      <value>\n        <array><data>\n          <value><int>{{ $item(0).$node[\"XML2\"].json[\"methodResponse\"][\"params\"][\"param\"][\"value\"][\"int\"] }}</int></value>\n        </data></array>\n      </value>\n    </param>\n  </params>\n</methodCall>\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        448,
+        128
+      ],
+      "id": "a3d1b03a-ce48-4d46-bcd6-0c4d1835399e",
+      "name": "HTTP Request2"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.odoo_domain }}/xmlrpc/2/object",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "text/xml"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "text/xml",
+        "body": "=<?xml version=\"1.0\"?>\n<methodCall>\n  <methodName>execute_kw</methodName>\n  <params>\n    <param><value><string>{{ $json.db_name }}</string></value></param>\n    <param><value><int>{{ $json.UID }}</int></value></param>\n    <param><value><string>{{ $json.user_password }}</string></value></param>\n    <param><value><string>utm.campaign</string></value></param>\n    <param><value><string>create</string></value></param>\n    <param>\n      <value>\n        <array><data>\n          <value>\n            <struct>\n              <member>\n                <name>name</name>\n                <value><string>{{ $json.campaign_name }}</string></value>\n              </member>\n              <member>\n                <name>user_id</name>\n                <value><int>{{ $json.UID }}</int></value>\n              </member>\n              <member>\n                <name>active</name>\n                <value><boolean>1</boolean></value>\n              </member>\n            </struct>\n          </value>\n        </data></array>\n      </value>\n    </param>\n  </params>\n</methodCall>\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -48,
+        1008
+      ],
+      "id": "f163a2e9-9bd1-4af3-b87e-a102dc7124cc",
+      "name": "Create Camaign",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.xml",
+      "typeVersion": 1,
+      "position": [
+        144,
+        1008
+      ],
+      "id": "5a3b6db3-3857-4e78-b543-ba1735bfff58",
+      "name": "Parse Campaign ID",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "79e3edc5-d7f2-492e-98ed-296f45936567",
+              "name": "campaign_id",
+              "value": "=7",
+              "type": "string"
+            },
+            {
+              "id": "f925df67-dd6a-4a67-b78d-956741b42019",
+              "name": "newsletter_name",
+              "value": "Test",
+              "type": "string"
+            },
+            {
+              "id": "eb6ff8d7-8c64-4f2f-8929-71eec75874d8",
+              "name": "newsletter_subject",
+              "value": "Test",
+              "type": "string"
+            },
+            {
+              "id": "0e39e0ec-f3ab-4e1a-a7e5-061231207656",
+              "name": "email_from",
+              "value": "origamis@test.com",
+              "type": "string"
+            },
+            {
+              "id": "6b6ede4b-b5ce-4ce8-96e8-8bedbc32ab8f",
+              "name": "email_to",
+              "value": "test@test.com",
+              "type": "string"
+            },
+            {
+              "id": "dc1bb475-7dc6-4ab8-be55-afeeb247cc3b",
+              "name": "html_body",
+              "value": " <!doctype html> <html lang=\"und\" dir=\"auto\" xmlns=\"http://www.w3.org/1999/xhtml\" xmlns:v=\"urn:schemas-microsoft-com:vml\" xmlns:o=\"urn:schemas-microsoft-com:office:office\">  <head>   <title> Proces výběru dřevěné podlahy</title>   <!--[if !mso]><!-->   <meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">   <!--<![endif]-->   <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">   <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">   <style type=\"text/css\">     #outlook a {       padding: 0;     }      body {       margin: 0;       padding: 0;       -webkit-text-size-adjust: 100%;       -ms-text-size-adjust: 100%;     }      table,     td {       border-collapse: collapse;       mso-table-lspace: 0pt;       mso-table-rspace: 0pt;     }      img {       border: 0;       height: auto;       line-height: 100%;       outline: none;       text-decoration: none;       -ms-interpolation-mode: bicubic;     }      p {       display: block;       margin: 13px 0;     }   </style>    <!--[if mso]>     <noscript>     <xml>     <o:OfficeDocumentSettings>       <o:AllowPNG/>       <o:PixelsPerInch>96</o:PixelsPerInch>     </o:OfficeDocumentSettings>     </xml>     </noscript>     <![endif]-->    <!--[if lte mso 11]>     <style type=\"text/css\">       .mj-outlook-group-fix { width:100% !important; }     </style>     <![endif]-->    <!--[if !mso]><!-->   <link href=\"https://fonts.googleapis.com/css?family=Droid+Sans:300,400,500,700\" rel=\"stylesheet\" type=\"text/css\">   <link href=\"https://fonts.googleapis.com/css?family=Roboto:300,400,500,700\" rel=\"stylesheet\" type=\"text/css\">   <link href=\"https://fonts.googleapis.com/css?family=Ubuntu:300,400,500,700\" rel=\"stylesheet\" type=\"text/css\">    <link href=\" https://izohjxqvhacjmutgnckf.supabase.co/storage/v1/object/public/Newsletter/Fonts/CaslonDoric-Bold-Web.woff2\" rel=\"stylesheet\" type=\"text/css\">   <link href=\" https://izohjxqvhacjmutgnckf.supabase.co/storage/v1/object/public/Newsletter/Fonts/ROMNarrow-Regular.woff2\" rel=\"stylesheet\" type=\"text/css\">    <style type=\"text/css\">     @import url(https://fonts.googleapis.com/css?family=Droid+Sans:300,400,500,700);     @import url(https://fonts.googleapis.com/css?family=Roboto:300,400,500,700);     @import url(https://fonts.googleapis.com/css?family=Ubuntu:300,400,500,700);      @import url( https://izohjxqvhacjmutgnckf.supabase.co/storage/v1/object/public/Newsletter/Fonts/CaslonDoric-Bold-Web.woff2);     @import url( https://izohjxqvhacjmutgnckf.supabase.co/storage/v1/object/public/Newsletter/Fonts/ROMNarrow-Regular.woff2);   </style>   <!--<![endif]-->    <style type=\"text/css\">     @media only screen and (min-width:480px) {       .mj-column-per-100 {         width: 100% !important;         max-width: 100%;       }        .mj-column-per-60 {         width: 60% !important;         max-width: 60%;       }        .mj-column-per-40 {         width: 40% !important;         max-width: 40%;       }        .mj-column-per-35 {         width: 35% !important;         max-width: 35%;       }        .mj-column-per-65 {         width: 65% !important;         max-width: 65%;       }     }   </style>    <style media=\"screen and (min-width:480px)\">     .moz-text-html .mj-column-per-100 {       width: 100% !important;       max-width: 100%;     }      .moz-text-html .mj-column-per-60 {       width: 60% !important;       max-width: 60%;     }      .moz-text-html .mj-column-per-40 {       width: 40% !important;       max-width: 40%;     }      .moz-text-html .mj-column-per-35 {       width: 35% !important;       max-width: 35%;     }      .moz-text-html .mj-column-per-65 {       width: 65% !important;       max-width: 65%;     }   </style>    <style type=\"text/css\">     @media only screen and (max-width:479px) {       table.mj-full-width-mobile {         width: 100% !important;       }        td.mj-full-width-mobile {         width: auto !important;       }     }   </style> </head>  <body style=\"word-spacing:normal;background-color:#EDE8E4;\">   <div aria-roledescription=\"email\" style=\"background-color:#EDE8E4;\" role=\"article\" lang=\"und\" dir=\"auto\">      <!--[if mso | IE]><table align=\"center\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" class=\"\" role=\"presentation\" style=\"width:600px;\" width=\"600\" bgcolor=\"#EDE8E4\" ><tr><td style=\"line-height:0px;font-size:0px;mso-line-height-rule:exactly;\"><![endif]-->     <div style=\"background:#EDE8E4;background-color:#EDE8E4;margin:0px auto;max-width:600px;\">       <table align=\"center\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"background:#EDE8E4;background-color:#EDE8E4;width:100%;\">         <tbody>           <tr>             <td style=\"border:none;direction:ltr;font-size:0px;padding:20px 0px 20px 0px;text-align:center;\">                <!-- ========================================= -->               <!-- 1 INTRO: logo + hero image -->               <!-- ========================================= -->                <!--[if mso | IE]><tr><td class=\"\" width=\"600px\" ><table align=\"center\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" class=\"\" role=\"presentation\" style=\"width:600px;\" width=\"600\" bgcolor=\"#EDE8E4\" ><tr><td style=\"line-height:0px;font-size:0px;mso-line-height-rule:exactly;\"><v:rect style=\"width:600px;\" xmlns:v=\"urn:schemas-microsoft-com:vml\" fill=\"true\" stroke=\"false\"><v:fill origin=\"0.5, 0.5\" position=\"0.5, 0.5\" src=\" https://izohjxqvhacjmutgnckf.supabase.co/storage/v1/object/public/Newsletter/Struktura_1_HQ.png\" color=\"#EDE8E4\" type=\"frame\" size=\"200px,auto\" /><v:textbox style=\"mso-fit-shape-to-text:true\" inset=\"0,0,0,0\"><![endif]-->               <div style=\"background:#EDE8E4 url(' https://izohjxqvhacjmutgnckf.supabase.co/storage/v1/object/public/Newsletter/Struktura_1_HQ.png') right bottom / 200px auto no-repeat;background-position:right bottom;background-repeat:no-repeat;background-size:200px auto;margin:0px auto;max-width:600px;\">                 <div style=\"line-height:0;font-size:0;\">                   <table align=\"center\" background=\" https://izohjxqvhacjmutgnckf.supabase.co/storage/v1/object/public/Newsletter/Struktura_1_HQ.png\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"background:#EDE8E4 url(' https://izohjxqvhacjmutgnckf.supabase.co/storage/v1/object/public/Newsletter/Struktura_1_HQ.png') right bottom / 200px auto no-repeat;background-position:right bottom;background-repeat:no-repeat;background-size:200px auto;width:100%;\">                     <tbody>                       <tr>                         <td style=\"border:none;direction:ltr;font-size:0px;padding:0px 0px 0px 0px;text-align:center;\">                           <div class=\"mj-column-per-100 mj-outlook-group-fix\" style=\"font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;\">                             <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" width=\"100%\">                               <tbody>                                 <tr>                                   <td style=\"border:none;vertical-align:top;padding:20px 20px 20px 20px;\">                                     <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"\" width=\"100%\">                                       <tbody>                                         <tr>                                           <td align=\"center\" style=\"font-size:0px;padding:0px 0px 16px 0px;word-break:break-word;\">                                             <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"border-collapse:collapse;border-spacing:0px;\">                                               <tbody>                                                 <tr>                                                   <td style=\"width:180px;\">                                                     <img alt=\" OAKCENT\" src=\" https://izohjxqvhacjmutgnckf.supabase.co/storage/v1/object/public/Newsletter/logo-oakcent.png\" style=\"border:0;display:block;outline:none;text-decoration:none;height:auto;width:100%;font-size:14px;\" width=\"180\" height=\"auto\" />                                                   </td>                                                 </tr>                                               </tbody>                                             </table>                                           </td>                                         </tr>                                          <tr>                                           <td align=\"center\" style=\"font-size:0px;padding:10px 0px 0px 0px;word-break:break-word;\">                                             <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"border-collapse:collapse;border-spacing:0px;\">                                               <tbody>                                                 <tr>                                                   <td style=\"width:560px;\">                                                     <img alt=\" Proces výběru dřevěné podlahy\" src=\" https://oakcent.com/magazine/zakazkova-vyroba/522/image-thumb__522___auto_492e1e580ee6bb86122a86efd2c4284a/Oakcent-zakazkova-vyroba.a93c2df2.jpg\" style=\"border:0;display:block;outline:none;text-decoration:none;height:auto;width:100%;font-size:14px;\" width=\"560\" height=\"auto\" />                                                   </td>                                                 </tr>                                               </tbody>                                             </table>                                           </td>                                         </tr>                                        </tbody>                                     </table>                                   </td>                                 </tr>                               </tbody>                             </table>                           </div>                         </td>                       </tr>                     </tbody>                   </table>                 </div>               </div>               <!--[if mso | IE]></v:textbox></v:rect></td></tr></table></td></tr><tr><td class=\"\" width=\"600px\" ><![endif]-->               <div style=\"height:18px;line-height:18px;\">&#8202;</div>               <!--[if mso | IE]></td></tr><![endif]-->                <!-- ========================================= -->               <!-- 2 MAGAZINE SECTION -->               <!-- ========================================= -->                <!-- top decor -->               <!--[if mso | IE]><tr><td class=\"\" width=\"600px\" ><table align=\"center\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" class=\"\" role=\"presentation\" style=\"width:600px;\" width=\"600\" bgcolor=\"#EDE8E4\" ><tr><td style=\"line-height:0px;font-size:0px;mso-line-height-rule:exactly;\"><v:rect style=\"width:600px;\" xmlns:v=\"urn:schemas-microsoft-com:vml\" fill=\"true\" stroke=\"false\"><v:fill origin=\"0.5, -0.5\" position=\"0.5, -0.5\" src=\" https://izohjxqvhacjmutgnckf.supabase.co/storage/v1/object/public/Newsletter/Struktura_2_HQ.png\" color=\"#EDE8E4\" type=\"frame\" size=\"200px,auto\" /><v:textbox style=\"mso-fit-shape-to-text:true\" inset=\"0,0,0,0\"><![endif]-->               <div style=\"background:#EDE8E4 url(' https://izohjxqvhacjmutgnckf.supabase.co/storage/v1/object/public/Newsletter/Struktura_2_HQ.png') right top / 200px auto no-repeat;background-position:right top;background-repeat:no-repeat;background-size:200px auto;margin:0px auto;max-width:600px;\">                 <div style=\"line-height:0;font-size:0;\">                   <table align=\"center\" background=\" https://izohjxqvhacjmutgnckf.supabase.co/storage/v1/object/public/Newsletter/Struktura_2_HQ.png\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"background:#EDE8E4 url(' https://izohjxqvhacjmutgnckf.supabase.co/storage/v1/object/public/Newsletter/Struktura_2_HQ.png') right top / 200px auto no-repeat;background-position:right top;background-repeat:no-repeat;background-size:200px auto;width:100%;\">                     <tbody>                       <tr>                         <td style=\"border:none;direction:ltr;font-size:0px;padding:0px 0px 0px 0px;text-align:center;\">                           <div class=\"mj-column-per-100 mj-outlook-group-fix\" style=\"font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;\">                             <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" width=\"100%\">                               <tbody>                                 <tr>                                   <td style=\"border:none;vertical-align:top;padding:0px 0px 0px 0px;\">                                     <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"\" width=\"100%\">                                       <tbody>                                         <tr>                                           <td style=\"font-size:0px;word-break:break-word;\">                                             <div style=\"height:70px;line-height:70px;\">&#8202;</div>                                           </td>                                         </tr>                                       </tbody>                                     </table>                                   </td>                                 </tr>                               </tbody>                             </table>                           </div>                         </td>                       </tr>                     </tbody>                   </table>                 </div>               </div>               <!--[if mso | IE]></v:textbox></v:rect></td></tr></table></td></tr><![endif]-->                <!-- main magazine block + bottom decor -->               <!--[if mso | IE]><tr><td class=\"\" width=\"600px\" ><table align=\"center\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" class=\"\" role=\"presentation\" style=\"width:600px;\" width=\"600\" bgcolor=\"#EDE8E4\" ><tr><td style=\"line-height:0px;font-size:0px;mso-line-height-rule:exactly;\"><v:rect style=\"width:600px;\" xmlns:v=\"urn:schemas-microsoft-com:vml\" fill=\"true\" stroke=\"false\"><v:fill origin=\"0.5, 0.5\" position=\"0.5, 0.5\" src=\" https://izohjxqvhacjmutgnckf.supabase.co/storage/v1/object/public/Newsletter/Struktura_2_HQ.png\" color=\"#EDE8E4\" type=\"frame\" size=\"200px,auto\" /><v:textbox style=\"mso-fit-shape-to-text:true\" inset=\"0,0,0,0\"><![endif]-->               <div style=\"background:#EDE8E4 url(' https://izohjxqvhacjmutgnckf.supabase.co/storage/v1/object/public/Newsletter/Struktura_2_HQ.png') right bottom / 200px auto no-repeat;background-position:right bottom;background-repeat:no-repeat;background-size:200px auto;margin:0px auto;max-width:600px;\">                 <div style=\"line-height:0;font-size:0;\">                   <table align=\"center\" background=\" https://izohjxqvhacjmutgnckf.supabase.co/storage/v1/object/public/Newsletter/Struktura_2_HQ.png\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"background:#EDE8E4 url(' https://izohjxqvhacjmutgnckf.supabase.co/storage/v1/object/public/Newsletter/Struktura_2_HQ.png') right bottom / 200px auto no-repeat;background-position:right bottom;background-repeat:no-repeat;background-size:200px auto;width:100%;\">                     <tbody>                       <tr>                         <td style=\"border:none;direction:ltr;font-size:0px;padding:0px 0px 0px 0px;text-align:center;\">                            <!-- Left: text -->                           <div class=\"mj-column-per-60 mj-outlook-group-fix\" style=\"font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:middle;width:100%;\">                             <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" width=\"100%\">                               <tbody>                                 <tr>                                   <td style=\"border:none;vertical-align:middle;padding:20px 0px 20px 20px;\">                                     <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"\" width=\"100%\">                                       <tbody>                                          <tr>                                           <td style=\"font-size:0px;word-break:break-word;\">                                             <div style=\"height:18px;line-height:18px;\">&#8202;</div>                                           </td>                                         </tr>                                          <tr>                                           <td align=\"left\" style=\"font-size:0px;padding:0px 8px 8px 0px;word-break:break-word;\">                                             <div style=\"font-family:CaslonDoric;font-size:24px;font-weight:bold;line-height:1.15;text-align:left;color:#5C5957;\"> Proces výběru dřevěné podlahy</div>                                           </td>                                         </tr>                                          <tr>                                           <td align=\"left\" style=\"font-size:0px;padding:40px 18px 0px 0px;word-break:break-word;\">                                             <div style=\"font-family:RomNarrowLight;font-size:14px;font-weight:400;line-height:1.45;text-align:left;color:#5C5957;\">                                                Zakázková výroba v Oakcentu propojuje architektonické záměry s řemeslnou precizností. Volíte povrch (přírodní nebo pigmentované oleje, opalování), texturu a charakter (Premium, Rustic, Heart), rozměry a vzory (Herringbone, Chevron, Planks); my zajistíme výrobu, dodání, instalaci i péči včetně sady Clean&Care.                                             </div>                                           </td>                                         </tr>                                          <tr>                                           <td style=\"font-size:0px;word-break:break-word;\">                                             <div style=\"height:18px;line-height:18px;\">&#8202;</div>                                           </td>                                         </tr>                                          <tr>                                           <td align=\"center\" style=\"font-size:0px;padding:40px 0px 0px 0px;word-break:break-word;\">                                             <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"border-collapse:separate;line-height:100%;\">                                               <tbody>                                                 <tr>                                                   <td align=\"center\" bgcolor=\"#EDE8E4\" role=\"presentation\" style=\"border:1px solid #5C5957;border-radius:0px;cursor:auto;mso-padding-alt:10px 25px 10px 25px;text-align:center;background:#EDE8E4;\" valign=\"middle\">                                                     <a href=\" https://oakcent.com/magazine/custom-production\" style=\"display:inline-block;background:#EDE8E4;color:#5C5957;font-family:RomNarrowLight;font-size:14px;font-weight:normal;line-height:120%;margin:0;text-decoration:none;text-transform:none;padding:10px 25px 10px 25px;mso-padding-alt:0px;border-radius:0px;\" target=\"_blank\"> Domluvit konzultaci</a>                                                   </td>                                                 </tr>                                               </tbody>                                             </table>                                           </td>                                         </tr>                                          <tr>                                           <td style=\"font-size:0px;word-break:break-word;\">                                             <div style=\"height:18px;line-height:18px;\">&#8202;</div>                                           </td>                                         </tr>                                        </tbody>                                     </table>                                   </td>                                 </tr>                               </tbody>                             </table>                           </div>                            <!-- Right: 2 images -->                           <div class=\"mj-column-per-40 mj-outlook-group-fix\" style=\"font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;\">                             <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" width=\"100%\">                               <tbody>                                 <tr>                                   <td style=\"border:none;vertical-align:top;padding:20px 20px 20px 0px;\">                                     <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"\" width=\"100%\">                                       <tbody>                                          <tr>                                           <td align=\"center\" style=\"font-size:0px;padding:6px 0px 12px 0px;word-break:break-word;\">                                             <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"border-collapse:collapse;border-spacing:0px;\">                                               <tbody>                                                 <tr>                                                   <td style=\"width:220px;\">                                                     <img alt=\" Proces výběru dřevěné podlahy\" src=\" https://oakcent.com/magazine/zakazkova-vyroba/527/image-thumb__527___auto_177535db6a5d937f36939905bed88ae2/Oakcent-zakazkova-vyroba-2.4d2edd36.jpg\" style=\"border:0;display:block;outline:none;text-decoration:none;height:auto;width:100%;font-size:14px;\" width=\"220\" height=\"auto\" />                                                   </td>                                                 </tr>                                               </tbody>                                             </table>                                           </td>                                         </tr>                                          <tr>                                           <td style=\"font-size:0px;word-break:break-word;\">                                             <div style=\"height:8px;line-height:8px;\">&#8202;</div>                                           </td>                                         </tr>                                          <tr>                                           <td align=\"center\" style=\"font-size:0px;padding:12px 0px 6px 0px;word-break:break-word;\">                                             <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"border-collapse:collapse;border-spacing:0px;\">                                               <tbody>                                                 <tr>                                                   <td style=\"width:220px;\">                                                     <img alt=\" Proces výběru dřevěné podlahy\" src=\" https://oakcent.com/magazine/zakazkova-vyroba/528/image-thumb__528___auto_177535db6a5d937f36939905bed88ae2/oakcent-zakazkova-vyroba-3.d2534bca.jpg\" style=\"border:0;display:block;outline:none;text-decoration:none;height:auto;width:100%;font-size:14px;\" width=\"220\" height=\"auto\" />                                                   </td>                                                 </tr>                                               </tbody>                                             </table>                                           </td>                                         </tr>                                        </tbody>                                     </table>                                   </td>                                 </tr>                               </tbody>                             </table>                           </div>                          </td>                       </tr>                     </tbody>                   </table>                 </div>               </div>                <div style=\"height:18px;line-height:18px;\">&#8202;</div>                <!-- ========================================= -->               <!-- 3 PROJECT HERO IMAGE -->               <!-- ========================================= -->                <div style=\"background:#DECFC6;background-color:#DECFC6;margin:0px auto;max-width:600px;\">                 <table align=\"center\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"background:#DECFC6;background-color:#DECFC6;width:100%;\">                   <tbody>                     <tr>                       <td style=\"border:none;direction:ltr;font-size:0px;padding:0px 0px 0px 0px;text-align:center;\">                         <div class=\"mj-column-per-100 mj-outlook-group-fix\" style=\"font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;\">                           <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" width=\"100%\">                             <tbody>                               <tr>                                 <td style=\"border:none;vertical-align:top;padding:20px 20px 12px 20px;\">                                   <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"\" width=\"100%\">                                     <tbody>                                       <tr>                                         <td align=\"center\" style=\"font-size:0px;padding:0px 0px 0px 0px;word-break:break-word;\">                                           <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"border-collapse:collapse;border-spacing:0px;\">                                             <tbody>                                               <tr>                                                 <td style=\"width:560px;\">                                                   <img alt=\" Soukromý byt Skierniewicka\" src=\" https://oakcent.com/references/soukromy-byt-skirniewicka/982/image-thumb__982___auto_542ad910d6c13e91f3a59aff942adc0f/Oakcent-completed-project-poland-private-apartment-skirniewicka-banner-photo.70f67696.jpg\" style=\"border:0;display:block;outline:none;text-decoration:none;height:auto;width:100%;font-size:14px;\" width=\"560\" height=\"auto\" />                                                 </td>                                               </tr>                                             </tbody>                                           </table>                                         </td>                                       </tr>                                     </tbody>                                   </table>                                 </td>                               </tr>                             </tbody>                           </table>                         </div>                       </td>                     </tr>                   </tbody>                 </table>               </div>                <!-- ========================================= -->               <!-- 4 PROJECT (40/60) -->               <!-- ========================================= -->                <div style=\"background:#DECFC6;background-color:#DECFC6;margin:0px auto;max-width:600px;\">                 <table align=\"center\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"background:#DECFC6;background-color:#DECFC6;width:100%;\">                   <tbody>                     <tr>                       <td style=\"border:none;direction:ltr;font-size:0px;padding:0px 0px 0px 0px;text-align:center;\">                          <div class=\"mj-column-per-40 mj-outlook-group-fix\" style=\"font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;\">                           <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" width=\"100%\">                             <tbody>                               <tr>                                 <td style=\"border:none;vertical-align:top;padding:20px 0px 20px 20px;\">                                   <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"\" width=\"100%\">                                     <tbody>                                        <tr>                                         <td align=\"center\" style=\"font-size:0px;padding:6px 0px 10px 0px;word-break:break-word;\">                                           <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"border-collapse:collapse;border-spacing:0px;\">                                             <tbody>                                               <tr>                                                 <td style=\"width:220px;\">                                                   <img alt=\" Soukromý byt Skierniewicka\" src=\" https://oakcent.com/references/soukromy-byt-skirniewicka/987/image-thumb__987___auto_e64beae0a51a131cdffef9b15f463240/Oakcent-completed-project-poland-private-apartment-skirniewicka-hall.e0eabe3f.jpg\" style=\"border:0;display:block;outline:none;text-decoration:none;height:224px;width:100%;font-size:14px;\" width=\"220\" height=\"224\" />                                                 </td>                                               </tr>                                             </tbody>                                           </table>                                         </td>                                       </tr>                                        <tr>                                         <td align=\"center\" style=\"font-size:0px;padding:10px 0px 6px 0px;word-break:break-word;\">                                           <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"border-collapse:collapse;border-spacing:0px;\">                                             <tbody>                                               <tr>                                                 <td style=\"width:220px;\">                                                   <img alt=\" Soukromý byt Skierniewicka\" src=\" https://oakcent.com/references/soukromy-byt-skirniewicka/984/image-thumb__984___auto_ed4a344a97db2b37434b7e1b28e93894/Oakcent-completed-project-poland-private-apartment-skirniewicka-detail.9a5d3d7f.jpg\" style=\"border:0;display:block;outline:none;text-decoration:none;height:224px;width:100%;font-size:14px;\" width=\"220\" height=\"224\" />                                                 </td>                                               </tr>                                             </tbody>                                           </table>                                         </td>                                       </tr>                                      </tbody>                                   </table>                                 </td>                               </tr>                             </tbody>                           </table>                         </div>                          <div class=\"mj-column-per-60 mj-outlook-group-fix\" style=\"font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:middle;width:100%;\">                           <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" width=\"100%\">                             <tbody>                               <tr>                                 <td style=\"border:none;vertical-align:middle;padding:20px 20px 20px 12px;\">                                   <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"\" width=\"100%\">                                     <tbody>                                        <tr>                                         <td style=\"font-size:0px;word-break:break-word;\">                                           <div style=\"height:14px;line-height:14px;\">&#8202;</div>                                         </td>                                       </tr>                                        <tr>                                         <td align=\"left\" style=\"font-size:0px;padding:40px 18px 8px 18px;word-break:break-word;\">                                           <div style=\"font-family:CaslonDoric;font-size:22px;font-weight:bold;line-height:1.15;text-align:left;color:#5C5957;\"> Soukromý byt Skierniewicka</div>                                         </td>                                       </tr>                                        <tr>                                         <td align=\"left\" style=\"font-size:0px;padding:40px 18px 0px 18px;word-break:break-word;\">                                           <div style=\"font-family:RomNarrowLight;font-size:14px;font-weight:400;line-height:1.45;text-align:left;color:#5C5957;\">                                              V centru Varšavy vznikl soukromý byt, jehož architektonická koncepce klade důraz na přirozené světlo, precizní proporce a kontrastní povrchy, takže interiér působí současně přesně i uvolněně. Hlavní obytný prostor je definován čistou geometrií a tlumenými barevnými přechody, které v návaznosti na zimní zahradu vytvářejí proměnlivou, intimní atmosféru denního světla. Podlahové řešení od Oakcentu — třívrstvá dubová deska Hazel v rustikálním provedení s kartáčovaným povrchem a šedým olejem, položena v chevronu pod úhlem 45° — strukturuje otevřený plán a zároveň jemně akcentuje kresbu dřeva matným efektem. Precizní kladka a pečlivé řemeslné detaily podtrhují architektonický rytmus, zajišťují tvarovou stálost a nízký lesk redukující odlesky tak, aby podlaha sloužila jako vizuální kotva i plynulý přechod mezi zónami. Prostor tak funguje jako vyvážený dialog mezi materiálem a proporcí, který zve k bližšímu objevování svého tichého, materiálově založeného luxusu.                                           </div>                                         </td>                                       </tr>                                        <tr>                                         <td style=\"font-size:0px;word-break:break-word;\">                                           <div style=\"height:16px;line-height:16px;\">&#8202;</div>                                         </td>                                       </tr>                                        <tr>                                         <td align=\"center\" style=\"font-size:0px;padding:40px 0px 0px 0px;word-break:break-word;\">                                           <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"border-collapse:separate;line-height:100%;\">                                             <tbody>                                               <tr>                                                 <td align=\"center\" bgcolor=\"#DECFC6\" role=\"presentation\" style=\"border:1px solid #5C5957;border-radius:0px;cursor:auto;mso-padding-alt:10px 25px 10px 25px;text-align:center;background:#DECFC6;\" valign=\"middle\">                                                   <a href=\" https://oakcent.com/projects\" style=\"display:inline-block;background:#DECFC6;color:#5C5957;font-family:RomNarrowLight;font-size:14px;font-weight:normal;line-height:120%;margin:0;text-decoration:none;text-transform:none;padding:10px 25px 10px 25px;mso-padding-alt:0px;border-radius:0px;\" target=\"_blank\"> Objevte projekt</a>                                                 </td>                                               </tr>                                             </tbody>                                           </table>                                         </td>                                       </tr>                                        <tr>                                         <td style=\"font-size:0px;word-break:break-word;\">                                           <div style=\"height:14px;line-height:14px;\">&#8202;</div>                                         </td>                                       </tr>                                      </tbody>                                   </table>                                 </td>                               </tr>                             </tbody>                           </table>                         </div>                        </td>                     </tr>                   </tbody>                 </table>               </div>                <div style=\"height:18px;line-height:18px;\">&#8202;</div>                <!-- ========================================= -->               <!-- 5 COLLECTION -->               <!-- ========================================= -->                <div style=\"background:#EDE8E4 url(' https://izohjxqvhacjmutgnckf.supabase.co/storage/v1/object/public/Newsletter/Struktura_2_HQ.png') right top / 180px auto no-repeat;background-position:right top;background-repeat:no-repeat;background-size:180px auto;margin:0px auto;max-width:600px;\">                 <div style=\"line-height:0;font-size:0;\">                   <table align=\"center\" background=\" https://izohjxqvhacjmutgnckf.supabase.co/storage/v1/object/public/Newsletter/Struktura_2_HQ.png\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"background:#EDE8E4 url(' https://izohjxqvhacjmutgnckf.supabase.co/storage/v1/object/public/Newsletter/Struktura_2_HQ.png') right top / 180px auto no-repeat;background-position:right top;background-repeat:no-repeat;background-size:180px auto;width:100%;\">                     <tbody>                       <tr>                         <td style=\"border:none;direction:ltr;font-size:0px;padding:24px 20px 0px 20px;text-align:center;\">                            <div class=\"mj-column-per-35 mj-outlook-group-fix\" style=\"font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;\">                             <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" width=\"100%\">                               <tbody>                                 <tr>                                   <td style=\"border:none;vertical-align:top;padding:0px 12px 0px 0px;\">                                     <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"\" width=\"100%\">                                       <tbody>                                         <tr>                                           <td align=\"center\" style=\"font-size:0px;padding:6px 0px 10px 0px;word-break:break-word;\">                                             <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"border-collapse:collapse;border-spacing:0px;\">                                               <tbody>                                                 <tr>                                                   <td style=\"width:150px;\">                                                     <img alt=\" Smoke\" src=\" https://izohjxqvhacjmutgnckf.supabase.co/storage/v1/object/public/Newsletter/collection_images/Smoke.png\" style=\"border:0;display:block;outline:none;text-decoration:none;height:auto;width:100%;font-size:14px;\" width=\"150\" height=\"auto\" />                                                   </td>                                                 </tr>                                               </tbody>                                             </table>                                           </td>                                         </tr>                                       </tbody>                                     </table>                                   </td>                                 </tr>                               </tbody>                             </table>                           </div>                            <div class=\"mj-column-per-65 mj-outlook-group-fix\" style=\"font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;\">                             <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" width=\"100%\">                               <tbody>                                 <tr>                                   <td style=\"border:none;border-left:1px solid #cdc5bf;vertical-align:top;padding:0px 0px 0px 16px;\">                                     <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"\" width=\"100%\">                                       <tbody>                                         <tr>                                           <td align=\"left\" style=\"font-size:0px;padding:6px 0px 4px 0px;word-break:break-word;\">                                             <div style=\"font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans','Helvetica Neue', sans-serif;font-size:12px;font-weight:400;letter-spacing:0.02em;line-height:1.55;text-align:left;color:#6b6b6b;\"> Colour Collection</div>                                           </td>                                         </tr>                                         <tr>                                           <td align=\"left\" style=\"font-size:0px;padding:0px 0px 4px 0px;word-break:break-word;\">                                             <div style=\"font-family:CaslonDoric;font-size:20px;font-weight:400;line-height:1.55;text-align:left;color:#5C5957;\"><strong> Smoke</strong></div>                                           </td>                                         </tr>                                         <tr>                                           <td align=\"left\" style=\"font-size:0px;padding:0px 0px 0px 0px;word-break:break-word;\">                                             <div style=\"font-family:RomNarrowLight;font-size:14px;font-weight:400;line-height:1.35;text-align:left;color:#5C5957;\">                                                Kouřové odstíny kolekce Smoke vnesly do projektu sofistikovanost a jemný kontrast, který zvýraznil přirozenou krásu dubu.                                             </div>                                           </td>                                         </tr>                                         <tr>                                           <td style=\"font-size:0px;word-break:break-word;\">                                             <div style=\"height:10px;line-height:10px;\">&#8202;</div>                                           </td>                                         </tr>                                         <tr>                                           <td align=\"left\" style=\"font-size:0px;padding:0px 0px 0px 0px;word-break:break-word;\">                                             <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"border-collapse:separate;line-height:100%;\">                                               <tbody>                                                 <tr>                                                   <td align=\"center\" bgcolor=\"#EDE8E4\" role=\"presentation\" style=\"border:1px solid #5C5957;border-radius:0px;cursor:auto;mso-padding-alt:10px 25px 10px 25px;text-align:center;background:#EDE8E4;\" valign=\"middle\">                                                     <a href=\" https://www.oakcent.cz/kolekce-podlah/smoke\" style=\"display:inline-block;background:#EDE8E4;color:#5C5957;font-family:RomNarrowLight;font-size:14px;font-weight:normal;line-height:120%;margin:0;text-decoration:none;text-transform:none;padding:10px 25px 10px 25px;mso-padding-alt:0px;border-radius:0px;\" target=\"_blank\"> Objevte kolekci Smoke</a>                                                   </td>                                                 </tr>                                               </tbody>                                             </table>                                           </td>                                         </tr>                                       </tbody>                                     </table>                                   </td>                                 </tr>                               </tbody>                             </table>                           </div>                          </td>                       </tr>                     </tbody>                   </table>                 </div>               </div>                <div style=\"height:12px;line-height:12px;\">&#8202;</div>                <!-- divider row under text only -->               <div style=\"background:#EDE8E4;background-color:#EDE8E4;margin:0px auto;max-width:600px;\">                 <table align=\"center\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"background:#EDE8E4;background-color:#EDE8E4;width:100%;\">                   <tbody>                     <tr>                       <td style=\"border:none;direction:ltr;font-size:0px;padding:0px 20px 0px 20px;text-align:center;\">                         <div class=\"mj-column-per-35 mj-outlook-group-fix\" style=\"font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;\">                           <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" width=\"100%\">                             <tbody>                               <tr>                                 <td style=\"border:none;vertical-align:top;padding:0px 0px 0px 0px;\">                                   <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"\" width=\"100%\">                                     <tbody></tbody>                                   </table>                                 </td>                               </tr>                             </tbody>                           </table>                         </div>                          <div class=\"mj-column-per-65 mj-outlook-group-fix\" style=\"font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;\">                           <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" width=\"100%\">                             <tbody>                               <tr>                                 <td style=\"border:none;vertical-align:top;padding:0px 0px 0px 16px;\">                                   <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"\" width=\"100%\">                                     <tbody>                                       <tr>                                         <td align=\"left\" style=\"font-size:0px;padding:0px 0px 0px 0px;word-break:break-word;\">                                           <p style=\"border-top:solid 1px #cdc5bf;font-size:1px;margin:0px;width:100%;\"></p>                                         </td>                                       </tr>                                     </tbody>                                   </table>                                 </td>                               </tr>                             </tbody>                           </table>                         </div>                        </td>                     </tr>                   </tbody>                 </table>               </div>                <div style=\"height:12px;line-height:12px;\">&#8202;</div>                <!-- ========================================= -->               <!-- 6 PATTERN -->               <!-- ========================================= -->                <div style=\"background:#EDE8E4 url(' https://izohjxqvhacjmutgnckf.supabase.co/storage/v1/object/public/Newsletter/Struktura_2_HQ.png') right bottom / 180px auto no-repeat;background-position:right bottom;background-repeat:no-repeat;background-size:180px auto;margin:0px auto;max-width:600px;\">                 <div style=\"line-height:0;font-size:0;\">                   <table align=\"center\" background=\" https://izohjxqvhacjmutgnckf.supabase.co/storage/v1/object/public/Newsletter/Struktura_2_HQ.png\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"background:#EDE8E4 url(' https://izohjxqvhacjmutgnckf.supabase.co/storage/v1/object/public/Newsletter/Struktura_2_HQ.png') right bottom / 180px auto no-repeat;background-position:right bottom;background-repeat:no-repeat;background-size:180px auto;width:100%;\">                     <tbody>                       <tr>                         <td style=\"border:none;direction:ltr;font-size:0px;padding:0px 20px 0px 20px;text-align:center;\">                            <div class=\"mj-column-per-35 mj-outlook-group-fix\" style=\"font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;\">                             <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" width=\"100%\">                               <tbody>                                 <tr>                                   <td style=\"border:none;vertical-align:top;padding:0px 12px 0px 0px;\">                                     <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"\" width=\"100%\">                                       <tbody>                                         <tr>                                           <td align=\"center\" style=\"font-size:0px;padding:6px 0px 10px 0px;word-break:break-word;\">                                             <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"border-collapse:collapse;border-spacing:0px;\">                                               <tbody>                                                 <tr>                                                   <td style=\"width:150px;\">                                                     <img alt=\" Dice z kolekce Squares\" src=\" https://izohjxqvhacjmutgnckf.supabase.co/storage/v1/object/public/Newsletter/pattern_images/Dice.png\" style=\"border:0;display:block;outline:none;text-decoration:none;height:auto;width:100%;font-size:14px;\" width=\"150\" height=\"auto\" />                                                   </td>                                                 </tr>                                               </tbody>                                             </table>                                           </td>                                         </tr>                                       </tbody>                                     </table>                                   </td>                                 </tr>                               </tbody>                             </table>                           </div>                            <div class=\"mj-column-per-65 mj-outlook-group-fix\" style=\"font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;\">                             <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" width=\"100%\">                               <tbody>                                 <tr>                                   <td style=\"border:none;border-left:1px solid #cdc5bf;vertical-align:top;padding:0px 0px 0px 16px;\">                                     <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"\" width=\"100%\">                                       <tbody>                                         <tr>                                           <td align=\"left\" style=\"font-size:0px;padding:6px 0px 4px 0px;word-break:break-word;\">                                             <div style=\"font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans','Helvetica Neue', sans-serif;font-size:12px;font-weight:400;letter-spacing:0.02em;line-height:1.55;text-align:left;color:#6b6b6b;\"> Pattern Collection</div>                                           </td>                                         </tr>                                         <tr>                                           <td align=\"left\" style=\"font-size:0px;padding:0px 0px 4px 0px;word-break:break-word;\">                                             <div style=\"font-family:CaslonDoric;font-size:20px;font-weight:400;line-height:1.55;text-align:left;color:#5C5957;\"><strong> Dice</strong></div>                                           </td>                                         </tr>                                         <tr>                                           <td align=\"left\" style=\"font-size:0px;padding:0px 0px 0px 0px;word-break:break-word;\">                                             <div style=\"font-family:RomNarrowLight;font-size:14px;font-weight:400;line-height:1.35;text-align:left;color:#5C5957;\">                                                Vzor Dice dodal prostoru architektonickou hravost a moderní výraz díky své geometrické přesnosti.                                             </div>                                           </td>                                         </tr>                                         <tr>                                           <td style=\"font-size:0px;word-break:break-word;\">                                             <div style=\"height:10px;line-height:10px;\">&#8202;</div>                                           </td>                                         </tr>                                         <tr>                                           <td align=\"left\" style=\"font-size:0px;padding:0px 0px 0px 0px;word-break:break-word;\">                                             <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"border-collapse:separate;line-height:100%;\">                                               <tbody>                                                 <tr>                                                   <td align=\"center\" bgcolor=\"#EDE8E4\" role=\"presentation\" style=\"border:1px solid #5C5957;border-radius:0px;cursor:auto;mso-padding-alt:10px 25px 10px 25px;text-align:center;background:#EDE8E4;\" valign=\"middle\">                                                     <a href=\" https://www.oakcent.cz/kolekce-squares\" style=\"display:inline-block;background:#EDE8E4;color:#5C5957;font-family:RomNarrowLight;font-size:14px;font-weight:normal;line-height:120%;margin:0;text-decoration:none;text-transform:none;padding:10px 25px 10px 25px;mso-padding-alt:0px;border-radius:0px;\" target=\"_blank\"> Prozkoumejte Dice</a>                                                   </td>                                                 </tr>                                               </tbody>                                             </table>                                           </td>                                         </tr>                                       </tbody>                                     </table>                                   </td>                                 </tr>                               </tbody>                             </table>                           </div>                          </td>                       </tr>                     </tbody>                   </table>                 </div>               </div>                <!-- ========================================= -->               <!-- 7 GALLERY IMAGE -->               <!-- ========================================= -->                <div style=\"background:#EDE8E4;background-color:#EDE8E4;margin:0px auto;max-width:600px;\">                 <table align=\"center\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"background:#EDE8E4;background-color:#EDE8E4;width:100%;\">                   <tbody>                     <tr>                       <td style=\"border:none;direction:ltr;font-size:0px;padding:0px 20px 0px 20px;text-align:center;\">                         <div class=\"mj-column-per-100 mj-outlook-group-fix\" style=\"font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;\">                           <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" width=\"100%\">                             <tbody>                               <tr>                                 <td style=\"border:none;vertical-align:top;padding:20px 0px 20px 0px;\">                                   <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"\" width=\"100%\">                                     <tbody>                                       <tr>                                         <td align=\"center\" style=\"font-size:0px;padding:10px 0px 10px 0px;word-break:break-word;\">                                           <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"border-collapse:collapse;border-spacing:0px;\">                                             <tbody>                                               <tr>                                                 <td style=\"width:560px;\">                                                   <img alt=\" Proces výběru dřevěné podlahy\" src=\" https://oakcent.com/magazine/zakazkova-vyroba/519/image-thumb__519___auto_177535db6a5d937f36939905bed88ae2/Oakcent-zakazkova-vyroba-hoblovani-kastiel-kubinyi.2c1836cc.jpg\" style=\"border:0;display:block;outline:none;text-decoration:none;height:auto;width:100%;font-size:14px;\" width=\"560\" height=\"auto\" />                                                 </td>                                               </tr>                                             </tbody>                                           </table>                                         </td>                                       </tr>                                     </tbody>                                   </table>                                 </td>                               </tr>                             </tbody>                           </table>                         </div>                       </td>                     </tr>                   </tbody>                 </table>               </div>                <div style=\"height:18px;line-height:18px;\">&#8202;</div>                <!-- ========================================= -->               <!-- 8 DARK CTA + SOCIALS + FOOTER -->               <!-- ========================================= -->                <!--[if mso | IE]><tr><td class=\"\" width=\"600px\" ><table align=\"center\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" class=\"\" role=\"presentation\" style=\"width:600px;\" width=\"600\" bgcolor=\"rgba(0,0,0,0.7)\" ><tr><td style=\"line-height:0px;font-size:0px;mso-line-height-rule:exactly;\"><v:rect style=\"width:600px;\" xmlns:v=\"urn:schemas-microsoft-com:vml\" fill=\"true\" stroke=\"false\"><v:fill origin=\"0, 0\" position=\"0, 0\" src=\" https://izohjxqvhacjmutgnckf.supabase.co/storage/v1/object/public/Newsletter/forest_small.jpg\" color=\"rgba(0,0,0,0.7)\" type=\"frame\" size=\"750px,auto\" /><v:textbox style=\"mso-fit-shape-to-text:true\" inset=\"0,0,0,0\"><![endif]-->               <div style=\"background:rgba(0,0,0,0.7) url(' https://izohjxqvhacjmutgnckf.supabase.co/storage/v1/object/public/Newsletter/forest_small.jpg') center center / 750px auto no-repeat;background-position:center center;background-repeat:no-repeat;background-size:750px auto;margin:0px auto;max-width:600px;\">                 <div style=\"line-height:0;font-size:0;\">                   <table align=\"center\" background=\" https://izohjxqvhacjmutgnckf.supabase.co/storage/v1/object/public/Newsletter/forest_small.jpg\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"background:rgba(0,0,0,0.7) url(' https://izohjxqvhacjmutgnckf.supabase.co/storage/v1/object/public/Newsletter/forest_small.jpg') center center / 750px auto no-repeat;background-position:center center;background-repeat:no-repeat;background-size:750px auto;width:100%;\">                     <tbody>                       <tr>                         <td style=\"border:none;direction:ltr;font-size:0px;padding:0px 0px 0px 0px;text-align:center;\">                           <div class=\"mj-column-per-100 mj-outlook-group-fix\" style=\"font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;\">                             <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" width=\"100%\">                               <tbody>                                 <tr>                                   <td style=\"border:none;vertical-align:top;padding:36px 16px 26px 16px;\">                                     <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"\" width=\"100%\">                                       <tbody>                                          <tr>                                           <td align=\"center\" style=\"font-size:0px;padding:0px 0px 18px 0px;word-break:break-word;\">                                             <div style=\"font-family:RomNarrow;font-size:22px;font-weight:bold;line-height:1.2;text-align:center;color:#ffffff;\"> Hledáte autentické textury a barvy pro svůj projekt? Stáhněte si výběr vzorů Oakcent a nabídněte svým klientům vyjimečnost.</div>                                           </td>                                         </tr>                                          <tr>                                           <td style=\"font-size:0px;word-break:break-word;\">                                             <div style=\"height:10px;line-height:10px;\">&#8202;</div>                                           </td>                                         </tr>                                          <tr>                                           <td align=\"center\" style=\"font-size:0px;padding:0px 0px 0px 0px;word-break:break-word;\">                                             <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"border-collapse:separate;line-height:100%;\">                                               <tbody>                                                 <tr>                                                   <td align=\"center\" bgcolor=\"#ffffff\" role=\"presentation\" style=\"border:none;border-radius:0px;cursor:auto;mso-padding-alt:10px 25px;text-align:center;background:#ffffff;\" valign=\"middle\">                                                     <a href=\" #\" style=\"display:inline-block;background:#ffffff;color:#111827;font-family:RomNarrow;font-size:14px;font-weight:bold;line-height:120%;margin:0;text-decoration:none;text-transform:none;padding:10px 25px;mso-padding-alt:0px;border-radius:0px;\" target=\"_blank\"> Stáhnout textury</a>                                                   </td>                                                 </tr>                                               </tbody>                                             </table>                                           </td>                                         </tr>                                          <tr>                                           <td style=\"font-size:0px;word-break:break-word;\">                                             <div style=\"height:26px;line-height:26px;\">&#8202;</div>                                           </td>                                         </tr>                                          <!-- Social icons -->                                         <tr>                                           <td align=\"center\" style=\"font-size:0px;padding:0px 180px 0px 180px;word-break:break-word;\">                                             <table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" border=\"0\" style=\"color:#5C5957;font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans','Helvetica Neue', sans-serif;font-size:14px;line-height:1.55;table-layout:auto;width:100%;border:none;\">                                               <tr>                                                 <td style=\"padding:0 6px; text-align:center; vertical-align:middle;\">                                                   <a href=\" #\">                                                     <img src=\" https://izohjxqvhacjmutgnckf.supabase.co/storage/v1/object/public/Newsletter/Web_HQ.png\" alt=\" web\" width=\"20\" style=\"display:block; border:0; margin:0 auto;\" />                                                   </a>                                                 </td>                                                 <td style=\"padding:0 6px; text-align:center; vertical-align:middle;\">                                                   <a href=\" #\">                                                     <img src=\" https://izohjxqvhacjmutgnckf.supabase.co/storage/v1/object/public/Newsletter/Instagram_HQ.png\" alt=\" instagram\" width=\"20\" style=\"display:block; border:0; margin:0 auto;\" />                                                   </a>                                                 </td>                                                 <td style=\"padding:0 6px; text-align:center; vertical-align:middle;\">                                                   <a href=\" #\">                                                     <img src=\" https://izohjxqvhacjmutgnckf.supabase.co/storage/v1/object/public/Newsletter/Facebook_HQ.png\" alt=\" facebook\" width=\"20\" style=\"display:block; border:0; margin:0 auto;\" />                                                   </a>                                                 </td>                                                 <td style=\"padding:0 6px; text-align:center; vertical-align:middle;\">                                                   <a href=\" #\">                                                     <img src=\" https://izohjxqvhacjmutgnckf.supabase.co/storage/v1/object/public/Newsletter/Pinterest_HQ.png\" alt=\" pinterest\" width=\"20\" style=\"display:block; border:0; margin:0 auto;\" />                                                   </a>                                                 </td>                                                 <td style=\"padding:0 6px; text-align:center; vertical-align:middle;\">                                                   <a href=\" #\">                                                     <img src=\" https://izohjxqvhacjmutgnckf.supabase.co/storage/v1/object/public/Newsletter/Youtube_HQ.png\" alt=\" youtube\" width=\"20\" style=\"display:block; border:0; margin:0 auto;\" />                                                   </a>                                                 </td>                                                 <td style=\"padding:0 6px; text-align:center; vertical-align:middle;\">                                                   <a href=\" #\">                                                     <img src=\" https://izohjxqvhacjmutgnckf.supabase.co/storage/v1/object/public/Newsletter/LinkedIn_HQ.png\" alt=\" linkedin\" width=\"20\" style=\"display:block; border:0; margin:0 auto;\" />                                                   </a>                                                 </td>                                               </tr>                                             </table>                                           </td>                                         </tr>                                          <tr>                                           <td style=\"font-size:0px;word-break:break-word;\">                                             <div style=\"height:22px;line-height:22px;\">&#8202;</div>                                           </td>                                         </tr>                                          <!-- Unsubscribe + copyright -->                                         <tr>                                           <td align=\"center\" style=\"font-size:0px;padding:0px 34px 6px 34px;word-break:break-word;\">                                             <div style=\"font-family:CaslonDoric;font-size:10px;font-weight:400;line-height:1.4;text-align:center;color:#EDE8E4;\">                                                Pokud nechcete nadále dostávat emaily Oakcent, můžete se jednoduše                                               <a href=\" #\" style=\"color:#EDE8E4; text-decoration:underline;\"> odhlásit</a>.                                             </div>                                           </td>                                         </tr>                                          <tr>                                           <td align=\"center\" style=\"font-size:0px;padding:0px 34px 0px 34px;word-break:break-word;\">                                             <div style=\"font-family:CaslonDoric;font-size:10px;font-weight:400;line-height:1.4;text-align:center;color:#EDE8E4;\"> © 2025 Oakcent, Všechna práva vyhrazena.</div>                                           </td>                                         </tr>                                        </tbody>                                     </table>                                   </td>                                 </tr>                               </tbody>                             </table>                           </div>                         </td>                       </tr>                     </tbody>                   </table>                 </div>               </div>               <!--[if mso | IE]></v:textbox></v:rect></td></tr></table></td></tr></table><![endif]-->              </td>           </tr>         </tbody>       </table>     </div>     <!--[if mso | IE]></td></tr></table><![endif]-->    </div> </body>  </html>",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        368,
+        1008
+      ],
+      "id": "755d3b3f-bb25-43c8-bfcb-0856d1d4e0e9",
+      "name": "Campaign Detail"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Full credentials1').item.json.odoo_domain }}/xmlrpc/2/object",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "text/xml"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "text/xml",
+        "body": "=<?xml version=\"1.0\"?>\n<methodCall>\n  <methodName>execute_kw</methodName>\n  <params>\n\n    <!-- 1. Authentication -->\n    <param>\n      <value><string>{{ $('Full credentials1').item.json.db_name }}</string></value>\n    </param>\n    <param>\n      <value><int>{{ $('Full credentials1').item.json.UID }}</int></value>\n    </param>\n    <param>\n      <value><string>{{ $('Full credentials1').item.json.user_password }}</string></value>\n    </param>\n\n    <!-- 2. Target model -->\n    <param>\n      <value><string>mailing.mailing</string></value>\n    </param>\n\n    <!-- 3. Method -->\n    <param>\n      <value><string>create</string></value>\n    </param>\n\n    <!-- 4. Arguments -->\n    <param>\n      <value>\n        <array>\n          <data>\n            <value>\n              <struct>\n\n                <!-- Basic fields -->\n                <member>\n                  <name>name</name>\n                  <value><string>{{ $json.newsletter_name }}</string></value>\n                </member>\n\n                <member>\n                  <name>subject</name>\n                  <value><string>{{ $json.newsletter_subject }}</string></value>\n                </member>\n\n                <!-- Target model: Contacts -->\n                <member>\n                  <name>mailing_model_id</name>\n                  <value><int>84</int></value>\n                </member>\n\n                <!-- Recipient filter (THIS IS THE IMPORTANT PART) -->\n                <member>\n                  <name>mailing_domain</name>\n                  <value>\n                    <string><![CDATA[\n[\"&\", \"&\",\n (\"is_blacklisted\", \"=\", False),\n (\"lang\", \"=\", \"cs_CZ\"),\n (\"industry_id\", \"ilike\", \"developer\")\n]\n                    ]]></string>\n                  </value>\n                </member>\n\n                <!-- Optional campaign -->\n                <member>\n                  <name>campaign_id</name>\n                  <value><int>{{ $json.campaign_id }}</int></value>\n                </member>\n\n                <!-- Sender -->\n                <member>\n                  <name>email_from</name>\n                  <value><string>{{ $('Odoo XML creds1').item.json.user_name }}</string></value>\n                </member>\n\n                <!-- Email type -->\n                <member>\n                  <name>mailing_type</name>\n                  <value><string>mail</string></value>\n                </member>\n\n                <!-- Draft state -->\n                <member>\n                  <name>state</name>\n                  <value><string>draft</string></value>\n                </member>\n\n                <!-- HTML body (full HTML, editor will be locked) -->\n                <member>\n                  <name>body_arch</name>\n                  <value>\n                    <string><![CDATA[\n{{ $('Campaign Detail').item.json.html_body }}\n                    ]]></string>\n                  </value>\n                </member>\n\n                <member>\n                  <name>body_html</name>\n                  <value>\n                    <string><![CDATA[\n{{ $('Campaign Detail').item.json.html_body }}\n                    ]]></string>\n                  </value>\n                </member>\n\n              </struct>\n            </value>\n          </data>\n        </array>\n      </value>\n    </param>\n\n  </params>\n</methodCall>\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        592,
+        1008
+      ],
+      "id": "f57f7141-1de2-4b2c-bc1c-0dedbae5bfb5",
+      "name": "Create Mailing Comunication"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "49008af3-46fb-4dce-a6ae-ac0501dc142b",
+              "name": "api_key",
+              "value": "bc8fcffe2cb6250d74dd8517e48f8fa351bc787e",
+              "type": "string"
+            },
+            {
+              "id": "d7a1b1b7-eb39-49a5-84f2-06b45a8bcd9e",
+              "name": "db_name",
+              "value": "jumperscz-princparket-18staging-26267898",
+              "type": "string"
+            },
+            {
+              "id": "0297218b-5d4e-4aee-bd3c-ba2060a3c61b",
+              "name": "user_name",
+              "value": "pavel.urbann@gmail.com",
+              "type": "string"
+            },
+            {
+              "id": "9aedfacc-10f5-4cda-895a-164e384f14ef",
+              "name": "user_password",
+              "value": "PrinceParket12",
+              "type": "string"
+            },
+            {
+              "id": "85a9629e-e45f-483e-9a5e-501a71e50ba8",
+              "name": "odoo_domain",
+              "value": "https://princparket-test.odoo.com",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -704,
+        1008
+      ],
+      "id": "cc10009d-af22-4453-9af9-38576328cbb6",
+      "name": "Odoo XML creds1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.odoo_domain }}/xmlrpc/2/common ",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "text/xml"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "text/xml",
+        "body": "=<?xml version=\"1.0\"?>\n<methodCall>\n  <methodName>authenticate</methodName>\n  <params>\n    <param><value><string>{{ $json.db_name }}</string></value></param>\n    <param><value><string>{{ $json.user_name }}</string></value></param>\n    <param><value><string>{{ $json.user_password }}</string></value></param>\n    <param><value><array><data></data></array></value></param>\n  </params>\n</methodCall>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -544,
+        1008
+      ],
+      "id": "a7db2226-f3a9-4c39-a15f-5c5ea572b7ff",
+      "name": "Odoo Authenticate1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.xml",
+      "typeVersion": 1,
+      "position": [
+        -400,
+        1008
+      ],
+      "id": "c14529ff-d78a-4ddd-bda6-0d0335a35ea9",
+      "name": "Parse UID1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "339292ce-3ddc-4fa3-876d-984ad4cde6e2",
+              "name": "UID",
+              "value": "={{ $json.methodResponse.params.param.value.int }}",
+              "type": "string"
+            },
+            {
+              "id": "06a457a8-51fb-4b4a-bdc1-0e9e16a3245c",
+              "name": "api_key",
+              "value": "={{ $('Odoo XML creds1').item.json.api_key }}",
+              "type": "string"
+            },
+            {
+              "id": "9de9cec1-2776-4e1e-96c8-331f604646f9",
+              "name": "db_name",
+              "value": "={{ $('Odoo XML creds1').item.json.db_name }}",
+              "type": "string"
+            },
+            {
+              "id": "dd5fbdb7-ead4-4a83-888b-02ac8f6b60a9",
+              "name": "user_name",
+              "value": "={{ $('Odoo XML creds1').item.json.user_name }}",
+              "type": "string"
+            },
+            {
+              "id": "2f1c51fc-0577-4633-89ca-61f428ad0e16",
+              "name": "user_password",
+              "value": "={{ $('Odoo XML creds1').item.json.user_password }}",
+              "type": "string"
+            },
+            {
+              "id": "7539078d-52d1-4d71-8acc-da790f42cb12",
+              "name": "odoo_domain",
+              "value": "={{ $('Odoo XML creds1').item.json.odoo_domain }}",
+              "type": "string"
+            },
+            {
+              "id": "98ac37c6-1534-4555-9aa3-bb6497fc5a1f",
+              "name": "campaign_name",
+              "value": "Test",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -240,
+        1008
+      ],
+      "id": "7ef92153-dd25-4abd-8fed-949e49fa86ed",
+      "name": "Full credentials1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Full credentials1').item.json.odoo_domain }}/xmlrpc/2/object",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "text/xml"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "text/xml",
+        "body": "=<?xml version=\"1.0\"?>\n<methodCall>\n  <methodName>execute_kw</methodName>\n  <params>\n    <!-- 1. Auth credentials -->\n    <param><value><string>{{ $('Full credentials1').item.json.db_name }}</string></value></param>\n    <param><value><int>{{ $('Full credentials1').item.json.UID }}</int></value></param>\n    <param><value><string>{{ $('Full credentials1').item.json.user_password }}</string></value></param>\n\n    <!-- 2. Target model -->\n    <param><value><string>mailing.mailing</string></value></param>\n\n    <!-- 3. Method -->\n    <param><value><string>create</string></value></param>\n\n    <!-- 4. Values -->\n    <param>\n      <value>\n        <array><data>\n          <value>\n            <struct>\n              <!-- Basic fields -->\n              <member>\n                <name>name</name>\n                <value><string>{{ $json.newsletter_name }}</string></value>\n              </member>\n              <member>\n                <name>subject</name>\n                <value><string>{{ $json.newsletter_subject }}</string></value>\n              </member>\n              \n              <!-- Required model reference -->\n              <member>\n                <name>mailing_model_id</name>\n                <value><int>660</int></value>\n              </member>\n              \n              <!-- Campaign link (optional but safe) -->\n              <member>\n                <name>campaign_id</name>\n                <value><int>{{ $json.campaign_id }}</int></value>\n              </member>\n              \n              <!-- Sender -->\n              <member>\n                <name>email_from</name>\n                <value><string>{{ $('Odoo XML creds1').item.json.user_name }}</string></value>\n              </member>\n\n              <!-- Email format -->\n              <member>\n                <name>mailing_type</name>\n                <value><string>mail</string></value>\n              </member>\n              <member>\n                <name>state</name>\n                <value><string>draft</string></value>\n              </member>\n\n              <!-- HTML content -->\n              <member>\n                <name>body_arch</name>\n                <value><string><![CDATA[\n                  {{ $('Campaign Detail').item.json.html_body }}\n                ]]></string></value>\n              </member>\n              <member>\n                <name>body_html</name>\n                <value><string><![CDATA[\n                  {{ $('Campaign Detail').item.json.html_body }}\n                ]]></string></value>\n              </member>\n            </struct>\n          </value>\n        </data></array>\n      </value>\n    </param>\n  </params>\n</methodCall>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        560,
+        1280
+      ],
+      "id": "c8ed6c3f-78cd-4015-8d7b-5477d7d254af",
+      "name": "Create Mailing Comunication1"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "newsletter_creds",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "keyValue": "1"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -816,
+        1504
+      ],
+      "id": "c9fac049-ed29-4bc6-ac6b-3dd7198d6bd8",
+      "name": "Get a row",
+      "credentials": {
+        "supabaseApi": {
+          "id": "XbTsqF8wuG2gSZNT",
+          "name": "Supabase account 3"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "XML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "XML": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "XML1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Odoo XML creds": {
+      "main": [
+        [
+          {
+            "node": "Odoo Authenticate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Odoo Authenticate": {
+      "main": [
+        [
+          {
+            "node": "Parse UID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse UID": {
+      "main": [
+        [
+          {
+            "node": "Full credentials",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Full credentials": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "XML2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "XML2": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Camaign": {
+      "main": [
+        [
+          {
+            "node": "Parse Campaign ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Campaign ID": {
+      "main": [
+        [
+          {
+            "node": "Campaign Detail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Campaign Detail": {
+      "main": [
+        [
+          {
+            "node": "Create Mailing Comunication",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Odoo XML creds1": {
+      "main": [
+        [
+          {
+            "node": "Odoo Authenticate1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Odoo Authenticate1": {
+      "main": [
+        [
+          {
+            "node": "Parse UID1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse UID1": {
+      "main": [
+        [
+          {
+            "node": "Full credentials1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Full credentials1": {
+      "main": [
+        [
+          {
+            "node": "Create Camaign",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "97cd485e-26ed-4abc-bdaf-9a5430fd343d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "331d746bc1a63563201e278bbfd6be74ef21f3e48d7328285e9bf034335c85dd"
+  },
+  "id": "ucee4MCMNsS9FoqU",
+  "tags": [
+    {
+      "updatedAt": "2026-01-14T22:07:57.945Z",
+      "createdAt": "2026-01-14T22:07:57.945Z",
+      "id": "bitJDCcC3mELQkTy",
+      "name": "testing"
+    },
+    {
+      "updatedAt": "2026-01-14T22:06:51.931Z",
+      "createdAt": "2026-01-14T22:06:51.931Z",
+      "id": "zRjUdBe8yQo6o5Hd",
+      "name": "not used"
+    }
+  ]
+}

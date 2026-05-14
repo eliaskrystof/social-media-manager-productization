@@ -1,0 +1,284 @@
+{
+  "name": "SoMe_Automation_Donwload_file_ext",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "file_id"
+            },
+            {
+              "name": "platform"
+            },
+            {
+              "name": "file_name"
+            },
+            {
+              "name": "mimeType"
+            },
+            {
+              "name": "source_row",
+              "type": "number"
+            },
+            {
+              "name": "user_name"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -384,
+        0
+      ],
+      "id": "3dc38a11-6eb2-4099-81aa-c46f1cde17aa",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $('When Executed by Another Workflow').item.json.file_id }}",
+          "mode": "id"
+        },
+        "options": {
+          "binaryPropertyName": "file",
+          "fileName": "={{ $('When Executed by Another Workflow').item.json.file_name }}"
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        352,
+        0
+      ],
+      "id": "4f454fdf-9daa-4722-b67b-d0b19be1dc70",
+      "name": "Download file",
+      "credentials": {
+        "googleApi": {
+          "id": "aHVI3CAM5JAErt7B",
+          "name": "Google Service Account account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "={{ $('Set filePath').item.json.filePath }}",
+        "dataPropertyName": "file",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        560,
+        0
+      ],
+      "id": "b8489811-fb31-4904-8246-c96ba023ea8e",
+      "name": "Read/Write Files from Disk"
+    },
+    {
+      "parameters": {
+        "command": "=mkdir -p {{ $('Set dirName and fileName').item.json.dirPath }} && echo \"Created: {{ $('Set dirName and fileName').item.json.dirPath }}\"\n"
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        144,
+        0
+      ],
+      "id": "a107b4f4-9646-4738-ae2e-fca7f712abef",
+      "name": "Execute Command"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7aa8a4d0-a977-48f9-88f5-3fc8ca55fc07",
+              "name": "dirPath",
+              "value": "=/files/some_automation/{{ $json.user_name }}/{{ $('When Executed by Another Workflow').item.json.source_row }}/{{ $('When Executed by Another Workflow').item.json.platform }}/{{ $if($('When Executed by Another Workflow').item.json.mimeType === 'video/mp4', 'video', 'image') }}",
+              "type": "string"
+            },
+            {
+              "id": "6fa737f7-9a39-4356-9b81-3d64844ccf93",
+              "name": "fileName",
+              "value": "={{ $('When Executed by Another Workflow').item.json.file_name.replace(/[\\/\\\\?%*:|\"<>]/g, '_') }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -208,
+        0
+      ],
+      "id": "c14ad317-e2fe-4cbd-92cb-c9ac361b9efc",
+      "name": "Set dirName and fileName"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3b00ad19-ef09-46a7-88e4-1da209551088",
+              "name": "filePath",
+              "value": "={{ $json.dirPath + '/' + $json.fileName }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -48,
+        0
+      ],
+      "id": "442f289a-2a7e-4da3-9025-0d5498d9b007",
+      "name": "Set filePath"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "97182500-1e66-49d6-b8c1-6d48bec04eda",
+              "name": "fileName",
+              "value": "={{ $json.fileName }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        752,
+        0
+      ],
+      "id": "d738c895-d2cc-4068-b850-661c49481b2e",
+      "name": "out_filepath"
+    },
+    {
+      "parameters": {
+        "content": "## **1. Formátování obrázku pro post**\nNaformátuje obrázek pro post",
+        "height": 480,
+        "width": 1520,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -528,
+        -160
+      ],
+      "typeVersion": 1,
+      "id": "7859d8f1-6e19-44bd-b52c-0208556380e4",
+      "name": "Sticky Note6"
+    }
+  ],
+  "pinData": {
+    "When Executed by Another Workflow": [
+      {
+        "json": {
+          "file_id": "13nVEIT-34KzaGQVmYd-dDBm9-RCejIpX",
+          "platform": "facebook",
+          "file_name": "01.png",
+          "mimeType": "image/png",
+          "source_row": 473,
+          "user_name": "test_user"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Set dirName and fileName",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download file": {
+      "main": [
+        [
+          {
+            "node": "Read/Write Files from Disk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Command": {
+      "main": [
+        [
+          {
+            "node": "Download file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set dirName and fileName": {
+      "main": [
+        [
+          {
+            "node": "Set filePath",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set filePath": {
+      "main": [
+        [
+          {
+            "node": "Execute Command",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read/Write Files from Disk": {
+      "main": [
+        [
+          {
+            "node": "out_filepath",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "NmGg5uZ3m1rjeYmB"
+  },
+  "versionId": "fe694f10-6e97-472c-ad0c-528a6d30acf3",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "2b07eec16886132e3cd818fdfac587c65db27d72fe33b2ee54f787b58f4dff76"
+  },
+  "id": "C4SqONTqGko6lHJT",
+  "tags": []
+}

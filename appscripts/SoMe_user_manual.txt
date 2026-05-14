@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Social Media Manager – Uživatelský manuál</title>
+  <style>
+    /* === GENERAL STYLE === */
+    body {
+      font-family: "Inter", "Segoe UI", Roboto, Arial, sans-serif;
+      font-size: 16px;
+      line-height: 1.7;
+      color: #222;
+      background: #f8fafc;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 40px auto;
+      background: #fff;
+      border-radius: 16px;
+      padding: 48px 56px;
+      box-shadow: 0 6px 24px rgba(0,0,0,0.06);
+    }
+
+    h1, h2, h3 {
+      font-family: "Poppins", "Segoe UI", sans-serif;
+      color: #20457c;
+      margin-top: 32px;
+      margin-bottom: 12px;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 34px;
+      color: #16396b;
+      margin-bottom: 4px;
+    }
+
+    h2 {
+      font-size: 22px;
+      border-bottom: 2px solid #e6ecf5;
+      padding-bottom: 4px;
+      margin-top: 40px;
+    }
+
+    p {
+      margin: 12px 0;
+    }
+
+    ul, ol {
+      margin-left: 28px;
+    }
+
+    code {
+      background: #eef3fa;
+      color: #16396b;
+      padding: 3px 6px;
+      border-radius: 6px;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 14px;
+    }
+
+    /* === TABLE === */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    th, td {
+      border: 1px solid #e3e8f0;
+      padding: 10px 12px;
+      text-align: left;
+    }
+
+    th {
+      background: #f3f6fb;
+      font-weight: 600;
+    }
+
+    tr:nth-child(even) {
+      background: #fafbfc;
+    }
+
+    /* === CALLOUT / TIP BOX === */
+    .tip {
+      background: #e8f5e9;
+      border-left: 5px solid #4caf50;
+      padding: 14px 18px;
+      border-radius: 8px;
+      margin: 18px 0;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+    }
+
+    /* === LINKS === */
+    a {
+      color: #20457c;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    /* === FOOTER === */
+    footer {
+      text-align: center;
+      font-size: 14px;
+      color: #888;
+      margin-top: 60px;
+      border-top: 1px solid #eee;
+      padding-top: 12px;
+    }
+
+    /* === RESPONSIVE === */
+    @media (max-width: 700px) {
+      .container {
+        padding: 28px;
+      }
+      h1 { font-size: 28px; }
+      h2 { font-size: 20px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📘 Social Media Manager</h1>
+    <p style="text-align:center; margin-top:-8px;">Uživatelský manuál</p>
+
+    <h2>1️⃣ Nastavení účtů – list <em>Settings</em></h2>
+    <p>
+      Otevřete list <strong>Settings</strong>, kde jsou uloženy vaše přístupové tokeny a základní konfigurace.
+    </p>
+    <ul>
+      <li><code>instagram_access_token</code></li>
+      <li><code>facebook_access_token</code></li>
+      <li><code>linkedin_access_token</code></li>
+    </ul>
+    <p>
+      Po vyplnění klikněte v horním menu na <strong>Access Tokens → Validate Tokens</strong>.<br>
+      <span style="color:#4caf50;">🟩 Zelená buňka</span> = token platný, 
+      <span style="color:#f44336;">🟥 červená</span> = neplatný.
+    </p>
+    <div class="tip">
+      💡 Pokud token změníte, klikněte na <strong>Update Access Tokens</strong>, aby se nové hodnoty propsaly do databáze.
+    </div>
+
+    <h2>2️⃣ Hlavní tabulka – <em>SoMe_content</em></h2>
+    <p>
+      Každý řádek představuje jeden příspěvek pro sociální sítě.
+    </p>
+
+    <table>
+      <tr><th>Sloupec</th><th>Obsah</th></tr>
+      <tr><td>A</td><td>ID (unikátní identifikátor)</td></tr>
+      <tr><td>B</td><td>Text pro Instagram</td></tr>
+      <tr><td>C–G</td><td>Texty, hashtagy a kredity pro Facebook a LinkedIn</td></tr>
+      <tr><td>H</td><td>Odkaz na složku s obrázky</td></tr>
+      <tr><td>I–N</td><td>Datumy a časy publikace</td></tr>
+      <tr><td>O</td><td>Checkbox – označte řádky, se kterými chcete pracovat</td></tr>
+      <tr><td>P</td><td>Status – draft, created, scheduled, done…</td></tr>
+      <tr><td>Q</td><td>Náhled příspěvku (HTML)</td></tr>
+    </table>
+
+    <h2>3️⃣ Menu „Post Actions“</h2>
+    <p>V horní liště tabulky najdete nabídku pro ovládání postů:</p>
+    <ul>
+      <li><strong>Navrhnout Příspěvek</strong> – vygeneruje návrh pomocí AI.</li>
+      <li><strong>Upravit Příspěvek</strong> – pošle příspěvek ke korekci.</li>
+      <li><strong>Odsouhlaseno – Naplánovat</strong> – zařadí do plánu publikace.</li>
+      <li><strong>Upravit Naplánovaný Příspěvek</strong> – změní již naplánovaný post.</li>
+      <li><strong>Zobrazit Náhled</strong> – otevře HTML náhled.</li>
+      <li><strong>Zveřejnit Dnešní Posty</strong> – odešle dnešní posty ke zveřejnění.</li>
+    </ul>
+
+    <h2>4️⃣ Automatické složky a média</h2>
+    <p>
+      Při zadání textu do sloupce <strong>B (INSTAGRAM TEXT)</strong> se automaticky vytvoří složka
+      <code>Images/&lt;id_příspěvku&gt;/</code> s podsložkami pro Facebook, Instagram, LinkedIn a Preview.
+    </p>
+
+    <h2>5️⃣ Náhled příspěvku</h2>
+    <p>
+      Označte řádek, klikněte na <strong>Zobrazit Náhled</strong> a otevře se HTML verze postu v novém okně.
+    </p>
+
+    <h2>6️⃣ Publikace</h2>
+    <p>
+      Po potvrzení se příspěvek automaticky odešle ke zpracování a publikaci na vybrané platformy.
+      O průběhu a výsledku akce budete informováni v okně po dokončení procesu.
+    </p>
+
+    <h2>7️⃣ Tipy a údržba</h2>
+    <ul>
+      <li>⚙️ Nemažte ani nepřesouvejte sloupce – skript používá pevné pozice.</li>
+      <li>📋 Při kopírování řádků ponechte checkboxy prázdné.</li>
+      <li>🔒 Při prvním použití povolte skript v dialogu Google („Rozšířené“ → „Přejít na Social Media Manager“ → „Povolit“).</li>
+    </ul>
+
+    <footer>
+      © 2025 Social Media Manager by [Your Company Name]  
+      Kontakt: <a href="mailto:support@example.com">support@example.com</a>
+    </footer>
+  </div>
+</body>
+</html>

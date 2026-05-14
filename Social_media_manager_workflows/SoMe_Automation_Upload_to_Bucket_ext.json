@@ -1,0 +1,307 @@
+{
+  "name": "SoMe_Automation_Upload_to_Bucket_ext",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "filePath"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -528,
+        32
+      ],
+      "id": "8a8123a0-15af-4fa0-9655-2d21cb8421a1",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://izohjxqvhacjmutgnckf.supabase.co/storage/v1/object/SoMe_Automation_media/{{ $('Code4').item.json.modifiedPath }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer REDACTED_SUPABASE_SERVICE_ROLE_KEY"
+            },
+            {
+              "name": "apikey",
+              "value": "REDACTED_SUPABASE_SERVICE_ROLE_KEY"
+            },
+            {
+              "name": "Content-Type",
+              "value": "={{ $('When Executed by Another Workflow').first().json.filePath.match(/(video|image)/)[0] }}/{{ $('When Executed by Another Workflow').item.json.filePath.split('.').pop()}}"
+            },
+            {
+              "name": "x-upsert",
+              "value": "true"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "binaryData",
+        "inputDataFieldName": "image",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        352,
+        32
+      ],
+      "id": "d14d236e-8a80-45aa-a6a2-a98b39df3e7e",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "fileSelector": "={{ $('When Executed by Another Workflow').item.json.filePath }}",
+        "options": {
+          "dataPropertyName": "image"
+        }
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        160,
+        32
+      ],
+      "id": "a07fb725-5951-44ea-8db2-1056aeb8494b",
+      "name": "Read/Write Files from Disk"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ebf89705-8598-43bc-8b1b-9317d76b2016",
+              "name": "file_url",
+              "value": "=https://izohjxqvhacjmutgnckf.supabase.co/storage/v1/object/public/{{ $json.Key }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        528,
+        32
+      ],
+      "id": "65157469-f740-4c05-8917-b2e2be0dc6bd",
+      "name": "Get file url"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "ee0bba30-8801-4a72-93d5-5fa14ab6b415",
+              "leftValue": "={{ $('When Executed by Another Workflow').item.json.filePath }}",
+              "rightValue": "video",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -224,
+        32
+      ],
+      "id": "6a66d5c8-ae66-450a-9026-e57d068e508b",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "command": "=ffmpeg -y -i \"{{ $json.filePath }}\" \\\n  -vf \"scale=1080:-2,fps=30\" \\\n  -c:v libx264 -profile:v high -level 4.1 -pix_fmt yuv420p \\\n  -preset medium -crf 23 -g 60 -keyint_min 60 -movflags +faststart \\\n  -c:a aac -b:a 128k -ac 2 -ar 48000 -r 30 \\\n  \"{{ $json.filePath }}.temp.mp4\" && \\\nmv \"{{ $json.filePath }}.temp.mp4\" \"{{ $json.filePath }}\" && \\\necho \"{{ $json.filePath }}\""
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        -96,
+        -144
+      ],
+      "id": "47541518-ec26-4b2f-96a4-2ddd801a3560",
+      "name": "Execute Command"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "fd56b1fd-c895-467c-9d88-32ee85885d8b",
+              "name": "filePath",
+              "value": "={{ $json.stdout }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        48,
+        -144
+      ],
+      "id": "1b4c460d-5a66-43d6-92c5-9b01ff753024",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "content": "## **1. Vytvoření obrázku pro post**\nNahraje obrázek do databáze ve formátu vhodném pro html",
+        "height": 480,
+        "width": 1380,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -608,
+        -224
+      ],
+      "typeVersion": 1,
+      "id": "15cdd384-542a-40f5-ac55-3d9a15fd6206",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "jsCode": "// This function performs the necessary text transformations.\nfunction transformFilename(inputText) {\n    // 1. Identify the filename part.\n    // The filename is everything after the last '/' and before the last '.'.\n    const parts = inputText.split('/');\n    const fullFilename = parts[parts.length - 1]; // e.g., 'Snímek obrazovky 2025-09-19 162321.png'\n    \n    // Check if there's a dot to separate the name and extension.\n    const lastDotIndex = fullFilename.lastIndexOf('.');\n    if (lastDotIndex === -1) {\n        // Handle case where there's no extension\n        return inputText; \n    }\n    \n    // Separate the name and the extension\n    let filenameBase = fullFilename.substring(0, lastDotIndex); // 'Snímek obrazovky 2025-09-19 162321'\n    const extension = fullFilename.substring(lastDotIndex); // '.png'\n    \n    // 2. Transliterate Czech characters and convert to lowercase.\n    // Map of common Czech characters to their non-diacritic counterparts.\n    const czechMap = {\n        'á': 'a', 'č': 'c', 'ď': 'd', 'é': 'e', 'ě': 'e', 'í': 'i', 'ň': 'n', \n        'ó': 'o', 'ř': 'r', 'š': 's', 'ť': 't', 'ú': 'u', 'ů': 'u', 'ý': 'y', \n        'ž': 'z',\n        'Á': 'a', 'Č': 'c', 'Ď': 'd', 'É': 'e', 'Ě': 'e', 'Í': 'i', 'Ň': 'n', \n        'Ó': 'o', 'Ř': 'r', 'Š': 's', 'Ť': 't', 'Ú': 'u', 'Ů': 'u', 'Ý': 'y', \n        'Ž': 'z'\n    };\n\n    // Replace characters using the map\n    let transformedName = filenameBase.split('').map(char => czechMap[char] || char).join('');\n    \n    // Ensure all characters are lowercase, which should be mostly done by the map, \n    // but this catches any non-mapped uppercase Latin letters.\n    transformedName = transformedName.toLowerCase();\n    \n    // 3. Replace whitespaces and hyphens with underscores.\n    // This uses a regular expression to replace one or more occurrences of \n    // whitespace (\\s) or a hyphen (-) with a single underscore (_).\n    transformedName = transformedName.replace(/[\\s-]/g, '_'); \n    \n    // 4. Reconstruct the full path.\n    // Rejoin the path components, replacing the original full filename with the new one.\n    parts[parts.length - 1] = transformedName + extension;\n    \n    return parts.join('/'); \n}\n\n// ----------------------------------------------------------------------\n// 1. TAILORED INPUT: Retrieve the path from the 'filePath' field\nconst inputText = $input.first().json.filePath; \n// ----------------------------------------------------------------------\n\n// Run the transformation.\nconst outputText = transformFilename(inputText);\n\n// Set the output for the Code node.\n// It creates a new field named 'modifiedPath' with the transformed string.\nreturn [{\n    json: {\n        modifiedPath: outputText\n    }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -368,
+        32
+      ],
+      "id": "1eedb5a4-375a-4791-99af-b7a0638c0f85",
+      "name": "Code4"
+    }
+  ],
+  "pinData": {
+    "When Executed by Another Workflow": [
+      {
+        "json": {
+          "filePath": "/files/some_automation//8/instagram/image/Snímek obrazovky 2025-09-19 162321.png"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Code4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read/Write Files from Disk": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Get file url",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Execute Command",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Read/Write Files from Disk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Command": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Read/Write Files from Disk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code4": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "NmGg5uZ3m1rjeYmB"
+  },
+  "versionId": "f9b499e1-853f-47c0-b338-869fa912f01d",
+  "meta": {
+    "instanceId": "2b07eec16886132e3cd818fdfac587c65db27d72fe33b2ee54f787b58f4dff76"
+  },
+  "id": "myeskH2bF31TDHUM",
+  "tags": []
+}

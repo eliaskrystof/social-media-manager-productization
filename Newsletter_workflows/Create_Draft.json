@@ -1,0 +1,1249 @@
+{
+  "name": "Create_Draft",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "2223b6ba-48b8-4d85-9034-16f83bb75bf7",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -544,
+        288
+      ],
+      "id": "df9476d9-59f6-4fb1-8d41-20e3afc3e497",
+      "name": "Webhook",
+      "webhookId": "2223b6ba-48b8-4d85-9034-16f83bb75bf7",
+      "disabled": true
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        -896,
+        1152
+      ],
+      "id": "9e2f061c-85b1-41d4-bd76-e838ea029362",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        -1104,
+        1120
+      ],
+      "id": "dc193ec2-d135-4a42-80d2-06a0398ca9b1",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "HrLuvJHhWPSgTQpu",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.body }}",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        -1088,
+        928
+      ],
+      "id": "dc0d973f-6afb-49af-ad9d-31dc31fa58a8",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -640,
+        -80
+      ],
+      "id": "964668a9-5d64-4085-aa8d-774a3d6281e4",
+      "name": "When clicking ‘Test workflow’"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "14CkOky3jXC9rcwen1GmEy6U1ALrfHjDRD1HAjsoycQg",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 445110406,
+          "mode": "list",
+          "cachedResultName": "Návrh tabulky Newsletterů",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/14CkOky3jXC9rcwen1GmEy6U1ALrfHjDRD1HAjsoycQg/edit#gid=445110406"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "No.",
+              "lookupValue": "2"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        -384,
+        -80
+      ],
+      "id": "0caeddce-8f6a-401a-8905-6a239272ad7e",
+      "name": "Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "ouZ4Cl4hWK3UY5OV",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ $json['1. blog'] }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        272,
+        -80
+      ],
+      "id": "201d9e7c-b9d0-4eea-9a30-a72bfbb40e5b",
+      "name": "GET blog"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        -80,
+        -80
+      ],
+      "id": "5d37125c-68c0-42bd-ab28-0ab177eff53e",
+      "name": "Pass Input"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json['2. project'] }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        272,
+        144
+      ],
+      "id": "ffe00290-14dd-48b2-ba6b-53bc18715c13",
+      "name": "GET project"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json['3. color collection'] }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        272,
+        352
+      ],
+      "id": "e099a351-c6f3-4b3a-9611-e78c3d94fb05",
+      "name": "GET color"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json['4. pattern collection'] }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        272,
+        608
+      ],
+      "id": "7669aee4-599c-4f55-939e-e53abee36a70",
+      "name": "GET pattern"
+    },
+    {
+      "parameters": {
+        "operation": "extractHtmlContent",
+        "extractionValues": {
+          "values": [
+            {
+              "key": "title",
+              "cssSelector": ".realization-detail .header-section .header-text h1"
+            },
+            {
+              "key": "heroImg",
+              "cssSelector": ".realization-detail .header-section .header-img img",
+              "returnValue": "attribute",
+              "attribute": "src"
+            },
+            {
+              "key": "collection_name",
+              "cssSelector": ".realization-detail .header-collection-img .title"
+            },
+            {
+              "key": "collection_image",
+              "cssSelector": ".realization-detail .header-collection-img img",
+              "returnValue": "attribute",
+              "attribute": "src"
+            },
+            {
+              "key": "facts_location",
+              "cssSelector": ".attributes-columns .row > div:nth-child(1) .attributes-list li"
+            },
+            {
+              "key": "facts_architect",
+              "cssSelector": ".attributes-columns .row > div:nth-child(2) .attributes-list li"
+            },
+            {
+              "key": "facts_photoCredits",
+              "cssSelector": ".attributes-columns .row > div:nth-child(3) .attributes-list li"
+            },
+            {
+              "key": "firstBlock_img",
+              "cssSelector": ".realization-first-block__img img",
+              "returnValue": "attribute",
+              "attribute": "src"
+            },
+            {
+              "key": "firstBlock_text",
+              "cssSelector": ".realization-first-block__text-wrap p"
+            },
+            {
+              "key": "cta_text",
+              "cssSelector": ".container.contact[data-contact-section] .contact-inner h2"
+            },
+            {
+              "key": "cta_href",
+              "cssSelector": ".container.contact[data-contact-section] .contact-inner a.link"
+            },
+            {
+              "key": "secondBlock_lead",
+              "cssSelector": ".realization-second-block .text-col p.h3"
+            },
+            {
+              "key": "secondBlock_img",
+              "cssSelector": ".realization-second-block__img img",
+              "returnValue": "attribute",
+              "attribute": "src"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        480,
+        144
+      ],
+      "id": "015db55c-0250-4d32-b251-d4a036a223bd",
+      "name": "HTML_Project"
+    },
+    {
+      "parameters": {
+        "numberInputs": 4
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        1248,
+        224
+      ],
+      "id": "c767ab42-d7c6-44a8-a3cc-cf11ee39e94a",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Input: items[0].json.newsletter\nconst p = items[0].json.newsletter;\n\nconst issue = {\n  id: p.issue.id,\n  brand: p.issue.brand,\n  locale: p.issue.locale\n};\n\n// rows for newsletter_segments\nconst segments = p.segments.map(s => ({\n  issue_id: p.issue.id,\n  ord: s.order,\n  type: s.type,\n  title: s.data?.title ?? null,\n  dek: s.data?.dek ?? null,\n  img_url: s.data?.img ?? null,\n  href: s.data?.href ?? null,\n  data: s.data // keep the full JSON for flexibility\n}));\n\nreturn [\n  { json: { issue, segments } }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1568,
+        864
+      ],
+      "id": "0764c2b7-91e6-425f-b0ed-efac0b5a52b4",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "jsCode": "// n8n Function — combine 4 scraped inputs into one normalized newsletter payload\n\nconst base = 'https://www.oakcent.com';\nfunction abs(u) {\n  if (!u) return u;\n  return /^https?:\\/\\//i.test(u) ? u : base + u;\n}\n\n// Index inputs by kind\nconst by = {};\nfor (const it of items.map(i => i.json)) {\n  if (it.pageUrl && it.pageUrl.includes('/magazine/')) by.article = it;\n  else if (it.facts_location || it.collection_name) by.project = it;\n  else if ((it.title && it.title.trim() === 'Sand') || it.grid_images) by.collection = it;\n  else if ((it.title && it.title.trim() === 'Heritage') || it.tiles_images) by.pattern = it;\n}\n\nconst segments = [];\n\n// HERO from article\nif (by.article) {\n  segments.push({\n    order: segments.length + 1,\n    type: 'hero',\n    data: {\n      title: by.article.title || '',\n      dek: (by.article.firstParagraph || '').trim(),\n      img: abs(by.article.heroImg),\n      href: by.article.pageUrl\n    }\n  });\n}\n\n// GRID from Sand collection\nif (by.collection && Array.isArray(by.collection.grid_images) && by.collection.grid_images.length) {\n  const itemsGrid = by.collection.grid_images.map((img, i) => ({\n    title: (by.collection.grid_titles && by.collection.grid_titles[i]) ? by.collection.grid_titles[i] : '',\n    img: abs(img),\n    href: 'https://www.oakcent.com/floor-collection/sand'\n  }));\n  segments.push({\n    order: segments.length + 1,\n    type: 'grid',\n    data: { heading: 'Sand collection — highlights', items: itemsGrid }\n  });\n}\n\n// PROJECT intro + gallery\nif (by.project) {\n  segments.push({\n    order: segments.length + 1,\n    type: 'project_intro',\n    data: {\n      title: by.project.title || '',\n      chip: by.project.collection_name || '',\n      attrs: {\n        location: by.project.facts_location || '',\n        architect: by.project.facts_architect || '',\n        photo: by.project.facts_photoCredits || ''\n      },\n      img: abs(by.project.heroImg)\n    }\n  });\n\n  const gallery = [];\n  if (by.project.firstBlock_img) gallery.push(abs(by.project.firstBlock_img));\n  if (by.project.secondBlock_img) gallery.push(abs(by.project.secondBlock_img));\n\n  segments.push({\n    order: segments.length + 1,\n    type: 'project_gallery',\n    data: {\n      summary: (by.project.secondBlock_lead || '').trim(),\n      images: gallery\n    }\n  });\n}\n\n// PATTERN tiles (Heritage)\nif (by.pattern && Array.isArray(by.pattern.tiles_images) && by.pattern.tiles_images.length) {\n  const patternTiles = by.pattern.tiles_images.map((img, i) => ({\n    title: (by.pattern.tiles_titles && by.pattern.tiles_titles[i]) ? by.pattern.tiles_titles[i] : '',\n    img: abs(img),\n    href: 'https://www.oakcent.com/collection-heritage'\n  }));\n  segments.push({\n    order: segments.length + 1,\n    type: 'grid',\n    data: { heading: 'Pattern collection — Heritage', items: patternTiles }\n  });\n}\n\n// COLLECTION gallery from Sand\nif (by.collection && Array.isArray(by.collection.galery_images) && by.collection.galery_images.length) {\n  segments.push({\n    order: segments.length + 1,\n    type: 'collection_gallery',\n    data: {\n      title: 'Sand — in real spaces',\n      summary: (by.collection.summary || '').trim(),\n      images: by.collection.galery_images.map(abs)\n    }\n  });\n}\n\n// CTA — prefer project CTA text; link to project contact anchor\nif (by.project && by.project.cta_text) {\n  segments.push({\n    order: segments.length + 1,\n    type: 'cta',\n    data: {\n      text: by.project.cta_text.replace(/\\s+/g, ' ').trim(),\n      href: 'https://www.oakcent.com/projects/bernard-visitor-center#footer-contact-form'\n    }\n  });\n}\n\n// Build assets.images without flatMap\nconst allImgs = [];\nsegments.forEach(seg => {\n  const d = seg.data || {};\n  if (Array.isArray(d.images)) d.images.forEach(u => { if (u) allImgs.push(u); });\n  if (d.img) allImgs.push(d.img);\n  if (Array.isArray(d.items)) d.items.forEach(it => { if (it && it.img) allImgs.push(it.img); });\n});\nconst images = Array.from(new Set(allImgs.filter(Boolean)));\n\nconst payload = {\n  issue: { id: 'oakcent-weekly-001', brand: 'OAKCENT', locale: 'en' },\n  sources: {\n    article: by.article ? { url: by.article.pageUrl, title: by.article.title } : null,\n    project: by.project ? { url: 'https://www.oakcent.com/projects/bernard-visitor-center', title: by.project.title } : null,\n    collection: by.collection ? { url: 'https://www.oakcent.com/floor-collection/sand', title: 'Sand' } : null,\n    pattern: by.pattern ? { url: 'https://www.oakcent.com/collection-heritage', title: 'Heritage' } : null\n  },\n  segments,\n  assets: { images }\n};\n\nreturn [{ json: { newsletter: payload } }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1472,
+        240
+      ],
+      "id": "81a9e796-c3bb-4019-ab76-7a460a504b90",
+      "name": "Flatten JSON"
+    },
+    {
+      "parameters": {
+        "jsCode": "// n8n Function node: adapt your `newsletter` -> renderer input\n// Input: items[0].json = { newsletter: {...} }  (or the newsletter object itself)\n// Output: items[0].json = { meta, segments }  (renderer-ready)\n\nconst item = items[0];\nconst root = item.json || {};\nconst nl = root.newsletter || root; // supports both shapes\n\nconst BASE = 'https://www.oakcent.com';\nconst abs = (u) => u ? (String(u).startsWith('http') ? u : BASE + u) : null;\nconst para = (t) => {\n  if (!t) return '';\n  return '<p>' + String(t).split(/\\n+/).map(s => s.trim()).filter(Boolean).join('</p><p>') + '</p>';\n};\n\n// Helpers to find segments by type\nconst segs = Array.isArray(nl.segments) ? nl.segments : [];\nconst segByType = (t) => {\n  for (let i = 0; i < segs.length; i++) if ((segs[i] || {}).type === t) return segs[i];\n  return null;\n};\nconst firstGrid = (() => {\n  for (let i = 0; i < segs.length; i++) {\n    const s = segs[i];\n    if (s.type === 'grid' && /Sand/i.test(s.data?.heading || '')) return s;\n  }\n  for (let i = 0; i < segs.length; i++) if (segs[i].type === 'grid') return segs[i];\n  return null;\n})();\nconst patternGrid = (() => {\n  for (let i = 0; i < segs.length; i++) {\n    const s = segs[i];\n    if (s.type === 'grid' && /Pattern/i.test(s.data?.heading || '')) return s;\n  }\n  return null;\n})();\n\n// Pull source bits\nconst hero      = (segByType('hero') || {}).data || {};\nconst projIntro = (segByType('project_intro') || {}).data || {};\nconst projGal   = (segByType('project_gallery') || {}).data || {};\nconst collGal   = (segByType('collection_gallery') || {}).data || {};\nconst cta       = (segByType('cta') || {}).data || {};\n\nconst brand = (nl.issue && nl.issue.brand) || 'Oakcent';\nconst coll  = (nl.sources && nl.sources.collection) || {};\nconst proj  = (nl.sources && nl.sources.project) || {};\nconst art   = (nl.sources && nl.sources.article) || {};\nconst patt  = (nl.sources && nl.sources.pattern) || {};\n\n// Meta\nconst subject = `${brand} — ${coll.title || 'Collection'} × ${proj.title || 'Project'}`;\nconst preheader = (hero.dek || projGal.summary || '')\n  .replace(/\\s+/g, ' ')\n  .trim()\n  .slice(0, 140);\n\n// Right images from the first grid\nfunction gridToRightImages(g) {\n  const arr = (g && g.data && Array.isArray(g.data.items)) ? g.data.items : [];\n  const out = [];\n  for (let i = 0; i < arr.length && out.length < 2; i++) {\n    const it = arr[i];\n    if (it && (it.img || it.href)) {\n      out.push({ url: abs(it.img), alt: it.title || '' });\n    }\n  }\n  return out;\n}\nconst rightImages = gridToRightImages(firstGrid);\n\n// Pattern pick (prefer Herringbone)\nconst patternPick = (() => {\n  const arr = (patternGrid && patternGrid.data && Array.isArray(patternGrid.data.items)) ? patternGrid.data.items : [];\n  for (let i = 0; i < arr.length; i++) {\n    if (/herringbone/i.test(arr[i].title || '')) return arr[i];\n  }\n  return arr[0] || {};\n})();\n\n// Build renderer-ready payload\nconst payload = {\n  meta: { subject, preheader },\n  segments: [\n    {\n      type: 'segment_intro',\n      data: {\n        logo_url: abs('/logo-oakcent.svg'),\n        hero_image_url: abs(hero.img),\n        kicker: 'Magazine',\n        title: hero.title || art.title,\n        body_html: para(hero.dek),\n        cta_text: 'Read the article',\n        cta_url: art.url || hero.href,\n        right_images: rightImages\n      }\n    },\n    {\n      type: 'segment_project_story',\n      data: {\n        top_image_url: abs(projIntro.img || (Array.isArray(projGal.images) ? projGal.images[0] : null)),\n        title: projIntro.title || proj.title,\n        body_html: para([\n          projGal.summary,\n          (projIntro.attrs && (projIntro.attrs.architect || projIntro.attrs.location || projIntro.attrs.photo))\n            ? `${projIntro.attrs.architect || ''}${(projIntro.attrs.architect && projIntro.attrs.location) ? ' — ' : ''}${projIntro.attrs.location || ''}${projIntro.attrs.photo ? ` · Photo: ${projIntro.attrs.photo}` : ''}`\n            : ''\n        ].filter(Boolean).join('\\n')),\n        cta_text: 'See the project',\n        cta_url: proj.url,\n        left_images: (() => {\n          const imgs = Array.isArray(projGal.images) ? projGal.images.slice(0, 2) : [];\n          const out = [];\n          for (let i = 0; i < imgs.length; i++) {\n            out.push({ url: abs(imgs[i]), alt: projIntro.title || proj.title || 'Project' });\n          }\n          return out;\n        })()\n      }\n    },\n    {\n      type: 'segment_collection_and_pattern',\n      data: {\n        collection: {\n          label: 'Collection:',\n          name: coll.title || '—',\n          desc_html: para(collGal.summary || ''),\n          swatch_url: abs(\n            (firstGrid && firstGrid.data && firstGrid.data.items && firstGrid.data.items[0])\n              ? firstGrid.data.items[0].img\n              : null\n          ),\n          cta_text: 'Explore the collection',\n          cta_url: coll.url\n        },\n        pattern: {\n          label: 'Pattern:',\n          name: patt.title || ((patternPick.title || '').split(':')[0] || '—'),\n          desc_html: para(patternPick.title || ''),\n          swatch_url: abs(patternPick.img),\n          cta_text: 'Explore patterns',\n          cta_url: patt.url\n        }\n      }\n    },\n    {\n      type: 'segment_full_width_image',\n      data: {\n        image_url: abs((Array.isArray(collGal.images) && collGal.images[0]) ? collGal.images[0] : hero.img),\n        alt: coll.title ? `${coll.title} — gallery` : 'Gallery'\n      }\n    },\n    {\n      type: 'segment_dark_cta',\n      data: {\n        title: cta.text || 'Let’s talk',\n        cta_text: 'OPEN',\n        cta_url: cta.href || coll.url || proj.url\n      }\n    }\n  ]\n};\n\n// Clean empty image arrays (defensive)\npayload.segments.forEach(s => {\n  if (s?.data?.right_images) s.data.right_images = s.data.right_images.filter(i => i && i.url);\n  if (s?.data?.left_images)  s.data.left_images  = s.data.left_images.filter(i => i && i.url);\n});\n\nreturn [{ json: payload }];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1632,
+        240
+      ],
+      "id": "0dedbae1-2668-4c3b-b95d-db67df89709d",
+      "name": "Adapter"
+    },
+    {
+      "parameters": {
+        "sendTo": "eliaskrystof1@gmail.com",
+        "subject": "newsletter draft",
+        "message": "={{$json[\"html\"]}}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1984,
+        608
+      ],
+      "id": "64e2919f-65d7-4b3e-945a-fcc69ed05129",
+      "name": "Gmail",
+      "webhookId": "e80363bf-b958-408d-b183-07cd526b821a",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "1GoH9lTPDQt6wiH0",
+          "name": "Gmail account Kryštof"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// n8n Function node: Build Oakcent-style newsletter (ALL CONTENT CENTERED)\n// Input: items[0].json = { meta, segments: [{ type, data }, ...] }\n// Output: item.json.html (string) + item.binary.newsletter (HTML file)\n\n// ---------- helpers ----------\nconst item = items[0];\nconst data = item.json || {};\n\nconst esc = (v = '') => String(v)\n  .replace(/&/g, '&amp;').replace(/</g, '&lt;')\n  .replace(/>/g, '&gt;').replace(/\"/g, '&quot;');\n\nconst aIf = (cond, html) => cond ? html : '';\nconst space = (h=12) => `<div style=\"line-height:0; height:${h}px; font-size:0;\">&nbsp;</div>`;\nconst dividerH = `<table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td style=\"border-top:1px solid #cdc5bf; height:1px; line-height:1px; font-size:0;\"></td></tr></table>`;\nconst btnOutline = (href, text) =>\n  `<a href=\"${esc(href)}\" style=\"display:inline-block; padding:12px 18px; border:1px solid #3b3b3b; color:#3b3b3b; text-decoration:none; border-radius:4px; font-family:Arial, sans-serif;\">${esc(text)}</a>`;\nconst btnSolidWhite = (href, text) =>\n  `<a href=\"${esc(href)}\" style=\"display:inline-block; padding:12px 18px; background:#ffffff; color:#111827; text-decoration:none; border-radius:2px; font-family:Arial, sans-serif; font-weight:bold;\">${esc(text)}</a>`;\n\n// brand palette (inline for email)\nconst BG = '#e9dfd7';        // light beige page background\nconst TEXT = '#3b3b3b';      // primary text\nconst MUTED = '#6b6b6b';     // secondary text\nconst DARK = '#232323';      // dark block background\n\n// ---------- layout ----------\nconst layoutStart = (meta = {}) => `<!doctype html>\n<html>\n<head>\n  <meta charset=\"utf-8\">\n  <meta name=\"x-apple-disable-message-reformatting\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n  <title>${esc(meta.subject || '')}</title>\n</head>\n<body style=\"margin:0; padding:0; background:${BG};\">\n  <div style=\"display:none; visibility:hidden; opacity:0; color:transparent; height:0; width:0; overflow:hidden;\">\n    ${esc(meta.preheader || '')}\n  </div>\n  <table role=\"presentation\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" width=\"100%\" style=\"background:${BG};\">\n    <tr>\n      <td align=\"center\">\n        <table role=\"presentation\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" width=\"600\" style=\"width:600px; max-width:100%;\">\n          <tr><td align=\"center\" style=\"padding:20px; font-family:Arial, sans-serif; color:${TEXT}; font-size:16px; line-height:1.5; text-align:center;\">`;\n\nconst layoutEnd = `</td></tr></table></td></tr></table></body></html>`;\n\n// ---------- segments ----------\n\n// 1) HERO / INTRO (centered logo, hero, two columns centered)\nfunction segment_intro(d = {}) {\n  const right = (d.right_images || []).slice(0,2);\n  return `\n  ${aIf(d.logo_url, `\n    <div style=\"text-align:center;\">${aIf(d.logo_url, `<img src=\"${esc(d.logo_url)}\" alt=\"${esc(d.logo_alt || 'Logo')}\" width=\"120\" style=\"display:inline-block; border:0; margin:0 auto;\">`)}</div>\n    ${space(12)}`)}\n  ${aIf(d.hero_image_url, `\n    <img src=\"${esc(d.hero_image_url)}\" alt=\"${esc(d.hero_image_alt || '')}\" width=\"560\" style=\"display:block; width:100%; max-width:560px; border:0; margin:0 auto;\">\n    ${space(16)}`)}\n\n  <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\">\n    <tr>\n      <td valign=\"top\" width=\"66%\" align=\"center\" style=\"padding-right:16px; text-align:center;\">\n        ${aIf(d.kicker, `<div style=\"text-transform:uppercase; letter-spacing:.04em; font-size:12px; color:${MUTED};\">${esc(d.kicker)}</div>`)}\n        ${aIf(d.title, `<h1 style=\"margin:6px 0 10px; color:${TEXT}; font-size:24px;\">${esc(d.title)}</h1>`)}\n        ${aIf(d.body_html, `<div style=\"text-align:center;\">${d.body_html}</div>`)}\n        ${space(12)}\n        ${aIf(d.cta_url, btnOutline(d.cta_url, d.cta_text || 'Zjistit více'))}\n      </td>\n      <td valign=\"top\" width=\"34%\" align=\"center\" style=\"text-align:center;\">\n        ${right.map((u,i) => `\n          ${i ? space(12) : ''}<img src=\"${esc(u.url)}\" alt=\"${esc(u.alt || '')}\" width=\"180\" style=\"display:block; width:100%; max-width:180px; border:0; margin:0 auto;\">\n        `).join('')}\n      </td>\n    </tr>\n  </table>`;\n}\n\n// 2) PROJECT STORY (centered)\nfunction segment_project_story(d = {}) {\n  const left = (d.left_images || []).slice(0,2);\n  return `\n  ${aIf(d.top_image_url, `\n    <img src=\"${esc(d.top_image_url)}\" alt=\"${esc(d.top_image_alt || '')}\" width=\"560\" style=\"display:block; width:100%; max-width:560px; border:0; margin:0 auto;\">\n    ${space(16)}`)}\n\n  <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\">\n    <tr>\n      <td valign=\"top\" width=\"40%\" align=\"center\" style=\"padding-right:16px; text-align:center;\">\n        ${left.map((u,i) => `\n          ${i ? space(12) : ''}<img src=\"${esc(u.url)}\" alt=\"${esc(u.alt || '')}\" width=\"220\" style=\"display:block; width:100%; max-width:220px; border:0; margin:0 auto;\">\n        `).join('')}\n      </td>\n      <td valign=\"top\" width=\"60%\" align=\"center\" style=\"text-align:center;\">\n        ${aIf(d.title, `<h2 style=\"margin:0 0 8px; color:${TEXT}; font-size:22px;\">${esc(d.title)}</h2>`)}\n        ${aIf(d.body_html, `<div style=\"text-align:center;\">${d.body_html}</div>`)}\n        ${space(12)}\n        ${aIf(d.cta_url, btnOutline(d.cta_url, d.cta_text || 'Prohlédněte si projekt'))}\n      </td>\n    </tr>\n  </table>`;\n}\n\n// 3 & 4) COLLECTION / PATTERN rows (centered text; keeps left divider)\nfunction swatchRow(r = {}) {\n  return `\n  <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\">\n    <tr>\n      <td valign=\"top\" width=\"120\" align=\"center\" style=\"padding-right:16px; text-align:center;\">\n        ${aIf(r.swatch_url, `<img src=\"${esc(r.swatch_url)}\" alt=\"${esc(r.swatch_alt || '')}\" width=\"100\" style=\"display:block; width:100px; height:100px; border-radius:50%; border:0; margin:0 auto;\">`)}\n      </td>\n      <td valign=\"top\" align=\"center\" style=\"border-left:1px solid #cdc5bf; padding-left:16px; text-align:center;\">\n        ${aIf(r.label, `<div style=\"font-size:12px; color:${MUTED}; text-transform:uppercase; letter-spacing:.02em;\">${esc(r.label)}</div>`)}\n        ${aIf(r.name, `<div style=\"font-size:20px; margin:6px 0 6px; color:${TEXT};\"><strong>${esc(r.name)}</strong></div>`)}\n        ${aIf(r.desc_html, `<div style=\"text-align:center;\">${r.desc_html}</div>`)}\n        ${space(10)}\n        ${aIf(r.cta_url, btnOutline(r.cta_url, r.cta_text || 'Zjistit více'))}\n      </td>\n    </tr>\n  </table>`;\n}\nfunction segment_collection_and_pattern(d = {}) {\n  const top = swatchRow(d.collection || {});\n  const bottom = swatchRow(d.pattern || {});\n  return `${top}${space(12)}${dividerH}${space(12)}${bottom}`;\n}\n\n// 5) FULL-WIDTH IMAGE (centered)\nfunction segment_full_width_image(d = {}) {\n  return `\n  <img src=\"${esc(d.image_url)}\" alt=\"${esc(d.alt || '')}\" width=\"560\" style=\"display:block; width:100%; max-width:560px; border:0; margin:0 auto;\">`;\n}\n\n// 6) DARK CTA (already centered)\nfunction segment_dark_cta(d = {}) {\n  const socials = (d.socials || []).slice(0,8);\n  return `\n  <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"background:${DARK}; border-radius:2px;\" align=\"center\">\n    <tr><td align=\"center\" style=\"padding:28px 16px; text-align:center;\">\n      ${aIf(d.title, `<div style=\"font-family:Arial, sans-serif; color:#ffffff; font-size:22px; font-weight:bold; margin:0 0 10px;\">${esc(d.title)}</div>`)}\n      ${aIf(d.subtitle, `<div style=\"font-family:Arial, sans-serif; color:#e5e5e5; margin:0 0 14px;\">${esc(d.subtitle)}</div>`)}\n      ${aIf(d.cta_url, btnSolidWhite(d.cta_url, d.cta_text || 'OPEN'))}\n      ${aIf(socials.length, `\n        ${space(16)}\n        <table role=\"presentation\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\">\n          <tr>\n            ${socials.map(s => `\n              <td style=\"padding:0 6px;\">\n                <a href=\"${esc(s.url)}\"><img src=\"${esc(s.icon_url)}\" alt=\"${esc(s.alt || '')}\" width=\"20\" style=\"display:block; border:0; margin:0 auto;\"></a>\n              </td>\n            `).join('')}\n          </tr>\n        </table>`)}\n    </td></tr>\n  </table>`;\n}\n\n// map of segment types\nconst renderers = {\n  segment_intro,\n  segment_project_story,\n  segment_collection_and_pattern,\n  segment_full_width_image,\n  segment_dark_cta,\n};\n\n// ---------- build body ----------\nlet body = '';\nconst list = Array.isArray(data.segments) ? data.segments : [];\nfor (let i = 0; i < list.length; i++) {\n  const seg = list[i] || {};\n  const fn = renderers[seg.type];\n  if (fn) {\n    body += fn(seg.data || {});\n  } else {\n    body += `<!-- Missing renderer for ${esc(seg.type)} -->`;\n  }\n  if (i < list.length - 1) body += space(18);\n}\n\n// ---------- finalize ----------\nconst html = layoutStart(data.meta || {}) + body + layoutEnd;\n\nitem.json.html = html;\nitem.binary = item.binary || {};\nitem.binary.newsletter = {\n  data: Buffer.from(html, 'utf8').toString('base64'),\n  fileName: 'newsletter.html',\n  mimeType: 'text/html',\n};\n\nreturn items;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1792,
+        864
+      ],
+      "id": "4f10c142-ca7a-44cd-a385-1b27cb6a5129",
+      "name": "Build Newsletter HTML OLD"
+    },
+    {
+      "parameters": {
+        "jsCode": "// n8n Function node: Build Oakcent-style newsletter\n// Input: items[0].json = { meta, segments: [{ type, data }, ...] }\n// Output: item.json.html (string) + item.binary.newsletter (HTML file)\n\n// ---------- helpers ----------\nconst item = items[0];\nconst data = item.json || {};\n\nconst esc = (v = '') => String(v)\n  .replace(/&/g, '&amp;').replace(/</g, '&lt;')\n  .replace(/>/g, '&gt;').replace(/\"/g, '&quot;');\n\nconst aIf = (cond, html) => cond ? html : '';\nconst space = (h=12) => `<div style=\"line-height:0; height:${h}px; font-size:0;\">&nbsp;</div>`;\nconst dividerH = `<table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\"><tr><td style=\"border-top:1px solid #cdc5bf; height:1px; line-height:1px; font-size:0;\"></td></tr></table>`;\nconst btnOutline = (href, text) =>\n  `<a href=\"${esc(href)}\" style=\"display:inline-block; padding:12px 18px; border:1px solid #3b3b3b; color:#3b3b3b; text-decoration:none; border-radius:4px; font-family:'RomNarrow','Roboto Condensed',Helvetica,Arial,sans-serif;\n\">${esc(text)}</a>`;\nconst btnSolidWhite = (href, text) =>\n  `<a href=\"${esc(href)}\" style=\"display:inline-block; padding:12px 18px; background:#ffffff; color:#111827; text-decoration:none; border-radius:2px; font-family:'RomNarrow','Roboto Condensed',Helvetica,Arial,sans-serif;\n font-weight:bold;\">${esc(text)}</a>`;\n\n// Wrap arbitrary HTML as a justified copy block on the center axis (email-safe)\nconst wrapJust = (html) => `\n  <div style=\"max-width:560px; margin:0 auto; text-align:justify; text-justify:inter-word; font-family:'RomNarrow','Roboto Condensed',Helvetica,Arial,sans-serif;\n\">\n    ${html || ''}\n  </div>`;\n\n// ---------- brand + assets (hard-coded, replace with Supabase links) ----------\nconst CONFIG = {\n  BRAND_LOGO_URL: 'https://izohjxqvhacjmutgnckf.supabase.co/storage/v1/object/sign/Newsletter/logo-oakcent.png',\n  BRAND_LOGO_ALT: 'OAKCENT',\n  FORCE_BRAND_LOGO: true,\n\n  // backgrounds\n  BG_PRIMARY: '#e9dfd7',     // inner beige wrapper\n  BG_SECONDARY: '#EDE8E4',   // Light Nude page background\n  BG_DARK: '#232323',        // default dark section\n  BG_DARK_OVERLAY: '#5C5957',// dark overlay on forest\n\n  // decorative graphics\n  DECOR_WOOD_LEFT: 'https://izohjxqvhacjmutgnckf.supabase.co/storage/v1/object/sign/Newsletter/Struktura_1_HQ.png',\n  DECOR_WOOD_RIGHT: 'https://izohjxqvhacjmutgnckf.supabase.co/storage/v1/object/sign/Newsletter/Struktura_2_HQ.png',\n  DECOR_FOREST: 'https://izohjxqvhacjmutgnckf.supabase.co/storage/v1/object/sign/Newsletter/_BR_2753.jpg',\n\n  // social icons\n  ICONS: {\n    web: 'https://izohjxqvhacjmutgnckf.supabase.co/storage/v1/object/sign/Newsletter/Web_HQ.png',\n    instagram: 'https://izohjxqvhacjmutgnckf.supabase.co/storage/v1/object/sign/Newsletter/Instagram_HQ.png',\n    facebook: 'https://izohjxqvhacjmutgnckf.supabase.co/storage/v1/object/sign/Newsletter/Facebook_HQ.png',\n    pinterest: 'https://izohjxqvhacjmutgnckf.supabase.co/storage/v1/object/sign/Newsletter/Pinterest_HQ.png',\n    youtube: 'https://izohjxqvhacjmutgnckf.supabase.co/storage/v1/object/sign/Newsletter/Youtube_HQ.png',\n    linkedin: 'https://izohjxqvhacjmutgnckf.supabase.co/storage/v1/object/sign/Newsletter/LinkedIn_HQ.png',\n  },\n\n  // unsubscribe\n  UNSUBSCRIBE_TEXT: 'Pokud nechcete nadále dostávat emaily Oakcent, můžete se jednoduše <a href=\"https://example.com/unsubscribe\" style=\"color:#6b6b6b; text-decoration:underline;\">odhlásit</a>.',\n  COPYRIGHT_TEXT: '© 2025 Oakcent, Všechna práva vyhrazena.',\n};\n\n// palette\nconst TEXT = '#3b3b3b';\nconst MUTED = '#6b6b6b';\n\n// ---------- reusable background section with VML fallback ----------\nfunction bgSection(contentHtml, imageUrl, options = {}) {\n  if (!imageUrl) {\n    return `\n      <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\">\n        <tr><td style=\"padding:${options.padding || '0'};\">${contentHtml}</td></tr>\n      </table>`;\n  }\n\n  const position = options.position || 'center center';\n  const size = options.size || 'cover';\n  const repeat = options.repeat || 'no-repeat';\n  const padding = options.padding || '0';\n\n  const overlayRGBA = options.overlayRGBA || null;\n  const overlayHex = options.overlayHex || CONFIG.BG_DARK_OVERLAY;\n  const overlayOpacity = typeof options.overlayOpacity === 'number' ? options.overlayOpacity : 0;\n\n  const cssBg = overlayRGBA\n    ? `background: linear-gradient(${overlayRGBA}, ${overlayRGBA}), url('${esc(imageUrl)}'); background-position:${position}; background-repeat:${repeat}; background-size:${size};`\n    : `background-image:url('${esc(imageUrl)}'); background-position:${position}; background-repeat:${repeat}; background-size:${size};`;\n\n  const vml = `\n  <!--[if gte mso 9]>\n  <v:rect xmlns:v=\"urn:schemas-microsoft-com:vml\" fill=\"true\" stroke=\"false\"\n          style=\"mso-fit-shape-to-text:true; width:600px;\">\n    <v:fill type=\"frame\" src=\"${esc(imageUrl)}\" color=\"${esc(overlayHex)}\" ${(overlayOpacity>0)?`opacity=\"${String(overlayOpacity)}\"`:''} />\n    <v:textbox inset=\"0,0,0,0\">\n  <![endif]-->`;\n\n  const vmlEnd = `\n  <!--[if gte mso 9]>\n    </v:textbox>\n  </v:rect>\n  <![endif]-->`;\n\n  return `\n  <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"${cssBg}\">\n    <tr>\n      <td style=\"padding:${padding};\">\n        ${vml}\n          ${contentHtml}\n        ${vmlEnd}\n      </td>\n    </tr>\n  </table>`;\n}\n\n// ---------- layout ----------\nconst layoutStart = (meta = {}) => `<!doctype html>\n<html>\n<head>\n  <meta charset=\"utf-8\">\n  <meta name=\"x-apple-disable-message-reformatting\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n  <title>${esc(meta.subject || '')}</title>\n\n  <!--[if !mso]><!-->\n  <style type=\"text/css\">\n    @font-face {\n      font-family: 'CaslonDoric';\n      font-style: normal;\n      font-weight: 700;\n      src: url('https://izohjxqvhacjmutgnckf.supabase.co/storage/v1/object/sign/Newsletter/Fonts/CaslonDoric-Bold-Web.woff2') format('woff2'),\n           url('https://izohjxqvhacjmutgnckf.supabase.co/storage/v1/object/sign/Newsletter/Fonts/CaslonDoric-Bold-Web.woff') format('woff');\n    }\n    @font-face {\n      font-family: 'RomNarrow';\n      font-style: normal;\n      font-weight: 400;\n      src: url('https://izohjxqvhacjmutgnckf.supabase.co/storage/v1/object/sign/Newsletter/Fonts/ROMNarrow-Regular.woff2') format('woff2'),\n           url('https://izohjxqvhacjmutgnckf.supabase.co/storage/v1/object/sign/Newsletter/Fonts/ROMNarrow-Regular.woff') format('woff');\n    }\n  </style>\n  <!--<![endif]-->\n</head>\n<body style=\"margin:0; padding:0; background:${CONFIG.BG_SECONDARY};\">\n  <div style=\"display:none; max-height:0px; overflow:hidden; mso-hide:all; font-size:1px; line-height:1px; color:#ffffff;\">\n    ${esc(meta.preheader || '')}\n  </div>\n  <table role=\"presentation\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" width=\"100%\" style=\"background:${CONFIG.BG_PRIMARY};\">\n    <tr>\n      <td align=\"center\">\n        <table role=\"presentation\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" width=\"600\" style=\"width:600px; max-width:100%;\">\n          <tr><td align=\"center\" style=\"padding:20px; font-family:'RomNarrow','Roboto Condensed',Helvetica,Arial,sans-serif;\n color:${TEXT}; font-size:16px; line-height:1.5; text-align:left;\">`;\n\nconst layoutEnd = `</td></tr></table></td></tr></table></body></html>`;\n\n// ---------- segments ----------\nfunction segment_intro(d = {}) {\n  const rightImgs = (d.right_images || []).slice(0, 2);\n  const logoSrc = CONFIG.FORCE_BRAND_LOGO ? CONFIG.BRAND_LOGO_URL : (d.logo_url || CONFIG.BRAND_LOGO_URL);\n  const logoAlt = d.logo_alt || CONFIG.BRAND_LOGO_ALT;\n\n  const textBlock = `\n    ${d.kicker ? `<div style=\"text-transform:uppercase; letter-spacing:.04em; font-size:12px; color:${MUTED}; font-family:'RomNarrow','Roboto Condensed',Helvetica,Arial,sans-serif;\n\">${esc(d.kicker)}</div>` : ''}\n    ${d.title ? `<h1 style=\"margin:6px 0 10px; color:${TEXT}; font-size:24px; text-align:left; font-family:'CaslonDoric','Cormorant Garamond',Georgia,'Times New Roman',serif;\">${esc(d.title)}</h1>` : ''}\n    ${d.body_html ? `<div style=\"text-align:justify; text-justify:inter-word; font-family:'RomNarrow','Roboto Condensed',Helvetica,Arial,sans-serif;\n\">${d.body_html}</div>` : ''}\n    ${space(12)}\n    ${d.cta_url ? `<div style=\"text-align:left;\">${btnOutline(d.cta_url, d.cta_text || 'Zjistit více')}</div>` : ''}\n  `;\n\n  const imageBlock = rightImgs.length ? `\n    ${rightImgs.map(u => `\n      <div style=\"padding:6px 0;\">\n        <img src=\"${esc(u.url)}\" alt=\"${esc(u.alt || '')}\" width=\"240\"\n             style=\"display:block; width:100%; max-width:240px; border:0;\">\n      </div>`).join('')}\n  ` : '';\n\n  const core = `\n    ${logoSrc ? `<div style=\"text-align:center;\"><img src=\"${esc(logoSrc)}\" alt=\"${esc(logoAlt)}\" width=\"120\" style=\"display:inline-block; border:0; margin:0 auto;\"></div>${space(12)}` : ''}\n    ${d.hero_image_url ? `<img src=\"${esc(d.hero_image_url)}\" alt=\"${esc(d.hero_image_alt || '')}\" width=\"560\" style=\"display:block; width:100%; max-width:560px; border:0; margin:0 auto;\">${space(16)}` : ''}\n    <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\">\n      <tr>\n        <td valign=\"top\" style=\"padding-right:12px; width:60%;\">${textBlock}</td>\n        <td valign=\"top\" align=\"right\" style=\"width:40%;\">${imageBlock}</td>\n      </tr>\n    </table>\n  `;\n\n  return bgSection(core, CONFIG.DECOR_WOOD_RIGHT, { position:'right center', size:'contain', repeat:'no-repeat', padding:'0' });\n}\n\nfunction segment_project_story(d = {}) {\n  const leftImgs = (d.left_images || []).slice(0, 2);\n  const textBlock = `\n    ${d.title ? `<h2 style=\"margin:0 0 8px; color:${TEXT}; font-size:22px; text-align:right; font-family:'CaslonDoric','Cormorant Garamond',Georgia,'Times New Roman',serif;\">${esc(d.title)}</h2>` : ''}\n    ${d.body_html ? `<div style=\"text-align:justify; text-justify:inter-word; font-family:'RomNarrow','Roboto Condensed',Helvetica,Arial,sans-serif;\n\">${d.body_html}</div>` : ''}\n    ${space(12)}\n    ${d.cta_url ? `<div style=\"text-align:right;\">${btnOutline(d.cta_url, d.cta_text || 'Prohlédněte si projekt')}</div>` : ''}\n  `;\n  const imageBlock = leftImgs.length ? `\n    ${leftImgs.map(u => `\n      <div style=\"padding:6px 0;\">\n        <img src=\"${esc(u.url)}\" alt=\"${esc(u.alt || '')}\" width=\"240\"\n             style=\"display:block; width:100%; max-width:240px; border:0;\">\n      </div>`).join('')}\n  ` : '';\n  const core = `\n    ${d.top_image_url ? `<img src=\"${esc(d.top_image_url)}\" alt=\"${esc(d.top_image_alt || '')}\" width=\"560\" style=\"display:block; width:100%; max-width:560px; border:0; margin:0 auto;\">${space(16)}` : ''}\n    <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\">\n      <tr>\n        <td valign=\"top\" align=\"left\" style=\"width:40%;\">${imageBlock}</td>\n        <td valign=\"top\" style=\"padding-left:12px; width:60%;\">${textBlock}</td>\n      </tr>\n    </table>\n  `;\n  return bgSection(core, CONFIG.DECOR_WOOD_LEFT, { position:'left center', size:'contain', repeat:'no-repeat', padding:'0' });\n}\n\nfunction swatchRow(r = {}) {\n  return `\n  <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\">\n    <tr>\n      <td valign=\"top\" width=\"120\" align=\"center\" style=\"padding-right:16px;\">\n        ${r.swatch_url ? `<img src=\"${esc(r.swatch_url)}\" alt=\"${esc(r.swatch_alt || '')}\" width=\"100\" style=\"display:block; width:100px; height:100px; border-radius:50%; border:0; margin:0 auto;\">` : ''}\n      </td>\n      <td valign=\"top\" align=\"left\" style=\"border-left:1px solid #cdc5bf; padding-left:16px; font-family:'RomNarrow','Roboto Condensed',Helvetica,Arial,sans-serif;\n\">\n        ${r.label ? `<div style=\"font-size:12px; color:${MUTED}; text-transform:uppercase; letter-spacing:.02em; text-align:center;\">${esc(r.label)}</div>` : ''}\n        ${r.name ? `<div style=\"font-size:20px; margin:6px 0 6px; color:${TEXT}; text-align:center;\"><strong>${esc(r.name)}</strong></div>` : ''}\n        ${r.desc_html ? `<div style=\"max-width:560px; margin:0 auto; text-align:justify; text-justify:inter-word;\">${r.desc_html}</div>` : ''}\n        ${space(10)}\n        ${r.cta_url ? `<div style=\"text-align:center;\">${btnOutline(r.cta_url, r.cta_text || 'Zjistit více')}</div>` : ''}\n      </td>\n    </tr>\n  </table>`;\n}\nfunction segment_collection_and_pattern(d = {}) {\n  return `${swatchRow(d.collection || {})}${space(12)}${dividerH}${space(12)}${swatchRow(d.pattern || {})}`;\n}\n\nfunction segment_full_width_image(d = {}) {\n  return `<img src=\"${esc(d.image_url)}\" alt=\"${esc(d.alt || '')}\" width=\"560\" style=\"display:block; width:100%; max-width:560px; border:0; margin:0 auto;\">`;\n}\n\nfunction segment_dark_cta(d = {}) {\n  const socials = (d.socials && d.socials.length) ? d.socials :\n    Object.entries(CONFIG.ICONS).map(([alt, url]) => ({ url: '#', icon_url: url, alt }));\n\n  // inner block with title, subtitle, button, socials\n  const core = `\n    <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" style=\"border-radius:2px;\">\n      <tr>\n        <td align=\"center\" style=\"padding:28px 16px; text-align:center;\">\n          ${aIf(d.title, `<div style=\"font-family:Arial, sans-serif; color:#ffffff; font-size:22px; font-weight:bold; margin:0 0 10px;\">${esc(d.title)}</div>`)}\n          ${aIf(d.subtitle, `<div style=\"font-family:Arial, sans-serif; color:#e5e5e5; margin:0 0 14px;\">${esc(d.subtitle)}</div>`)}\n          ${aIf(d.cta_url, btnSolidWhite(d.cta_url, d.cta_text || 'OPEN'))}\n          ${aIf(socials.length, `\n            ${space(16)}\n            <table role=\"presentation\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\">\n              <tr>\n                ${socials.map(s => `\n                  <td style=\"padding:0 6px;\">\n                    <a href=\"${esc(s.url)}\"><img src=\"${esc(s.icon_url)}\" alt=\"${esc(s.alt || '')}\" width=\"20\" style=\"display:block; border:0; margin:0 auto;\"></a>\n                  </td>\n                `).join('')}\n              </tr>\n            </table>`)}\n        </td>\n      </tr>\n    </table>\n  `;\n\n  // Wrapper with Gmail-safe <td background> + Outlook VML\n  return `\n  <table role=\"presentation\" width=\"100%\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\" align=\"center\">\n    <tr>\n      <td background=\"${esc(CONFIG.DECOR_FOREST)}\"\n          bgcolor=\"${esc(CONFIG.BG_DARK_OVERLAY)}\"\n          valign=\"top\"\n          style=\"background-image:url('${esc(CONFIG.DECOR_FOREST)}');\n                 background-repeat:no-repeat;\n                 background-position:center top;\n                 background-size:600px auto;\n                 -webkit-background-size:600px auto;\">\n        <!--[if gte mso 9]>\n        <v:rect xmlns:v=\"urn:schemas-microsoft-com:vml\" fill=\"true\" stroke=\"false\" style=\"width:600px; height:auto;\">\n          <v:fill type=\"frame\" src=\"${esc(CONFIG.DECOR_FOREST)}\" color=\"${esc(CONFIG.BG_DARK_OVERLAY)}\" opacity=\"0.55\" />\n          <v:textbox inset=\"0,0,0,0\">\n        <![endif]-->\n        <div style=\"background-color:rgba(92,89,87,0.55);\">\n          ${core}\n        </div>\n        <!--[if gte mso 9]>\n          </v:textbox>\n        </v:rect>\n        <![endif]-->\n      </td>\n    </tr>\n  </table>`;\n}\n\nfunction segment_footer_unsubscribe() {\n  const fallbackYear = new Date().getFullYear();\n  const copyright = CONFIG.COPYRIGHT_TEXT && CONFIG.COPYRIGHT_TEXT.trim().length\n    ? CONFIG.COPYRIGHT_TEXT\n    : `© ${fallbackYear} Oakcent, Všechna práva vyhrazena.`;\n  return `\n    ${space(16)}\n    <div style=\"font-family:'RomNarrow','Roboto Condensed',Helvetica,Arial,sans-serif;\n font-size:12px; color:${MUTED}; text-align:center; line-height:1.5;\">\n      <div>${CONFIG.UNSUBSCRIBE_TEXT}</div>\n      <div style=\"margin-top:6px;\">${copyright}</div>\n    </div>`;\n}\n\n// ---------- map ----------\nconst renderers = {\n  segment_intro,\n  segment_project_story,\n  segment_collection_and_pattern,\n  segment_full_width_image,\n  segment_dark_cta,\n};\n\n// ---------- build ----------\nlet body = '';\nconst list = Array.isArray(data.segments) ? data.segments : [];\nfor (let i = 0; i < list.length; i++) {\n  const seg = list[i] || {};\n  const fn = renderers[seg.type];\n  if (fn) body += fn(seg.data || {});\n  else body += `<!-- Missing renderer for ${esc(seg.type)} -->`;\n  if (i < list.length - 1) body += space(18);\n}\nbody += segment_footer_unsubscribe();\n\n// ---------- finalize ----------\nconst html = layoutStart(data.meta || {}) + body + layoutEnd;\n\n// put the full HTML into json.html_body\nitem.json.html_body = html;\n\nreturn items;\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1808,
+        240
+      ],
+      "id": "c657cc39-c1e9-4000-b26a-d92a7b50798b",
+      "name": "Build Newsletter HTML"
+    },
+    {
+      "parameters": {
+        "operation": "extractHtmlContent",
+        "extractionValues": {
+          "values": [
+            {
+              "key": "title",
+              "cssSelector": ".magazine-detail-header__text h2.h1.large"
+            },
+            {
+              "key": "metaDescription",
+              "cssSelector": "meta[name=\"description\"]",
+              "returnValue": "attribute",
+              "attribute": "content"
+            },
+            {
+              "key": "ogDescription",
+              "cssSelector": "meta[property=\"og:description\"]",
+              "returnValue": "attribute",
+              "attribute": "content"
+            },
+            {
+              "key": "heroImg",
+              "cssSelector": ".magazine-detail-header__img img",
+              "returnValue": "attribute",
+              "attribute": "src"
+            },
+            {
+              "key": "firstParagraph",
+              "cssSelector": "section.magazine-text-section p"
+            },
+            {
+              "key": "pageUrl",
+              "cssSelector": "meta[property=\"og:url\"]",
+              "returnValue": "attribute",
+              "attribute": "content"
+            },
+            {
+              "key": "logo_image",
+              "cssSelector": "img.logo",
+              "returnValue": "attribute",
+              "attribute": "src"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        480,
+        -80
+      ],
+      "id": "15a0dba4-75fd-455a-a6ce-6f2ed91997a0",
+      "name": "HTML_Blog"
+    },
+    {
+      "parameters": {
+        "operation": "extractHtmlContent",
+        "extractionValues": {
+          "values": [
+            {
+              "key": "title",
+              "cssSelector": ".header-section .header-text h1"
+            },
+            {
+              "key": "heroImg",
+              "cssSelector": ".header-section .header-img img",
+              "returnValue": "attribute",
+              "attribute": "src"
+            },
+            {
+              "key": "grid_titles",
+              "cssSelector": ".collection-columns-section .collection-item__title",
+              "returnArray": true
+            },
+            {
+              "key": "grid_images",
+              "cssSelector": ".collection-columns-section .collection-item__img img",
+              "returnValue": "attribute",
+              "attribute": "src",
+              "returnArray": true
+            },
+            {
+              "key": "galery_images",
+              "cssSelector": ".realizations-gallery-section .realizations-main-swiper .realizations-gallery-item__img img",
+              "returnValue": "attribute",
+              "attribute": "src",
+              "returnArray": true
+            },
+            {
+              "key": "summary",
+              "cssSelector": ".realization-detail-text__block.first"
+            },
+            {
+              "key": "body",
+              "cssSelector": ".realization-detail-text__block.second p, section.realization-detail-text-section .order-3 p",
+              "returnArray": true
+            },
+            {
+              "key": "cta_text",
+              "cssSelector": ".contact .contact-inner h2"
+            },
+            {
+              "key": "cta_href",
+              "cssSelector": ".contact .contact-inner a.link"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        480,
+        352
+      ],
+      "id": "0772180f-d4a9-4779-9169-4a7f687abeec",
+      "name": "HTML_Color"
+    },
+    {
+      "parameters": {
+        "operation": "extractHtmlContent",
+        "extractionValues": {
+          "values": [
+            {
+              "key": "title",
+              "cssSelector": ".content .header-section .header-text h1"
+            },
+            {
+              "key": "heroImg",
+              "cssSelector": ".content .header-section .header-img img",
+              "returnValue": "attribute",
+              "attribute": "src"
+            },
+            {
+              "key": "tiles_titles",
+              "cssSelector": ".collection-columns-section .collection-item__title",
+              "returnArray": true
+            },
+            {
+              "key": "tiles_images",
+              "cssSelector": ".collection-columns-section .collection-item__img img",
+              "returnValue": "attribute",
+              "attribute": "src",
+              "returnArray": true
+            },
+            {
+              "key": "cta_text",
+              "cssSelector": ".container.contact[data-contact-section] .contact-inner h2"
+            },
+            {
+              "key": "cta_href",
+              "cssSelector": ".container.contact[data-contact-section] .contact-inner a.link"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        480,
+        608
+      ],
+      "id": "9caeef3e-d09c-4cb5-8eed-8a8b1c10eca5",
+      "name": "HTML_Pattern"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "49008af3-46fb-4dce-a6ae-ac0501dc142b",
+              "name": "api_key",
+              "value": "2e6ff1d79df695db9cd2313b881ec08ae4b671db",
+              "type": "string"
+            },
+            {
+              "id": "d7a1b1b7-eb39-49a5-84f2-06b45a8bcd9e",
+              "name": "db_name",
+              "value": "jumperscz-princparket-18staging-24679493",
+              "type": "string"
+            },
+            {
+              "id": "0297218b-5d4e-4aee-bd3c-ba2060a3c61b",
+              "name": "user_name",
+              "value": "pavel.urbann@gmail.com",
+              "type": "string"
+            },
+            {
+              "id": "9aedfacc-10f5-4cda-895a-164e384f14ef",
+              "name": "user_password",
+              "value": "PrinceParket12",
+              "type": "string"
+            },
+            {
+              "id": "85a9629e-e45f-483e-9a5e-501a71e50ba8",
+              "name": "odoo_domain",
+              "value": "https://princparket-test.odoo.com",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2032,
+        240
+      ],
+      "id": "7f5c2580-aa93-4b7d-8fe4-30726d2a847f",
+      "name": "Odoo XML creds"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.odoo_domain }}/xmlrpc/2/common ",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "text/xml"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "text/xml",
+        "body": "=<?xml version=\"1.0\"?>\n<methodCall>\n  <methodName>authenticate</methodName>\n  <params>\n    <param><value><string>{{ $json.db_name }}</string></value></param>\n    <param><value><string>{{ $json.user_name }}</string></value></param>\n    <param><value><string>{{ $json.user_password }}</string></value></param>\n    <param><value><array><data></data></array></value></param>\n  </params>\n</methodCall>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2192,
+        240
+      ],
+      "id": "17b29c31-5138-449f-9fb3-f3a6109fa65f",
+      "name": "Odoo Authenticate"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.xml",
+      "typeVersion": 1,
+      "position": [
+        2320,
+        240
+      ],
+      "id": "129306c1-6811-45fe-8210-9944ba162844",
+      "name": "Parse UID"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "339292ce-3ddc-4fa3-876d-984ad4cde6e2",
+              "name": "UID",
+              "value": "={{ $json.methodResponse.params.param.value.int }}",
+              "type": "string"
+            },
+            {
+              "id": "06a457a8-51fb-4b4a-bdc1-0e9e16a3245c",
+              "name": "api_key",
+              "value": "={{ $('Odoo XML creds').item.json.api_key }}",
+              "type": "string"
+            },
+            {
+              "id": "9de9cec1-2776-4e1e-96c8-331f604646f9",
+              "name": "db_name",
+              "value": "={{ $('Odoo XML creds').item.json.db_name }}",
+              "type": "string"
+            },
+            {
+              "id": "dd5fbdb7-ead4-4a83-888b-02ac8f6b60a9",
+              "name": "user_name",
+              "value": "={{ $('Odoo XML creds').item.json.user_name }}",
+              "type": "string"
+            },
+            {
+              "id": "2f1c51fc-0577-4633-89ca-61f428ad0e16",
+              "name": "user_password",
+              "value": "={{ $('Odoo XML creds').item.json.user_password }}",
+              "type": "string"
+            },
+            {
+              "id": "7539078d-52d1-4d71-8acc-da790f42cb12",
+              "name": "odoo_domain",
+              "value": "={{ $('Odoo XML creds').item.json.odoo_domain }}",
+              "type": "string"
+            },
+            {
+              "id": "98ac37c6-1534-4555-9aa3-bb6497fc5a1f",
+              "name": "campaign_name",
+              "value": "Test_campaign",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2480,
+        240
+      ],
+      "id": "cb9b430e-3986-410e-9a4b-971e1d31f87e",
+      "name": "Full credentials"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.odoo_domain }}/xmlrpc/2/object",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "text/xml"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "text/xml",
+        "body": "=<?xml version=\"1.0\"?>\n<methodCall>\n  <methodName>execute_kw</methodName>\n  <params>\n    <param><value><string>{{ $json.db_name }}</string></value></param>\n    <param><value><int>{{ $json.UID }}</int></value></param>\n    <param><value><string>{{ $json.user_password }}</string></value></param>\n    <param><value><string>utm.campaign</string></value></param>\n    <param><value><string>create</string></value></param>\n    <param>\n      <value>\n        <array><data>\n          <value>\n            <struct>\n              <member>\n                <name>name</name>\n                <value><string>{{ $json.campaign_name }}</string></value>\n              </member>\n              <member>\n                <name>user_id</name>\n                <value><int>{{ $json.UID }}</int></value>\n              </member>\n              <member>\n                <name>active</name>\n                <value><boolean>1</boolean></value>\n              </member>\n            </struct>\n          </value>\n        </data></array>\n      </value>\n    </param>\n  </params>\n</methodCall>\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2688,
+        240
+      ],
+      "id": "39554611-0c0f-4a1b-bb0a-63499c7b498b",
+      "name": "Create Camaign"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.xml",
+      "typeVersion": 1,
+      "position": [
+        2864,
+        240
+      ],
+      "id": "072ff1b8-3233-4d70-9809-3d36aa33ed29",
+      "name": "Parse Campaign ID"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "79e3edc5-d7f2-492e-98ed-296f45936567",
+              "name": "campaign_id",
+              "value": "={{ $json.methodResponse.params.param.value.int }}",
+              "type": "string"
+            },
+            {
+              "id": "f925df67-dd6a-4a67-b78d-956741b42019",
+              "name": "newsletter_name",
+              "value": "Test",
+              "type": "string"
+            },
+            {
+              "id": "eb6ff8d7-8c64-4f2f-8929-71eec75874d8",
+              "name": "newsletter_subject",
+              "value": "Test",
+              "type": "string"
+            },
+            {
+              "id": "0e39e0ec-f3ab-4e1a-a7e5-061231207656",
+              "name": "email_from",
+              "value": "origamis@test.com",
+              "type": "string"
+            },
+            {
+              "id": "6b6ede4b-b5ce-4ce8-96e8-8bedbc32ab8f",
+              "name": "email_to",
+              "value": "test@test.com",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3088,
+        240
+      ],
+      "id": "2638cd3c-08cf-4790-8829-d9e53399a119",
+      "name": "Campaign Detail"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.xml",
+      "typeVersion": 1,
+      "position": [
+        3152,
+        528
+      ],
+      "id": "6fbc8242-7fda-4caf-b9d5-9d8fa08423ba",
+      "name": "XML"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Full credentials').item.json.odoo_domain }}/xmlrpc/2/object",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "text/xml"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "text/xml",
+        "body": "=<?xml version=\"1.0\"?>\n<methodCall>\n  <methodName>execute_kw</methodName>\n  <params>\n    <!-- 1. Auth credentials -->\n    <param><value><string>{{ $('Full credentials').item.json.db_name }}</string></value></param>\n    <param><value><int>{{ $('Full credentials').item.json.UID }}</int></value></param>\n    <param><value><string>{{ $('Full credentials').item.json.user_password }}</string></value></param>\n\n    <!-- 2. Target model -->\n    <param><value><string>mailing.mailing</string></value></param>\n\n    <!-- 3. Method -->\n    <param><value><string>create</string></value></param>\n\n    <!-- 4. Values -->\n    <param>\n      <value>\n        <array><data>\n          <value>\n            <struct>\n              <!-- Basic fields -->\n              <member>\n                <name>name</name>\n                <value><string>{{ $json.newsletter_name }}</string></value>\n              </member>\n              <member>\n                <name>subject</name>\n                <value><string>{{ $json.newsletter_subject }}</string></value>\n              </member>\n              \n              <!-- Required model reference -->\n              <member>\n                <name>mailing_model_id</name>\n                <value><int>660</int></value>\n              </member>\n              \n              <!-- Campaign link (optional but safe) -->\n              <member>\n                <name>campaign_id</name>\n                <value><int>{{ $json.campaign_id }}</int></value>\n              </member>\n              \n              <!-- Sender -->\n              <member>\n                <name>email_from</name>\n                <value><string>{{ $('Odoo XML creds').item.json.user_name }}</string></value>\n              </member>\n\n              <!-- Email format -->\n              <member>\n                <name>mailing_type</name>\n                <value><string>mail</string></value>\n              </member>\n              <member>\n                <name>state</name>\n                <value><string>draft</string></value>\n              </member>\n\n              <!-- HTML content -->\n              <member>\n                <name>body_arch</name>\n                <value><string><![CDATA[\n                  {{ $('Build Newsletter HTML').item.json.html_body }}\n                ]]></string></value>\n              </member>\n              <member>\n                <name>body_html</name>\n                <value><string><![CDATA[\n                  {{ $('Build Newsletter HTML').item.json.html_body }}\n                ]]></string></value>\n              </member>\n            </struct>\n          </value>\n        </data></array>\n      </value>\n    </param>\n  </params>\n</methodCall>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3312,
+        240
+      ],
+      "id": "f81a8627-87d8-4234-9485-3c8362a21a15",
+      "name": "Create Mailing Comunication"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f36637e5-c6b6-4208-8343-d4a2db643fb5",
+              "name": "mailing_id",
+              "value": "={{ $json.methodResponse.params.param.value.int }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3360,
+        528
+      ],
+      "id": "c58263de-bcdc-4686-8ed8-3db0a1524d15",
+      "name": "Get mailing id"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Full credentials').item.json.odoo_domain }}/xmlrpc/2/object",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "text/xml"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "text/xml",
+        "body": "=<?xml version=\"1.0\"?>\n<methodCall>\n  <methodName>execute_kw</methodName>\n  <params>\n    <param><value><string>{{ $('Full credentials').item.json.db_name }}</string></value></param>\n    <param><value><int>{{ $('Full credentials').item.json.UID }}</int></value></param>\n    <param><value><string>{{ $('Full credentials').item.json.user_password }}</string></value></param>\n    <param><value><string>mailing.mailing</string></value></param>\n    <param><value><string>write</string></value></param>\n    <param>\n      <value>\n        <array><data>\n          <!-- mailing_id from step 1 -->\n          <value><array><data><value><int>{{ $json.mailing_id }}</int></value></data></array></value>\n          <!-- updated fields -->\n          <value>\n            <struct>\n              <member><name>body_html</name>\n                <value><string><![CDATA[\n                  {{ $('Build Newsletter HTML').item.json.html_body }}\n                ]]></string></value>\n              </member>\n            </struct>\n          </value>\n        </data></array>\n      </value>\n    </param>\n  </params>\n</methodCall>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3808,
+        544
+      ],
+      "id": "8da8945f-cc21-428e-bd17-76a223aa7dea",
+      "name": "Post HTML to Campaign"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Full credentials').item.json.odoo_domain }}/xmlrpc/2/object",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "text/xml"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "text/xml",
+        "body": "=<?xml version=\"1.0\"?>\n<methodCall>\n  <methodName>execute_kw</methodName>\n  <params>\n    <param><value><string>{{ $('Full credentials').item.json.db_name }}</string></value></param>\n    <param><value><int>{{ $('Full credentials').item.json.UID }}</int></value></param>\n    <param><value><string>{{ $('Full credentials').item.json.user_password }}</string></value></param>\n    <param><value><string>mailing.mailing</string></value></param>\n    <param><value><string>read</string></value></param>\n    <param>\n      <value>\n        <array><data>\n          <!-- Your mailing record ID -->\n          <value><array><data><value><int>{{ $json.mailing_id }}</int></value></data></array></value>\n\n          <!-- Ask for all fields -->\n          <value><array><data></data></array></value>\n        </data></array>\n      </value>\n    </param>\n  </params>\n</methodCall>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3552,
+        528
+      ],
+      "id": "77d979ad-3704-48ad-a16b-266ecc1ba9d4",
+      "name": "Get mail detail"
+    },
+    {
+      "parameters": {
+        "jsCode": "import axios from 'axios';\nimport { XMLParser } from 'fast-xml-parser';\n\nconst odooUrl = $json.odoo_url;  // e.g. \"https://yourdomain.odoo.com/xmlrpc/2\"\nconst db = $json.db_name;\nconst username = $json.user_name;\nconst password = $json.user_password;\n\nconst parser = new XMLParser();\n\n// helper to send XML-RPC calls\nasync function odooCall(endpoint, xml) {\n  const res = await axios.post(`${odooUrl}/${endpoint}`, xml, {\n    headers: { 'Content-Type': 'text/xml' }\n  });\n  return parser.parse(res.data);\n}\n\nconst log = {};\n\n// 1️⃣ Authenticate\nconst authXML = `\n<?xml version=\"1.0\"?>\n<methodCall>\n  <methodName>authenticate</methodName>\n  <params>\n    <param><value><string>${db}</string></value></param>\n    <param><value><string>${username}</string></value></param>\n    <param><value><string>${password}</string></value></param>\n    <param><value><struct/></value></param>\n  </params>\n</methodCall>`;\n\nconst authRes = await odooCall('common', authXML);\nconst uid = authRes.methodResponse.params.param.value.int;\nlog.uid = uid;\n\n// 2️⃣ Create Campaign\nconst campaignXML = `\n<?xml version=\"1.0\"?>\n<methodCall>\n  <methodName>execute_kw</methodName>\n  <params>\n    <param><value><string>${db}</string></value></param>\n    <param><value><int>${uid}</int></value></param>\n    <param><value><string>${password}</string></value></param>\n    <param><value><string>marketing.campaign</string></value></param>\n    <param><value><string>create</string></value></param>\n    <param>\n      <value>\n        <array><data>\n          <value>\n            <struct>\n              <member><name>name</name><value><string>${$json.campaign_name}</string></value></member>\n            </struct>\n          </value>\n        </data></array>\n      </value>\n    </param>\n  </params>\n</methodCall>`;\n\nconst campaignRes = await odooCall('object', campaignXML);\nconst campaignId = campaignRes.methodResponse.params.param.value.int;\nlog.campaign_id = campaignId;\n\n// 3️⃣ Create Mailing with HTML\nconst html = $json.html_body.replace(/<!\\[CDATA\\[|\\]\\]>/g, ''); // clean if needed\nconst mailingXML = `\n<?xml version=\"1.0\"?>\n<methodCall>\n  <methodName>execute_kw</methodName>\n  <params>\n    <param><value><string>${db}</string></value></param>\n    <param><value><int>${uid}</int></value></param>\n    <param><value><string>${password}</string></value></param>\n    <param><value><string>mailing.mailing</string></value></param>\n    <param><value><string>create</string></value></param>\n    <param>\n      <value>\n        <array><data>\n          <value>\n            <struct>\n              <member><name>name</name><value><string>${$json.newsletter_name}</string></value></member>\n              <member><name>subject</name><value><string>${$json.newsletter_subject}</string></value></member>\n              <member><name>campaign_id</name><value><int>${campaignId}</int></value></member>\n              <member><name>mailing_model_id</name><value><int>660</int></value></member>\n              <member><name>mailing_type</name><value><string>mail</string></value></member>\n              <member><name>state</name><value><string>draft</string></value></member>\n              <member><name>email_from</name><value><string>${username}</string></value></member>\n              <member><name>body_arch</name><value><string><![CDATA[${html}]]></string></value></member>\n              <member><name>body_html</name><value><string><![CDATA[${html}]]></string></value></member>\n            </struct>\n          </value>\n        </data></array>\n      </value>\n    </param>\n  </params>\n</methodCall>`;\n\nconst mailingRes = await odooCall('object', mailingXML);\nconst mailingId = mailingRes.methodResponse.params.param.value.int;\nlog.mailing_id = mailingId;\n\nreturn log;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2400,
+        528
+      ],
+      "id": "138039d6-8ea3-4266-9440-4f74030ded2a",
+      "name": "Create Campaign and Draft"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        []
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        []
+      ]
+    },
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Pass Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GET blog": {
+      "main": [
+        [
+          {
+            "node": "HTML_Blog",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pass Input": {
+      "main": [
+        [
+          {
+            "node": "GET blog",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "GET project",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "GET color",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "GET pattern",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GET color": {
+      "main": [
+        [
+          {
+            "node": "HTML_Color",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GET project": {
+      "main": [
+        [
+          {
+            "node": "HTML_Project",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GET pattern": {
+      "main": [
+        [
+          {
+            "node": "HTML_Pattern",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTML_Project": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Flatten JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Flatten JSON": {
+      "main": [
+        [
+          {
+            "node": "Adapter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Adapter": {
+      "main": [
+        [
+          {
+            "node": "Build Newsletter HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build Newsletter HTML OLD": {
+      "main": [
+        []
+      ]
+    },
+    "Build Newsletter HTML": {
+      "main": [
+        [
+          {
+            "node": "Odoo XML creds",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTML_Blog": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTML_Color": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "HTML_Pattern": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 3
+          }
+        ]
+      ]
+    },
+    "Odoo XML creds": {
+      "main": [
+        [
+          {
+            "node": "Odoo Authenticate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Odoo Authenticate": {
+      "main": [
+        [
+          {
+            "node": "Parse UID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse UID": {
+      "main": [
+        [
+          {
+            "node": "Full credentials",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Full credentials": {
+      "main": [
+        [
+          {
+            "node": "Create Camaign",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Camaign": {
+      "main": [
+        [
+          {
+            "node": "Parse Campaign ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Campaign ID": {
+      "main": [
+        [
+          {
+            "node": "Campaign Detail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Campaign Detail": {
+      "main": [
+        [
+          {
+            "node": "Create Mailing Comunication",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "XML": {
+      "main": [
+        [
+          {
+            "node": "Get mailing id",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Mailing Comunication": {
+      "main": [
+        []
+      ]
+    },
+    "Get mailing id": {
+      "main": [
+        [
+          {
+            "node": "Get mail detail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "1b3bcf2d-8167-4c46-87fa-7f13d86b7423",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "331d746bc1a63563201e278bbfd6be74ef21f3e48d7328285e9bf034335c85dd"
+  },
+  "id": "vmhdAvj5o6MfPuT1",
+  "tags": [
+    {
+      "updatedAt": "2026-01-14T22:07:57.945Z",
+      "createdAt": "2026-01-14T22:07:57.945Z",
+      "id": "bitJDCcC3mELQkTy",
+      "name": "testing"
+    },
+    {
+      "updatedAt": "2026-01-14T22:06:51.931Z",
+      "createdAt": "2026-01-14T22:06:51.931Z",
+      "id": "zRjUdBe8yQo6o5Hd",
+      "name": "not used"
+    }
+  ]
+}

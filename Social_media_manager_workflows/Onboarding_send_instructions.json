@@ -1,0 +1,178 @@
+{
+  "name": "Onboarding_send_instructions",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "email"
+            },
+            {
+              "name": "user_id"
+            }
+          ]
+        }
+      },
+      "id": "c055762a-8fe7-4141-a639-df2372f30060",
+      "typeVersion": 1.1,
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        272,
+        352
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('When Executed by Another Workflow').item.json.email }}",
+        "subject": "Vítejte - Váš Social Media Manager byl založen",
+        "message": "={{ $json.body }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        832,
+        352
+      ],
+      "id": "b7b7fe30-8348-4911-be9b-d09b5f2f86e7",
+      "name": "Send a message",
+      "webhookId": "d73979d7-6286-4871-802d-aed7e42841c6",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "uw1TRsYWazbTRe5e",
+          "name": "Gmail account Oauth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## **1. Úvodní mail**\nPošle úvodní mail uživatelovy\n",
+        "height": 400,
+        "width": 860,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        112,
+        192
+      ],
+      "typeVersion": 1,
+      "id": "da777643-f7fd-43cb-83f4-ef31521e998b",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "SoMe_user_db",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "user_id",
+              "keyValue": "={{ $('When Executed by Another Workflow').item.json.user_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        512,
+        352
+      ],
+      "id": "27177814-6c2a-428f-a3b4-15beddf17e09",
+      "name": "Get Credentials",
+      "credentials": {
+        "supabaseApi": {
+          "id": "2oNjiFHjAgVX7z4h",
+          "name": "Supabase Origamis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "11764147-6a0b-421a-8b65-ab52cddd8ca6",
+              "name": "body",
+              "value": "=<div style=\"font-family: Arial, sans-serif; font-size: 16px; line-height: 1.6; color: #222; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e0e0e0; border-radius: 8px; background: #fafafa;\">   <h2 style=\"color: #2b5aa0; text-align: center;\">🎉 Vítejte v Social Media Manageru!</h2>    <p>     Děkujeme, že jste se připojili k našemu nástroji pro správu příspěvků.       Právě jsme vám vytvořili osobní pracovní prostor na Google Drive, kde budete mít vše potřebné k plánování a publikaci obsahu.   </p>    <h3>📂 Co váš pracovní prostor obsahuje</h3>   <ul>     <li><strong>Hlavní tabulka s plánovačem</strong> – přehled všech příspěvků, textů a plánů pro Instagram, Facebook i LinkedIn.</li>     <li><strong>Images</strong> – složka pro ukládání obrázků, videí a vizuálů.</li>     <li><strong>Prompts</strong> – prostor pro textové podklady, nápady a AI prompty.</li>   </ul>    <p>     Vše je propojeno automaticky – nemusíte nic sdílet ani nastavovat.       Stačí otevřít tabulku a začít pracovat.   </p>    <div style=\"margin: 24px 0; text-align: center;\">     <a href=\"https://docs.google.com/spreadsheets/d/{{$('Get Credentials').item.json.master_table_id}}/edit\" target=\"_blank\" style=\"background-color: #2b5aa0; color: #fff; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block; font-weight: bold;\">Otevřít tabulku</a>   </div>    <p style=\"text-align: center; margin-top: -8px;\">     nebo přejděte do celé složky:<br>     <a href=\"https://drive.google.com/drive/folders/{{$('Get Credentials').item.json.master_folder_id}}\" target=\"_blank\" style=\"color: #2b5aa0; text-decoration: underline;\">Zobrazit můj Google Drive workspace</a>   </p>    <h3>⚙️ První kroky</h3>   <ol>     <li>Otevřete <strong>tabulku</strong> (viz odkaz výše).</li>     <li>Povolit při prvním otevření skript <em>Post Actions</em> (Google vás vyzve k udělení oprávnění).</li>     <li>Vyplňte své přístupové údaje v listu <strong>Settings</strong> – zde přidáte tokeny k vašim účtům na sociálních sítích.</li>     <li>Projděte si krátký video-návod, který vás provede první publikací příspěvku.</li>   </ol>    <div style=\"margin: 24px 0; text-align: center;\">     <a href=\"https://your-user-manual-url.example.com\" target=\"_blank\" style=\"background-color: #4caf50; color: #fff; padding: 10px 20px; text-decoration: none; border-radius: 6px; font-weight: bold;\">📘 Otevřít uživatelský manuál</a>   </div>    <hr style=\"border: none; border-top: 1px solid #ddd; margin: 32px 0;\">    <p style=\"font-size: 14px; color: #666;\">     Pokud se vám workspace neotevře automaticky, můžete použít odkazy výše.       V případě problémů nás kontaktujte na <a href=\"mailto:support@example.com\">support@example.com</a>.   </p>    <p style=\"font-size: 14px; color: #999; text-align: center; margin-top: 24px;\">     © 2025 Social Media Manager by [Your Company Name]   </p> </div>",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        672,
+        352
+      ],
+      "id": "265e24bb-89d3-43e9-b30a-961fada25834",
+      "name": "Create Body HTML"
+    }
+  ],
+  "pinData": {
+    "When Executed by Another Workflow": [
+      {
+        "json": {
+          "email": "eliaskrystof1@gmail.com",
+          "user_id": "b67ef553-dd6e-4bd5-8273-7bdf1cd56b18"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Get Credentials",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Credentials": {
+      "main": [
+        [
+          {
+            "node": "Create Body HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Body HTML": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "NmGg5uZ3m1rjeYmB"
+  },
+  "versionId": "28ab60d0-02ae-4928-989f-416ebc1215ab",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "2b07eec16886132e3cd818fdfac587c65db27d72fe33b2ee54f787b58f4dff76"
+  },
+  "id": "5aiRLcktFoskDGjI",
+  "tags": []
+}

@@ -1,0 +1,214 @@
+{
+  "name": "Create_HTML_and_Send",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "da3dafdb-9bf5-494f-a1c4-07abe3477a06",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        -368,
+        -16
+      ],
+      "id": "08ff2487-3b41-4525-a697-a542ba57b609",
+      "name": "Webhook",
+      "webhookId": "da3dafdb-9bf5-494f-a1c4-07abe3477a06"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "newsletter_segments"
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -144,
+        -16
+      ],
+      "id": "e80c4df3-fa18-4959-a329-cd64c44fc6a8",
+      "name": "Supabase",
+      "credentials": {
+        "supabaseApi": {
+          "id": "XbTsqF8wuG2gSZNT",
+          "name": "Supabase account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.content }}",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.9,
+      "position": [
+        80,
+        -16
+      ],
+      "id": "cfed13bd-bfba-4ec8-9078-24074d8369b3",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        112,
+        208
+      ],
+      "id": "9caa8555-bac1-4c7d-a400-6b626ed15a5e",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "HrLuvJHhWPSgTQpu",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.2,
+      "position": [
+        272,
+        208
+      ],
+      "id": "1a2093c5-92af-48cc-b877-ff4b80baf630",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        448,
+        -16
+      ],
+      "id": "f60ed27b-e2d8-4177-a877-edd61601b5da",
+      "name": "Gmail",
+      "webhookId": "1a3bb329-60d5-4853-bff0-37f9c0f9150c",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "jNklS6UcnmthFH4R",
+          "name": "kusyn135@gmail.com"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "newsletter_drafts"
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        672,
+        -16
+      ],
+      "id": "30fd2433-103c-4166-a957-fdff8c5e0aa6",
+      "name": "Send_html_to_database",
+      "credentials": {
+        "supabaseApi": {
+          "id": "XbTsqF8wuG2gSZNT",
+          "name": "Supabase account 3"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Supabase",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Gmail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail": {
+      "main": [
+        [
+          {
+            "node": "Send_html_to_database",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "91dff1e8-40f8-48c5-a49c-3846b0504457",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "331d746bc1a63563201e278bbfd6be74ef21f3e48d7328285e9bf034335c85dd"
+  },
+  "id": "NfjfMMBIR0cVZhp3",
+  "tags": [
+    {
+      "updatedAt": "2026-01-14T22:06:51.931Z",
+      "createdAt": "2026-01-14T22:06:51.931Z",
+      "id": "zRjUdBe8yQo6o5Hd",
+      "name": "not used"
+    }
+  ]
+}

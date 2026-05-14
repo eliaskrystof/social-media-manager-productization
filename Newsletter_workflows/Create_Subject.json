@@ -1,0 +1,197 @@
+{
+  "name": "Create_Subject",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Create a suitable {{ $json.language }} subject based on the following content blocks.\nBlog:\n{{ $json.blog_title }}\n{{ $json.blog_text }}\n\nProject:\n{{ $json.project_title }}\n{{ $json.project_text }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=You are a senior email copywriter for the premium interior design brand Oakcent.\n\nOakcent represents natural materials, craftsmanship, timeless design, and refined interiors.\n\nYour task is to create high-performing newsletter subject lines based on the content provided in the user message.\n\nThe goal is to maximize open rate while maintaining a premium brand tone.\n\nSubject Line Guidelines\n\nSubject lines must be:\n\nshort\n\nclear\n\ncuriosity-driven\n\nmobile-friendly\n\npremium and trustworthy\n\nThey should create interest and an open loop without sounding like cheap clickbait.\n\nBrand Voice\n\nAll subject lines must reflect the Oakcent tone:\n\nconfident\n\ntimeless\n\nnatural\n\nhuman\n\ndesign-focused\n\ncraftsmanship-oriented\n\nAvoid aggressive marketing language.\n\nThe style should feel elegant, calm, and refined.\n\nOutput Requirements\n\nGenerate 6 unique subject line variants.\n\nLength rules:\n\nmaximum ~45 characters\n\nideal length: 28–42 characters\n\nEach subject line must be distinct and meaningfully different.\n\nAvoid simple word swaps.\n\nAngle Diversity\n\nUse different copywriting angles across the variants, such as:\n\nbenefit / value\n\ncuriosity or mystery\n\nproduct or collection launch\n\ncraftsmanship / material / detail\n\ndesign inspiration\n\nsubtle urgency (without pressure)\n\naudience targeting (if relevant)\n\nContext Awareness\n\nUse concrete information from the newsletter when available.\n\nIf the content includes:\n\nnumbers\n\ndates\n\ndiscounts\n\nproduct names\n\ncollections\n\nevents\n\nyou may incorporate them into some subject lines.\n\nDo not invent information that is not present.\n\nDesign Vocabulary\n\nIf the newsletter relates to interior design or materials, naturally use vocabulary connected to:\n\ncalm\n\natmosphere\n\ntexture\n\noak\n\ncraftsmanship\n\ndetail\n\ntimeless design\n\nAdapt wording naturally to the language specified in the user message.\n\nRestrictions\n\nDo NOT use:\n\nALL CAPS\n\nmore than one emoji\n\nspam-style phrases such as\nFREE!!!, YOU WON'T BELIEVE, 100% GUARANTEED\n\nexaggerated promises\n\naggressive sales pressure\n\nsemicolons inside subject lines\n\nOutput Format\n\nReturn exactly 6 subject lines in a single line.\n\nSeparate each subject line with a semicolon ;.\n\nExample format:\n\nSubject 1; Subject 2; Subject 3; Subject 4; Subject 5; Subject 6\n\nDo not include numbering, bullet points, or line breaks.\n\nQuality Requirement\n\nEach subject line must:\n\nsound natural for a native speaker\n\nreflect the core message of the newsletter\n\nmaintain a premium feel\n\nFocus on clarity, rhythm, and natural language. Avoid overcomplicated wording."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        416,
+        48
+      ],
+      "id": "0a2f021e-d5b5-4a34-ad6d-822b78b45086",
+      "name": "Subject writer"
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "project_title",
+              "type": "any"
+            },
+            {
+              "name": "project_text",
+              "type": "any"
+            },
+            {
+              "name": "blog_title",
+              "type": "any"
+            },
+            {
+              "name": "blog_text",
+              "type": "any"
+            },
+            {
+              "name": "language",
+              "type": "any"
+            },
+            {
+              "name": "post_id",
+              "type": "any"
+            }
+          ]
+        }
+      },
+      "id": "4b2303b6-7936-4518-8bf7-5546a8007ed6",
+      "typeVersion": 1.1,
+      "name": "Start",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        208,
+        48
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        384,
+        272
+      ],
+      "id": "989c144f-2926-4078-8a28-4f2bdf25c0ec",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "HrLuvJHhWPSgTQpu",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "newsletter_drafts",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "post_id",
+              "condition": "eq",
+              "keyValue": "={{ $('Start').item.json.post_id }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "email_subject",
+              "fieldValue": "={{ $json.output.email_subject }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        768,
+        48
+      ],
+      "id": "282c498e-e1fe-45f3-8ef2-5f2e20607c6a",
+      "name": "Update a row",
+      "credentials": {
+        "supabaseApi": {
+          "id": "XbTsqF8wuG2gSZNT",
+          "name": "Supabase account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n\t\"email_subject\": \"California\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        560,
+        272
+      ],
+      "id": "db009493-ffe2-45f2-a42d-63facb9e2f4f",
+      "name": "Structured Output Parser"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Subject writer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Subject writer",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Subject writer": {
+      "main": [
+        [
+          {
+            "node": "Update a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Subject writer",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "d86cc2ef-db08-48a6-adaf-f599a84c62ee",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "331d746bc1a63563201e278bbfd6be74ef21f3e48d7328285e9bf034335c85dd"
+  },
+  "id": "U2f4DBEHzdxhPhuR",
+  "tags": [
+    {
+      "updatedAt": "2026-01-14T22:03:19.715Z",
+      "createdAt": "2026-01-14T22:03:19.715Z",
+      "id": "ovTLfrcCyllneaEm",
+      "name": "Sub"
+    }
+  ]
+}

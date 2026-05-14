@@ -1,0 +1,1623 @@
+/**********************
+ * MAIN onOpen (PATCHED)
+ * - Adds "Newsletter actions" menu with SEND + EDIT
+ **********************/
+
+function onOpen() {
+  const ui = SpreadsheetApp.getUi();
+
+  // Your existing Post Actions menu
+  ui.createMenu("Post Actions")
+    .addItem("Schedule Posts", "schedulePosts")
+    .addItem("Create Posts", "createPosts")
+    .addItem("Update Posts", "updatePosts")
+    .addItem("Update Scheduled Posts", "updateScheduledPosts")
+    .addItem("Publish Today's Posts", "publishTodaysPosts")
+    .addToUi();
+
+  // Newsletter menu
+  ui.createMenu("Newsletter actions")
+    .addItem("Generate draft for checked rows", "runNewsletterActions")
+    .addItem("Edit checked row", "runNewsletterEditActions")
+    .addItem("Strict edit checked row", "runStrictEditActions")
+    .addItem("Edit from master", "runEditFromMasterActions")
+    .addSeparator()
+    .addItem("Post to odoo", "runPostToOdoo")
+    .addItem("Confirm and send", "runConfirmAndSend")
+    .addToUi();
+
+  // Your existing init logic
+  setCheckboxesAndDropdownInOddRowsWithContent();
+}
+
+
+/**********************
+ * CONFIGURATION
+ **********************/
+
+// Name of the sheet with newsletter rows
+const NL_SHEET_NAME = 'Návrh tabulky Newsletterů';
+
+// Name of the sheet with default/settings values
+const SETTINGS_SHEET_NAME = 'Newsletter_defaul_settings';
+
+// Row where headers are (data starts below this row)
+const HEADER_ROW = 1;
+
+// Column indices (1-based: A=1, B=2, ...)
+const COL = {
+  MONTH: 1,
+  NO: 2,
+  TOPIC: 3,
+  TARGET_GROUP: 4,            // Target group (databáze)
+  SUBJECT: 5,                  // Subject
+  BLOG1: 6,                    // 1. blog
+  PROJECT2: 7,                 // 2. project
+  COLOR_COLLECTION: 8,         // 3. color collection (name dropdown)
+  PATTERN_COLLECTION: 9,       // 4. pattern collection (name dropdown)
+  CTA_CONTENT: 10,             // 5. CTA content
+  CTA_LINK: 11,                // 5. CTA link (button text)
+  CHECKBOX: 12                 // Vytvořit obsah
+  // rest ignored for this script
+};
+
+// Checkbox column = Vytvořit obsah
+const CHECKBOX_COLUMN = COL.CHECKBOX;
+
+// Webhook URL (main create/update webhook)
+const WEBHOOK_URL = 'https://origamis.app.n8n.cloud/webhook/Newsletter';
+
+// Webhook URL for EDIT payloads (replace with your real URL)
+const EDIT_WEBHOOK_URL = 'https://origamis.app.n8n.cloud/webhook/edit-newsletter';
+
+const ODOO_WEBHOOK_URL = 'https://origamis.app.n8n.cloud/webhook/post_to_odoo';
+const CONFIRM_SEND_WEBHOOK_URL = 'https://origamis.app.n8n.cloud/webhook/confirm_and_send';
+const STRICT_EDIT_WEBHOOK_URL = 'https://origamis.app.n8n.cloud/webhook/strict-edit-newsletter';
+
+// Language name → code mapping (internal)
+const LANGUAGE_CODES = {
+  czech: 'czech',
+  english: 'english',
+  german: 'german',
+  polish: 'polish'
+};
+
+// Mapping langCode → column name in settings sheet
+const LANG_PROP = {
+  czech: 'cz',
+  english: 'en',
+  polish: 'pl',
+  german: 'de'
+};
+
+// Suffixes for color and pattern resources based on selected name
+const COLOR_SUFFIXES = [
+  '_col_H3',
+  '_col',
+  '_col_img1',
+  '_col_img2',
+  '_col_CTA',
+  '_col_url'
+];
+
+const PATTERN_SUFFIXES = [
+  '_pat_H2',
+  '_pat_col',
+  '_pat',
+  '_pat_img1',
+  '_pat_img2',
+  '_pat_CTA',
+  '_pat_col_url'
+];
+
+// Map color suffix → generic field name in payload
+const COLOR_SUFFIX_FIELD_MAP = {
+  '_col_H3': 'title',        // e.g. "Sand_col_H3"
+  '_col': 'body',            // e.g. "Sand_col"
+  '_col_img1': 'img1',       // e.g. "Sand_col_img1"
+  '_col_img2': 'img2',       // e.g. "Sand_col_img2"
+  '_col_CTA': 'cta',         // e.g. "Sand_col_CTA"
+  '_col_url': 'url'          // e.g. "Sand_col_url"
+};
+
+// Map pattern suffix → generic field name in payload
+const PATTERN_SUFFIX_FIELD_MAP = {
+  '_pat_H2': 'title',          // e.g. "Planks_pat_H2"
+  '_pat_col': 'collectionName',// e.g. "Planks_pat_col"
+  '_pat': 'body',              // e.g. "Planks_pat"
+  '_pat_img1': 'img1',         // e.g. "Planks_pat_img1"
+  '_pat_img2': 'img2',         // e.g. "Planks_pat_img2"
+  '_pat_CTA': 'cta',           // e.g. "Planks_pat_CTA"
+  '_pat_col_url': 'collectionUrl' // e.g. "Planks_pat_col_url"
+};
+
+// Mapping from Target group cell value → CTA resource keys in settings sheet
+const CTA_RESOURCE_KEYS = {
+  'End Customers': {
+    textKey: '1. CTA text End Customers',
+    buttonKey: '1. CTA  button End Customers'
+  },
+  'Architects & Designers': {
+    textKey: '2A. CTA text Architects & Designers',
+    buttonKey: '2A. CTA button Architects & Designers'
+  },
+  'General / Universal': {
+    textKey: '3. CTA text General / Universal',
+    buttonKey: '3. CTA button General / Universal'
+  },
+  'Developers': {
+    textKey: '4. CTA text Developers',
+    buttonKey: '4. CTA button Developers'
+  }
+};
+
+
+/**********************
+ * ENTRY POINTS FROM MENU
+ **********************/
+
+// Called by the "Send checked rows" menu item
+function runNewsletterActions() {
+  showLanguageDialog_();
+}
+
+// Called by the "Send edit request for checked row" menu item
+function runNewsletterEditActions() {
+  showEditLanguageDialog_();
+}
+
+function runPostToOdoo() {
+  showLanguageDialogForAction_('odoo');
+}
+
+function runConfirmAndSend() {
+  showLanguageDialogForAction_('confirm_send');
+}
+
+function runStrictEditActions() {
+  showStrictEditLanguageDialog_();
+}
+
+function runEditFromMasterActions() {
+  showEditFromMasterLanguageDialog_();
+}
+
+
+/**********************
+ * LANGUAGE CHECKBOX DIALOG (CREATE/SEND)
+ **********************/
+
+function showLanguageDialog_() {
+  var htmlContent = `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <base target="_top">
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+            font-size: 13px;
+            padding: 12px 16px;
+          }
+          h3 {
+            margin-top: 0;
+            margin-bottom: 8px;
+          }
+          .lang-option {
+            margin: 2px 0;
+          }
+          .buttons {
+            margin-top: 12px;
+            text-align: right;
+          }
+          button {
+            margin-left: 6px;
+          }
+        </style>
+      </head>
+      <body>
+        <h3>What languages to create a draft for?</h3>
+        <div class="lang-option">
+          <label><input type="checkbox" name="lang" value="czech"> Czech</label>
+        </div>
+        <div class="lang-option">
+          <label><input type="checkbox" name="lang" value="english"> English</label>
+        </div>
+        <div class="lang-option">
+          <label><input type="checkbox" name="lang" value="german"> German</label>
+        </div>
+        <div class="lang-option">
+          <label><input type="checkbox" name="lang" value="polish"> Polish</label>
+        </div>
+        <div class="lang-option" style="margin-top: 4px;">
+          <label><input type="checkbox" id="allLangs" value="all"> All</label>
+        </div>
+
+        <div class="buttons">
+          <button type="button" onclick="google.script.host.close()">Cancel</button>
+          <button type="button" onclick="onConfirm()">Confirm</button>
+        </div>
+
+        <script>
+          function onConfirm() {
+            var allChecked = document.getElementById('allLangs').checked;
+            var selected = [];
+
+            if (allChecked) {
+              selected.push('all');
+            } else {
+              var boxes = document.querySelectorAll('input[name="lang"]:checked');
+              boxes.forEach(function(b) { selected.push(b.value); });
+            }
+
+            if (selected.length === 0) {
+              alert('Please select at least one option.');
+              return;
+            }
+
+            google.script.run
+              .withSuccessHandler(function() {
+                google.script.host.close();
+              })
+              .processNewsletterLanguages(selected);
+          }
+        </script>
+      </body>
+    </html>
+  `;
+
+  var html = HtmlService.createHtmlOutput(htmlContent)
+    .setWidth(300)
+    .setHeight(230);
+
+  SpreadsheetApp.getUi().showModalDialog(html, 'Newsletter languages');
+}
+
+
+/**********************
+ * LANGUAGE CHECKBOX DIALOG (EDIT)
+ **********************/
+
+function showEditLanguageDialog_() {
+  var htmlContent = `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <base target="_top">
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+            font-size: 13px;
+            padding: 12px 16px;
+          }
+          h3 {
+            margin-top: 0;
+            margin-bottom: 8px;
+          }
+          .lang-option {
+            margin: 2px 0;
+          }
+          .buttons {
+            margin-top: 12px;
+            text-align: right;
+          }
+          button {
+            margin-left: 6px;
+          }
+        </style>
+      </head>
+      <body>
+        <h3>For which languages do you want to request changes?</h3>
+        <div class="lang-option">
+          <label><input type="checkbox" name="lang" value="czech"> Czech</label>
+        </div>
+        <div class="lang-option">
+          <label><input type="checkbox" name="lang" value="english"> English</label>
+        </div>
+        <div class="lang-option">
+          <label><input type="checkbox" name="lang" value="german"> German</label>
+        </div>
+        <div class="lang-option">
+          <label><input type="checkbox" name="lang" value="polish"> Polish</label>
+        </div>
+        <div class="lang-option" style="margin-top: 4px;">
+          <label><input type="checkbox" id="allLangs" value="all"> All</label>
+        </div>
+
+        <div class="buttons">
+          <button type="button" onclick="google.script.host.close()">Cancel</button>
+          <button type="button" onclick="onConfirm()">Next</button>
+        </div>
+
+        <script>
+          function onConfirm() {
+            var allChecked = document.getElementById('allLangs').checked;
+            var selected = [];
+
+            if (allChecked) {
+              selected.push('all');
+            } else {
+              var boxes = document.querySelectorAll('input[name="lang"]:checked');
+              boxes.forEach(function(b) { selected.push(b.value); });
+            }
+
+            if (selected.length === 0) {
+              alert('Please select at least one option.');
+              return;
+            }
+
+            google.script.run
+              .withSuccessHandler(function() {
+                google.script.host.close();
+              })
+              .processNewsletterEditLanguages(selected);
+          }
+        </script>
+      </body>
+    </html>
+  `;
+
+  var html = HtmlService.createHtmlOutput(htmlContent)
+    .setWidth(320)
+    .setHeight(240);
+
+  SpreadsheetApp.getUi().showModalDialog(html, 'Edit – select languages');
+}
+
+/**********************
+ * LANGUAGE CHECKBOX DIALOG (STRICT EDIT)
+ **********************/
+
+function showStrictEditLanguageDialog_() {
+  var htmlContent = `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <base target="_top">
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+            font-size: 13px;
+            padding: 12px 16px;
+          }
+          h3 {
+            margin-top: 0;
+            margin-bottom: 8px;
+          }
+          .lang-option {
+            margin: 2px 0;
+          }
+          .buttons {
+            margin-top: 12px;
+            text-align: right;
+          }
+          button {
+            margin-left: 6px;
+          }
+        </style>
+      </head>
+      <body>
+        <h3>For which languages do you want to run strict edit?</h3>
+
+        <div class="lang-option">
+          <label><input type="checkbox" name="lang" value="czech"> Czech</label>
+        </div>
+        <div class="lang-option">
+          <label><input type="checkbox" name="lang" value="english"> English</label>
+        </div>
+        <div class="lang-option">
+          <label><input type="checkbox" name="lang" value="german"> German</label>
+        </div>
+        <div class="lang-option">
+          <label><input type="checkbox" name="lang" value="polish"> Polish</label>
+        </div>
+        <div class="lang-option" style="margin-top: 4px;">
+          <label><input type="checkbox" id="allLangs" value="all"> All</label>
+        </div>
+
+        <div class="buttons">
+          <button type="button" onclick="google.script.host.close()">Cancel</button>
+          <button type="button" onclick="onConfirm()">Confirm</button>
+        </div>
+
+        <script>
+          function onConfirm() {
+            var allChecked = document.getElementById('allLangs').checked;
+            var selected = [];
+
+            if (allChecked) {
+              selected.push('all');
+            } else {
+              var boxes = document.querySelectorAll('input[name="lang"]:checked');
+              boxes.forEach(function(b) { selected.push(b.value); });
+            }
+
+            if (selected.length === 0) {
+              alert('Please select at least one option.');
+              return;
+            }
+
+            google.script.run
+              .withSuccessHandler(function(msg) {
+                if (msg) alert(msg);
+                google.script.host.close();
+              })
+              .processStrictEditLanguages(selected);
+          }
+        </script>
+      </body>
+    </html>
+  `;
+
+  var html = HtmlService.createHtmlOutput(htmlContent)
+    .setWidth(320)
+    .setHeight(240);
+
+  SpreadsheetApp.getUi().showModalDialog(html, 'Strict edit – select languages');
+}
+
+/**********************
+ * LANGUAGE CHECKBOX DIALOG (SIMPLE ACTIONS)
+ **********************/
+
+function showLanguageDialogForAction_(action) {
+  var htmlContent = `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <base target="_top">
+        <style>
+          body { font-family: Arial, sans-serif; font-size: 13px; padding: 12px 16px; }
+          h3 { margin-top: 0; margin-bottom: 8px; }
+          .lang-option { margin: 2px 0; }
+          .buttons { margin-top: 12px; text-align: right; }
+          button { margin-left: 6px; }
+        </style>
+      </head>
+      <body>
+        <h3>Select languages</h3>
+
+        <div class="lang-option"><label><input type="checkbox" name="lang" value="czech"> Czech</label></div>
+        <div class="lang-option"><label><input type="checkbox" name="lang" value="english"> English</label></div>
+        <div class="lang-option"><label><input type="checkbox" name="lang" value="german"> German</label></div>
+        <div class="lang-option"><label><input type="checkbox" name="lang" value="polish"> Polish</label></div>
+
+        <div class="lang-option" style="margin-top: 4px;">
+          <label><input type="checkbox" id="allLangs" value="all"> All</label>
+        </div>
+
+        <div class="buttons">
+          <button type="button" onclick="google.script.host.close()">Cancel</button>
+          <button type="button" onclick="onConfirm()">Confirm</button>
+        </div>
+
+        <script>
+          var action = ${JSON.stringify(action)};
+
+          function onConfirm() {
+            var allChecked = document.getElementById('allLangs').checked;
+            var selected = [];
+
+            if (allChecked) {
+              selected.push('all');
+            } else {
+              var boxes = document.querySelectorAll('input[name="lang"]:checked');
+              boxes.forEach(function(b) { selected.push(b.value); });
+            }
+
+            if (selected.length === 0) {
+              alert('Please select at least one option.');
+              return;
+            }
+
+            google.script.run
+              .withSuccessHandler(function(msg) {
+                if (msg) alert(msg);
+                google.script.host.close();
+              })
+              .processSimpleActionLanguages(action, selected);
+          }
+        </script>
+      </body>
+    </html>
+  `;
+
+  SpreadsheetApp.getUi().showModalDialog(
+    HtmlService.createHtmlOutput(htmlContent).setWidth(300).setHeight(230),
+    (action === 'odoo' ? 'Post to odoo' : 'Confirm and send')
+  );
+}
+
+/**********************
+ * LANGUAGE CHECKBOX DIALOG (EDIT FROM MASTER)
+ **********************/
+
+function showEditFromMasterLanguageDialog_() {
+  var htmlContent = `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <base target="_top">
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+            font-size: 13px;
+            padding: 12px 16px;
+          }
+          h3 {
+            margin-top: 0;
+            margin-bottom: 8px;
+          }
+          .lang-option {
+            margin: 2px 0;
+          }
+          .buttons {
+            margin-top: 12px;
+            text-align: right;
+          }
+          button {
+            margin-left: 6px;
+          }
+        </style>
+      </head>
+      <body>
+        <h3>For which target languages do you want to apply edits from Czech master?</h3>
+
+        <div class="lang-option">
+          <label><input type="checkbox" name="lang" value="english"> English</label>
+        </div>
+        <div class="lang-option">
+          <label><input type="checkbox" name="lang" value="german"> German</label>
+        </div>
+        <div class="lang-option">
+          <label><input type="checkbox" name="lang" value="polish"> Polish</label>
+        </div>
+        <div class="lang-option" style="margin-top: 4px;">
+          <label><input type="checkbox" id="allLangs" value="all"> All</label>
+        </div>
+
+        <div class="buttons">
+          <button type="button" onclick="google.script.host.close()">Cancel</button>
+          <button type="button" onclick="onConfirm()">Confirm</button>
+        </div>
+
+        <script>
+          function onConfirm() {
+            var allChecked = document.getElementById('allLangs').checked;
+            var selected = [];
+
+            if (allChecked) {
+              selected = ['english', 'german', 'polish'];
+            } else {
+              var boxes = document.querySelectorAll('input[name="lang"]:checked');
+              boxes.forEach(function(b) { selected.push(b.value); });
+            }
+
+            if (selected.length === 0) {
+              alert('Please select at least one target language.');
+              return;
+            }
+
+            google.script.run
+              .withSuccessHandler(function(msg) {
+                if (msg) alert(msg);
+                google.script.host.close();
+              })
+              .processEditFromMasterLanguages(selected);
+          }
+        </script>
+      </body>
+    </html>
+  `;
+
+  var html = HtmlService.createHtmlOutput(htmlContent)
+    .setWidth(360)
+    .setHeight(230);
+
+  SpreadsheetApp.getUi().showModalDialog(html, 'Edit from master');
+}
+
+/**********************
+ * SERVER-SIDE: PROCESS SELECTED LANGUAGES (CREATE/SEND)
+ **********************/
+
+// Called from the HTML dialog with an array like ['czech', 'german'] or ['all']
+function processNewsletterLanguages(selectedLangs) {
+  var ui = SpreadsheetApp.getUi();
+
+  // Resolve language codes
+  var langCodes = [];
+
+  if (selectedLangs.indexOf('all') !== -1) {
+    langCodes = Object.values(LANGUAGE_CODES); // all languages
+  } else {
+    selectedLangs.forEach(function(name) {
+      var code = LANGUAGE_CODES[name];
+      if (code) {
+        langCodes.push(code);
+      }
+    });
+  }
+
+  if (langCodes.length === 0) {
+    ui.alert('No valid language selected.');
+    return;
+  }
+
+  var ss = SpreadsheetApp.getActive();
+  var sheet = ss.getSheetByName(NL_SHEET_NAME);
+
+  if (!sheet) {
+    ui.alert('Sheet "' + NL_SHEET_NAME + '" not found.');
+    return;
+  }
+
+  var lastRow = sheet.getLastRow();
+  var lastCol = sheet.getLastColumn();
+
+  if (lastRow <= HEADER_ROW) {
+    ui.alert('No data rows found.');
+    return;
+  }
+
+  var dataRange = sheet.getRange(HEADER_ROW + 1, 1, lastRow - HEADER_ROW, lastCol);
+  var values = dataRange.getValues();
+
+  var settings = loadSettings_();
+  var payloadArray = [];
+
+  // Group by row, include rowNumber at main level
+  values.forEach(function(row, index) {
+    var isChecked = row[CHECKBOX_COLUMN - 1] === true;
+    if (!isChecked) return;
+
+    // Actual 1-based sheet row number for this data row
+    var sheetRowNumber = HEADER_ROW + 1 + index;
+
+    var rowEntry = {
+      rowNumber: sheetRowNumber,
+      languages: []
+    };
+
+    langCodes.forEach(function(langCode) {
+      var obj = buildJsonFromRow_(row, settings, langCode);
+      obj.language = langCode;
+      rowEntry.languages.push(obj);
+    });
+
+    payloadArray.push(rowEntry);
+  });
+
+  if (payloadArray.length === 0) {
+    ui.alert('No checked rows found for the selected language(s).');
+    return;
+  }
+
+  var payload = {
+    newsletters: payloadArray
+  };
+
+  try {
+    var response = UrlFetchApp.fetch(WEBHOOK_URL, {
+      method: 'post',
+      contentType: 'application/json',
+      payload: JSON.stringify(payload),
+      muteHttpExceptions: true
+    });
+
+    ui.alert(
+      'POST sent.\nHTTP Status: ' + response.getResponseCode() +
+      '\nResponse: ' + response.getContentText()
+    );
+
+  } catch (e) {
+    ui.alert('Error sending POST: ' + e);
+  }
+}
+
+
+/**********************
+ * SERVER-SIDE: PROCESS SELECTED LANGUAGES (EDIT)
+ **********************/
+
+// Called from Edit language dialog
+function processNewsletterEditLanguages(selectedLangs) {
+  var ui = SpreadsheetApp.getUi();
+
+  // Resolve language codes
+  var langCodes = [];
+
+  if (selectedLangs.indexOf('all') !== -1) {
+    langCodes = Object.values(LANGUAGE_CODES); // all languages
+  } else {
+    selectedLangs.forEach(function(name) {
+      var code = LANGUAGE_CODES[name];
+      if (code) {
+        langCodes.push(code);
+      }
+    });
+  }
+
+  if (langCodes.length === 0) {
+    ui.alert('No valid language selected.');
+    return;
+  }
+
+  var ss = SpreadsheetApp.getActive();
+  var sheet = ss.getSheetByName(NL_SHEET_NAME);
+
+  if (!sheet) {
+    ui.alert('Sheet "' + NL_SHEET_NAME + '" not found.');
+    return;
+  }
+
+  var lastRow = sheet.getLastRow();
+  var lastCol = sheet.getLastColumn();
+
+  if (lastRow <= HEADER_ROW) {
+    ui.alert('No data rows found.');
+    return;
+  }
+
+  var dataRange = sheet.getRange(HEADER_ROW + 1, 1, lastRow - HEADER_ROW, lastCol);
+  var values = dataRange.getValues();
+
+  // Find checked rows
+  var checkedRows = [];
+  values.forEach(function(row, index) {
+    if (row[CHECKBOX_COLUMN - 1] === true) {
+      checkedRows.push(HEADER_ROW + 1 + index); // sheet row number
+    }
+  });
+
+  if (checkedRows.length === 0) {
+    ui.alert('No checked row found. Please check exactly one row to edit.');
+    return;
+  }
+
+  if (checkedRows.length > 1) {
+    ui.alert('Please check only one row for edit.');
+    return;
+  }
+
+  var sheetRowNumber = checkedRows[0];
+
+  // Show second dialog to select sections + comments, per language (wizard)
+  showEditSectionsDialog_(sheetRowNumber, langCodes);
+}
+
+/**********************
+ * SERVER-SIDE: SIMPLE ROW + LANGUAGE ACTIONS
+ **********************/
+
+function processSimpleActionLanguages(action, selectedLangs) {
+  var ui = SpreadsheetApp.getUi();
+
+  // resolve languages
+  var langCodes = [];
+  if (selectedLangs.indexOf('all') !== -1) {
+    langCodes = Object.values(LANGUAGE_CODES);
+  } else {
+    selectedLangs.forEach(function(name) {
+      var code = LANGUAGE_CODES[name];
+      if (code) langCodes.push(code);
+    });
+  }
+
+  if (langCodes.length === 0) {
+    return 'No valid language selected.';
+  }
+
+  // pick webhook by action
+  var url = '';
+  if (action === 'odoo') url = ODOO_WEBHOOK_URL;
+  else if (action === 'confirm_send') url = CONFIRM_SEND_WEBHOOK_URL;
+  else return 'Unknown action: ' + action;
+
+  // sheet + data
+  var ss = SpreadsheetApp.getActive();
+  var sheet = ss.getSheetByName(NL_SHEET_NAME);
+  if (!sheet) return 'Sheet "' + NL_SHEET_NAME + '" not found.';
+
+  var lastRow = sheet.getLastRow();
+  var lastCol = sheet.getLastColumn();
+  if (lastRow <= HEADER_ROW) return 'No data rows found.';
+
+  var values = sheet.getRange(HEADER_ROW + 1, 1, lastRow - HEADER_ROW, lastCol).getValues();
+
+  // collect checked rows + target group
+  var checkedRows = [];
+  values.forEach(function(row, index) {
+    if (row[COL.CHECKBOX - 1] === true) {
+      checkedRows.push({
+        rowNumber: HEADER_ROW + 1 + index,
+        targetGroup: row[COL.TARGET_GROUP - 1],
+        month: row[COL.MONTH - 1]
+      });
+    }
+  });
+
+  if (checkedRows.length === 0) {
+    return 'No checked rows found.';
+  }
+
+  // send individual POSTs
+  var sent = 0;
+  var failures = [];
+
+  checkedRows.forEach(function(item) {
+    langCodes.forEach(function(langCode) {
+      var payload = {
+        row_number: item.rowNumber,
+        language: langCode,
+        target_group: item.targetGroup,
+        month: item.month
+      };
+
+      try {
+        var resp = UrlFetchApp.fetch(url, {
+          method: 'post',
+          contentType: 'application/json',
+          payload: JSON.stringify(payload),
+          muteHttpExceptions: true
+        });
+
+        var code = resp.getResponseCode();
+        if (code >= 200 && code < 300) {
+          sent++;
+        } else {
+          failures.push(
+            'Row ' + item.rowNumber + ', ' + langCode + ' → HTTP ' + code + ' → ' + resp.getContentText()
+          );
+        }
+      } catch (e) {
+        failures.push(
+          'Row ' + item.rowNumber + ', ' + langCode + ' → ERROR: ' + e
+        );
+      }
+    });
+  });
+
+  var msg = 'Done. Sent: ' + sent + ' request(s).';
+  if (failures.length) {
+    msg += '\n\nFailures:\n' + failures.slice(0, 10).join('\n');
+    if (failures.length > 10) msg += '\n...and ' + (failures.length - 10) + ' more';
+  }
+  return msg;
+}
+
+/**********************
+ * SERVER-SIDE: PROCESS SELECTED LANGUAGES (STRICT EDIT)
+ **********************/
+
+function processStrictEditLanguages(selectedLangs) {
+  var ui = SpreadsheetApp.getUi();
+
+  // Resolve language codes
+  var langCodes = [];
+
+  if (selectedLangs.indexOf('all') !== -1) {
+    langCodes = Object.values(LANGUAGE_CODES);
+  } else {
+    selectedLangs.forEach(function(name) {
+      var code = LANGUAGE_CODES[name];
+      if (code) {
+        langCodes.push(code);
+      }
+    });
+  }
+
+  if (langCodes.length === 0) {
+    return 'No valid language selected.';
+  }
+
+  var ss = SpreadsheetApp.getActive();
+  var sheet = ss.getSheetByName(NL_SHEET_NAME);
+
+  if (!sheet) {
+    return 'Sheet "' + NL_SHEET_NAME + '" not found.';
+  }
+
+  var lastRow = sheet.getLastRow();
+  var lastCol = sheet.getLastColumn();
+
+  if (lastRow <= HEADER_ROW) {
+    return 'No data rows found.';
+  }
+
+  var values = sheet.getRange(HEADER_ROW + 1, 1, lastRow - HEADER_ROW, lastCol).getValues();
+
+  // Find checked rows
+  var checkedRows = [];
+  values.forEach(function(row, index) {
+    if (row[CHECKBOX_COLUMN - 1] === true) {
+      checkedRows.push(HEADER_ROW + 1 + index);
+    }
+  });
+
+  if (checkedRows.length === 0) {
+    return 'No checked row found. Please check exactly one row.';
+  }
+
+  if (checkedRows.length > 1) {
+    return 'Please check only one row for strict edit.';
+  }
+
+  var rowNumber = checkedRows[0];
+
+  var headerMap = getHeaderMap_(sheet);
+  
+  var sourceRowValue = rowNumber;
+
+  var sent = 0;
+  var failures = [];
+
+  langCodes.forEach(function(langCode) {
+    var contentHeader = getLangContentHeader_(langCode);
+    var contentCol = headerMap[contentHeader];
+
+    if (!contentCol) {
+      failures.push('Column "' + contentHeader + '" not found.');
+      return;
+    }
+
+    var contentBlob = sheet.getRange(rowNumber, contentCol).getValue();
+
+    var payload = {
+      source_row: sourceRowValue,
+      language: langCode,
+      target_languages: [],
+      content_blob: contentBlob,
+      propagate: false
+    };
+
+    try {
+      var response = UrlFetchApp.fetch(STRICT_EDIT_WEBHOOK_URL, {
+        method: 'post',
+        contentType: 'application/json',
+        payload: JSON.stringify(payload),
+        muteHttpExceptions: true
+      });
+
+      var code = response.getResponseCode();
+      if (code >= 200 && code < 300) {
+        sent++;
+      } else {
+        failures.push(
+          'Language ' + langCode + ' → HTTP ' + code + ' → ' + response.getContentText()
+        );
+      }
+
+    } catch (e) {
+      failures.push('Language ' + langCode + ' → ERROR: ' + e);
+    }
+  });
+
+  var msg = 'Done. Sent: ' + sent + ' strict edit request(s).';
+  if (failures.length) {
+    msg += '\n\nFailures:\n' + failures.slice(0, 10).join('\n');
+    if (failures.length > 10) msg += '\n...and ' + (failures.length - 10) + ' more';
+  }
+
+  return msg;
+}
+
+/**********************
+ * SERVER-SIDE: PROCESS TARGET LANGUAGES (EDIT FROM MASTER)
+ **********************/
+
+function processEditFromMasterLanguages(selectedLangs) {
+  var ss = SpreadsheetApp.getActive();
+  var sheet = ss.getSheetByName(NL_SHEET_NAME);
+
+  if (!sheet) {
+    return 'Sheet "' + NL_SHEET_NAME + '" not found.';
+  }
+
+  var lastRow = sheet.getLastRow();
+  var lastCol = sheet.getLastColumn();
+
+  if (lastRow <= HEADER_ROW) {
+    return 'No data rows found.';
+  }
+
+  var values = sheet.getRange(HEADER_ROW + 1, 1, lastRow - HEADER_ROW, lastCol).getValues();
+
+  // Find checked rows
+  var checkedRows = [];
+  values.forEach(function(row, index) {
+    if (row[CHECKBOX_COLUMN - 1] === true) {
+      checkedRows.push(HEADER_ROW + 1 + index);
+    }
+  });
+
+  if (checkedRows.length === 0) {
+    return 'No checked row found. Please check exactly one row.';
+  }
+
+  if (checkedRows.length > 1) {
+    return 'Please check only one row for edit from master.';
+  }
+
+  var rowNumber = checkedRows[0];
+  var sourceRowValue = rowNumber;
+
+  var headerMap = getHeaderMap_(sheet);
+
+  var masterContentCol = headerMap['CZ content'];
+  if (!masterContentCol) {
+    return 'Column "CZ content" not found.';
+  }
+
+  var contentBlob = sheet.getRange(rowNumber, masterContentCol).getValue();
+
+  var payload = {
+    source_row: sourceRowValue,
+    language: 'czech',
+    target_languages: selectedLangs,
+    content_blob: contentBlob,
+    propagate: true
+  };
+
+  try {
+    var response = UrlFetchApp.fetch(STRICT_EDIT_WEBHOOK_URL, {
+      method: 'post',
+      contentType: 'application/json',
+      payload: JSON.stringify(payload),
+      muteHttpExceptions: true
+    });
+
+    return response.getContentText();
+
+  } catch (e) {
+    return 'Error sending edit from master POST: ' + e;
+  }
+}
+
+/**********************
+ * EDIT SECTIONS DIALOG (STEP 2 – PER LANGUAGE WIZARD)
+ **********************/
+
+function showEditSectionsDialog_(sheetRowNumber, langCodes) {
+  var config = {
+    rowNumber: sheetRowNumber,
+    languages: langCodes
+  };
+  var configJson = JSON.stringify(config);
+
+  var htmlContent = `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <base target="_top">
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+            font-size: 13px;
+            padding: 12px 16px;
+            max-width: 520px;
+          }
+          h3 {
+            margin-top: 0;
+            margin-bottom: 8px;
+          }
+          .section-block {
+            border: 1px solid #ddd;
+            padding: 8px;
+            margin-bottom: 8px;
+            border-radius: 4px;
+          }
+          .section-block h4 {
+            margin: 0 0 4px 0;
+            font-size: 13px;
+          }
+          textarea {
+            width: 100%;
+            box-sizing: border-box;
+          }
+          .hint {
+            font-size: 11px;
+            color: #666;
+          }
+          .meta {
+            font-size: 11px;
+            color: #555;
+            margin-bottom: 8px;
+          }
+          .buttons {
+            margin-top: 12px;
+            text-align: right;
+          }
+          button {
+            margin-left: 6px;
+          }
+        </style>
+      </head>
+      <body>
+        <h3>What needs to change?</h3>
+        <div class="meta">
+          Row: <span id="rowNumber"></span><br>
+          Language: <span id="currentLang"></span> (<span id="stepInfo"></span>)
+        </div>
+
+        <div class="section-block">
+          <h4><label><input type="checkbox" id="blogChange"> Blog section</label></h4>
+          <div class="hint">If checked, describe what should change in the blog part for this language.</div>
+          <textarea id="blogComment" rows="3" placeholder="Comment for blog (optional)"></textarea>
+        </div>
+
+        <div class="section-block">
+          <h4><label><input type="checkbox" id="projectChange"> Project section</label></h4>
+          <div class="hint">If checked, describe what should change in the project part for this language.</div>
+          <textarea id="projectComment" rows="3" placeholder="Comment for project (optional)"></textarea>
+        </div>
+
+        <div class="section-block">
+          <h4><label><input type="checkbox" id="collectionChange"> Collection block (color collection)</label></h4>
+          <div class="hint">
+            If checked, the collection block will be reloaded from defaults for this language.
+          </div>
+        </div>
+
+        <div class="section-block">
+          <h4><label><input type="checkbox" id="patternChange"> Pattern block</label></h4>
+          <div class="hint">
+            If checked, the pattern block will be reloaded from defaults for this language.
+          </div>
+        </div>
+
+        <div class="buttons">
+          <button type="button" onclick="google.script.host.close()">Cancel</button>
+          <button type="button" id="backBtn" onclick="onBack()">Back</button>
+          <button type="button" id="nextBtn" onclick="onNext()">Next</button>
+        </div>
+
+        <script>
+          var editConfig = ${configJson};
+          var langConfigs = [];
+          var currentIndex = 0;
+
+          document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('rowNumber').textContent = editConfig.rowNumber;
+
+            // Initialize per-language configs
+            langConfigs = editConfig.languages.map(function(code) {
+              return {
+                langCode: code,
+                blogChange: false,
+                blogComment: '',
+                projectChange: false,
+                projectComment: '',
+                collectionChange: false,
+                patternChange: false
+              };
+            });
+
+            loadCurrentLanguage();
+          });
+
+          function loadCurrentLanguage() {
+            var cfg = langConfigs[currentIndex];
+            document.getElementById('currentLang').textContent = cfg.langCode;
+            document.getElementById('stepInfo').textContent =
+              (currentIndex + 1) + ' / ' + langConfigs.length;
+
+            document.getElementById('blogChange').checked = cfg.blogChange;
+            document.getElementById('blogComment').value = cfg.blogComment || '';
+
+            document.getElementById('projectChange').checked = cfg.projectChange;
+            document.getElementById('projectComment').value = cfg.projectComment || '';
+
+            document.getElementById('collectionChange').checked = cfg.collectionChange;
+            document.getElementById('patternChange').checked = cfg.patternChange;
+
+            document.getElementById('backBtn').disabled = (currentIndex === 0);
+
+            var nextBtn = document.getElementById('nextBtn');
+            if (currentIndex === langConfigs.length - 1) {
+              nextBtn.textContent = 'Send edit request';
+            } else {
+              nextBtn.textContent = 'Next language';
+            }
+          }
+
+          function saveCurrentLanguage() {
+            var cfg = langConfigs[currentIndex];
+            cfg.blogChange = document.getElementById('blogChange').checked;
+            cfg.blogComment = document.getElementById('blogComment').value || '';
+
+            cfg.projectChange = document.getElementById('projectChange').checked;
+            cfg.projectComment = document.getElementById('projectComment').value || '';
+
+            cfg.collectionChange = document.getElementById('collectionChange').checked;
+            cfg.patternChange = document.getElementById('patternChange').checked;
+          }
+
+          function onBack() {
+            if (currentIndex === 0) return;
+            saveCurrentLanguage();
+            currentIndex--;
+            loadCurrentLanguage();
+          }
+
+          function onNext() {
+            saveCurrentLanguage();
+
+            if (currentIndex < langConfigs.length - 1) {
+              currentIndex++;
+              loadCurrentLanguage();
+              return;
+            }
+
+            // Last language: send
+            var anyChange = langConfigs.some(function(cfg) {
+              return cfg.blogChange || cfg.projectChange || cfg.collectionChange || cfg.patternChange;
+            });
+
+            if (!anyChange) {
+              if (!confirm('No sections are checked for any language. This will send an edit request with no changes flagged. Continue?')) {
+                return;
+              }
+            }
+
+            var payloadForm = {
+              rowNumber: editConfig.rowNumber,
+              languages: langConfigs
+            };
+
+            google.script.run
+              .withSuccessHandler(function(message) {
+                if (message) {
+                  alert(message);
+                }
+                google.script.host.close();
+              })
+              .submitNewsletterEdit(payloadForm);
+          }
+        </script>
+      </body>
+    </html>
+  `;
+
+  var html = HtmlService.createHtmlOutput(htmlContent)
+    .setWidth(540)
+    .setHeight(520);
+
+  SpreadsheetApp.getUi().showModalDialog(html, 'Edit – what needs to change?');
+}
+
+
+/**********************
+ * SUBMIT EDIT REQUEST (SERVER-SIDE)
+ **********************/
+
+function submitNewsletterEdit(form) {
+  var ui = SpreadsheetApp.getUi();
+
+  try {
+    var ss = SpreadsheetApp.getActive();
+    var sheet = ss.getSheetByName(NL_SHEET_NAME);
+
+    if (!sheet) {
+      throw new Error('Sheet "' + NL_SHEET_NAME + '" not found.');
+    }
+
+    var lastCol = sheet.getLastColumn();
+    var rowValues = sheet.getRange(form.rowNumber, 1, 1, lastCol).getValues()[0];
+
+    var settings = loadSettings_();
+
+    var rowEntry = {
+      rowNumber: form.rowNumber,
+      languages: []
+    };
+
+    (form.languages || []).forEach(function(langCfg) {
+      var langCode = langCfg.langCode;
+      var langObj = buildEditJsonFromRow_(rowValues, settings, langCode, langCfg);
+      rowEntry.languages.push(langObj);
+    });
+
+    var payload = {
+      newsletters: [rowEntry]
+    };
+
+    var response = UrlFetchApp.fetch(EDIT_WEBHOOK_URL, {
+      method: 'post',
+      contentType: 'application/json',
+      payload: JSON.stringify(payload),
+      muteHttpExceptions: true
+    });
+
+    var msg =
+      'Edit POST sent.\nHTTP Status: ' + response.getResponseCode() +
+      '\nResponse: ' + response.getContentText();
+
+    return msg;
+
+  } catch (e) {
+    ui.alert('Error sending EDIT POST: ' + e);
+    return 'Error sending EDIT POST: ' + e;
+  }
+}
+
+
+/**********************
+ * SETTINGS LOADER
+ **********************/
+
+// Load settings from SETTINGS_SHEET:
+// Row 1 = header: Resource | Description | CZ | EN | PL | DE
+function loadSettings_() {
+  var ss = SpreadsheetApp.getActive();
+  var sheet = ss.getSheetByName(SETTINGS_SHEET_NAME);
+
+  if (!sheet) {
+    throw new Error('Settings sheet "' + SETTINGS_SHEET_NAME + '" not found.');
+  }
+
+  var lastRow = sheet.getLastRow();
+  if (lastRow < 2) return {};
+
+  // From row 2 downwards, columns A:F
+  var range = sheet.getRange(2, 1, lastRow - 1, 6);
+  var values = range.getValues();
+
+  var settings = {};
+  values.forEach(function(row) {
+    var resource = row[0]; // Col A
+    if (!resource) return;
+
+    settings[String(resource).trim()] = {
+      cz: row[2], // Col C
+      en: row[3], // Col D
+      pl: row[4], // Col E
+      de: row[5]  // Col F
+    };
+  });
+
+  return settings;
+}
+
+// Get setting by resource key + language code
+function getSettingByResourceAndLang_(settings, resourceKey, langCode) {
+  if (!resourceKey) return '';
+
+  var trimmedKey = String(resourceKey).trim();
+  var entry = settings[trimmedKey];
+  if (!entry) return '';
+
+  var prop = LANG_PROP[langCode] || 'cz'; // default to CZ if unknown
+  var value = entry[prop];
+
+  return value != null ? value : '';
+}
+
+/**********************
+ * HEADER MAPPING
+ **********************/
+
+function getHeaderMap_(sheet) {
+  var lastCol = sheet.getLastColumn();
+  var headers = sheet.getRange(HEADER_ROW, 1, 1, lastCol).getValues()[0];
+
+  var map = {};
+  headers.forEach(function(header, index) {
+    if (!header) return;
+    map[String(header).trim()] = index + 1; // 1-based
+  });
+
+  return map;
+}
+
+function getLangContentHeader_(langCode) {
+  var map = {
+    czech: 'CZ content',
+    english: 'EN content',
+    german: 'DE content',
+    polish: 'PL content'
+  };
+
+  return map[langCode] || '';
+}
+
+/**********************
+ * JSON BUILDER (UNIFIED KEYS – MAIN SEND)
+ **********************/
+
+function buildJsonFromRow_(rowValues, settings, langCode) {
+  var obj = {};
+
+  // 1) Direct columns from the row
+  obj.month = rowValues[COL.MONTH - 1];
+  obj.targetGroup = rowValues[COL.TARGET_GROUP - 1];
+  obj.subject = rowValues[COL.SUBJECT - 1];
+  obj.blog1 = rowValues[COL.BLOG1 - 1];
+  obj.project2 = rowValues[COL.PROJECT2 - 1];
+
+  // 2) Collection (color) block – unified keys
+  var colorName = (rowValues[COL.COLOR_COLLECTION - 1] || '').toString().trim();
+  var collection = {
+    name: colorName || '',
+    title: '',
+    body: '',
+    img1: '',
+    img2: '',
+    cta: '',
+    url: ''
+  };
+
+  if (colorName) {
+    COLOR_SUFFIXES.forEach(function(suffix) {
+      var field = COLOR_SUFFIX_FIELD_MAP[suffix];
+      if (!field) return;
+
+      var resourceKey = colorName + suffix;
+      var value = getSettingByResourceAndLang_(settings, resourceKey, langCode);
+
+      // image/url keys should always exist (already initialized as empty string)
+      if (field === 'img1' || field === 'img2' || field === 'url') {
+        collection[field] = value != null ? String(value) : '';
+      } else {
+        if (value != null && String(value) !== '') {
+          collection[field] = String(value);
+        }
+      }
+    });
+  }
+
+  obj.collection = collection;
+
+  // 3) Pattern block – unified keys
+  var patternName = (rowValues[COL.PATTERN_COLLECTION - 1] || '').toString().trim();
+  var pattern = {
+    name: patternName || '',
+    title: '',
+    collectionName: '',
+    body: '',
+    img1: '',
+    img2: '',
+    cta: '',
+    collectionUrl: ''
+  };
+
+  if (patternName) {
+    PATTERN_SUFFIXES.forEach(function(suffix) {
+      var field = PATTERN_SUFFIX_FIELD_MAP[suffix];
+      if (!field) return;
+
+      var resourceKey = patternName + suffix;
+      var value = getSettingByResourceAndLang_(settings, resourceKey, langCode);
+
+      if (field === 'img1' || field === 'img2' || field === 'collectionUrl') {
+        pattern[field] = value != null ? String(value) : '';
+      } else {
+        if (value != null && String(value) !== '') {
+          pattern[field] = String(value);
+        }
+      }
+    });
+  }
+
+  obj.pattern = pattern;
+
+  // 4) CTA content (text) and CTA button (your "link" column)
+  var targetGroup = (rowValues[COL.TARGET_GROUP - 1] || '').toString().trim();
+  var ctaContentCell = rowValues[COL.CTA_CONTENT - 1];
+  var ctaLinkCell = rowValues[COL.CTA_LINK - 1];
+
+  obj.ctaContent = resolveCtaValue_(
+    'text',
+    targetGroup,
+    ctaContentCell,
+    settings,
+    langCode
+  );
+
+  obj.ctaButton = resolveCtaValue_(
+    'button',
+    targetGroup,
+    ctaLinkCell,
+    settings,
+    langCode
+  );
+
+  return obj;
+}
+
+
+/**********************
+ * JSON BUILDER (EDIT PAYLOAD – PER LANGUAGE)
+ **********************/
+
+// Builds the per-language object for the EDIT webhook.
+// Each section has a boolean "change" flag.
+// - If change === false → all fields in that section are null.
+// - If change === true:
+//    - blog/project: include comment + original content
+//    - collection/pattern: rebuilt from defaults/settings via buildJsonFromRow_
+function buildEditJsonFromRow_(rowValues, settings, langCode, langCfg) {
+  var base = buildJsonFromRow_(rowValues, settings, langCode);
+  var obj = {};
+
+  obj.language = langCode;
+
+  // Blog section
+  var blogChange = !!langCfg.blogChange;
+  obj.blog = {
+    change: blogChange,
+    comment: blogChange ? (langCfg.blogComment || '') : null,
+    subject: blogChange ? (base.subject || null) : null,
+    blog1: blogChange ? (base.blog1 || null) : null
+  };
+
+  // Project section
+  var projectChange = !!langCfg.projectChange;
+  obj.project = {
+    change: projectChange,
+    comment: projectChange ? (langCfg.projectComment || '') : null,
+    project2: projectChange ? (base.project2 || null) : null
+  };
+
+  // Collection block
+  var collectionChange = !!langCfg.collectionChange;
+  obj.collection = {
+    change: collectionChange,
+    name: collectionChange ? (base.collection && base.collection.name) || null : null,
+    title: collectionChange ? (base.collection && base.collection.title) || null : null,
+    body: collectionChange ? (base.collection && base.collection.body) || null : null,
+    img1: collectionChange ? (base.collection && base.collection.img1) || null : null,
+    img2: collectionChange ? (base.collection && base.collection.img2) || null : null,
+    cta: collectionChange ? (base.collection && base.collection.cta) || null : null,
+    url: collectionChange ? (base.collection && base.collection.url) || null : null
+  };
+
+  // Pattern block
+  var patternChange = !!langCfg.patternChange;
+  obj.pattern = {
+    change: patternChange,
+    name: patternChange ? (base.pattern && base.pattern.name) || null : null,
+    title: patternChange ? (base.pattern && base.pattern.title) || null : null,
+    collectionName: patternChange ? (base.pattern && base.pattern.collectionName) || null : null,
+    body: patternChange ? (base.pattern && base.pattern.body) || null : null,
+    img1: patternChange ? (base.pattern && base.pattern.img1) || null : null,
+    img2: patternChange ? (base.pattern && base.pattern.img2) || null : null,
+    cta: patternChange ? (base.pattern && base.pattern.cta) || null : null,
+    collectionUrl: patternChange ? (base.pattern && base.pattern.collectionUrl) || null : null
+  };
+
+  return obj;
+}
+
+
+/**********************
+ * CTA RESOLUTION
+ **********************/
+
+// Helper to handle CTA "default" vs custom text
+// kind: "text" | "button"
+function resolveCtaValue_(kind, targetGroup, cellValue, settings, langCode) {
+  var raw = (cellValue != null ? String(cellValue) : '').trim();
+  var isDefault =
+    raw === '' ||
+    raw.toLowerCase() === 'default';
+
+  if (!isDefault) {
+    // Use custom cell text directly
+    return raw;
+  }
+
+  if (!targetGroup) {
+    return '';
+  }
+
+  var groupConfig = CTA_RESOURCE_KEYS[targetGroup];
+  if (!groupConfig) {
+    return '';
+  }
+
+  var resourceKey =
+    kind === 'text' ? groupConfig.textKey : groupConfig.buttonKey;
+
+  return getSettingByResourceAndLang_(settings, resourceKey, langCode);
+}

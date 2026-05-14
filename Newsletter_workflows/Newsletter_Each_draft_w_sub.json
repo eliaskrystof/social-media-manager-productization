@@ -1,0 +1,1234 @@
+{
+  "name": "Newsletter_Each_draft_w/sub",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "newsletter_defaults",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "resource_id",
+              "keyValue": "06a22a8b-580d-4d21-ab94-a0f7b640a1e5"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        80,
+        432
+      ],
+      "id": "03b2126c-0abd-4592-a858-9f61d3a2560a",
+      "name": "Supabase Data",
+      "credentials": {
+        "supabaseApi": {
+          "id": "XbTsqF8wuG2gSZNT",
+          "name": "Supabase account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Runs once per item\n\nconst html = $json.html_rendered;\nif (!html) {\n  throw new Error(\"html_rendered is missing. Make sure your previous node creates it.\");\n}\n\nreturn {\n  json: $json,  // keep all existing JSON fields\n  binary: {\n    html_file: {\n      data: Buffer.from(html, \"utf8\").toString(\"base64\"),\n      mimeType: \"text/html\",\n      fileName: \"newsletter.html\",\n    },\n  },\n};\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1184,
+        224
+      ],
+      "id": "3a51be2d-4472-4dea-a876-013b985d3505",
+      "name": "Code1",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "source_row",
+              "type": "number"
+            },
+            {
+              "name": "blog"
+            },
+            {
+              "name": "project"
+            },
+            {
+              "name": "language"
+            },
+            {
+              "name": "collection_title"
+            },
+            {
+              "name": "collection_cta"
+            },
+            {
+              "name": "collection_body"
+            },
+            {
+              "name": "collection_url"
+            },
+            {
+              "name": "pattern_title"
+            },
+            {
+              "name": "pattern_collectionName"
+            },
+            {
+              "name": "pattern_collectionUrl"
+            },
+            {
+              "name": "pattern_body"
+            },
+            {
+              "name": "pattern_cta"
+            },
+            {
+              "name": "cta_text"
+            },
+            {
+              "name": "cta_button"
+            },
+            {
+              "name": "subject"
+            },
+            {
+              "name": "month"
+            },
+            {
+              "name": "targetGroup"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -704,
+        240
+      ],
+      "id": "906480ba-edc3-43d5-acb8-557fc39ebd84",
+      "name": "Trigger"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c19894e4-eedb-45e9-94cb-d69f5d292cb7",
+              "name": "output_html",
+              "value": "={{ $('Replace placeholders').item.json.html_rendered }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1632,
+        224
+      ],
+      "id": "d3e06192-fc94-4834-a484-78bc40ae736d",
+      "name": "Build output"
+    },
+    {
+      "parameters": {
+        "tableId": "newsletter_drafts",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "source_row",
+              "fieldValue": "={{ $json.source_row }}"
+            },
+            {
+              "fieldId": "language",
+              "fieldValue": "={{ $json.language }}"
+            },
+            {
+              "fieldId": "collection_title",
+              "fieldValue": "={{ $json.collection_title }}"
+            },
+            {
+              "fieldId": "collection_text",
+              "fieldValue": "={{ $json.collection_body }}"
+            },
+            {
+              "fieldId": "collection_cta",
+              "fieldValue": "={{ $json.collection_cta }}"
+            },
+            {
+              "fieldId": "collection_url",
+              "fieldValue": "={{ $json.collection_url }}"
+            },
+            {
+              "fieldId": "pattern_title",
+              "fieldValue": "={{ $json.pattern_title }}"
+            },
+            {
+              "fieldId": "pattern_text",
+              "fieldValue": "={{ $json.pattern_body }}"
+            },
+            {
+              "fieldId": "pattern_cta",
+              "fieldValue": "={{ $json.pattern_cta }}"
+            },
+            {
+              "fieldId": "patternCollection_name",
+              "fieldValue": "={{ $json.pattern_collectionName }}"
+            },
+            {
+              "fieldId": "patternCollection_url",
+              "fieldValue": "={{ $json.pattern_collectionUrl }}"
+            },
+            {
+              "fieldId": "cta_text",
+              "fieldValue": "={{ $json.cta_text }}"
+            },
+            {
+              "fieldId": "cta_button",
+              "fieldValue": "={{ $json.cta_button }}"
+            },
+            {
+              "fieldId": "month",
+              "fieldValue": "={{ $json.month }}"
+            },
+            {
+              "fieldId": "target_group",
+              "fieldValue": "={{ $json.targetGroup }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -448,
+        48
+      ],
+      "id": "555834b8-c43d-4028-aa6c-3d596d8fe1b8",
+      "name": "Create a row",
+      "credentials": {
+        "supabaseApi": {
+          "id": "XbTsqF8wuG2gSZNT",
+          "name": "Supabase account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "ZQsRZ5F5SAulrXLn",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/ZQsRZ5F5SAulrXLn",
+          "cachedResultName": "Socials Agent — Draft_from_blog"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "blog": "={{ $('Trigger').item.json.blog }}",
+            "language": "={{ $('Trigger').item.json.language }}",
+            "source_row": "={{ $('Trigger').item.json.source_row }}",
+            "change": false
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "blog",
+              "displayName": "blog",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "language",
+              "displayName": "language",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "source_row",
+              "displayName": "source_row",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "change",
+              "displayName": "change",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "boolean",
+              "removed": false
+            },
+            {
+              "id": "comment",
+              "displayName": "comment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -272,
+        48
+      ],
+      "id": "704d5fc6-e79c-4502-9012-9129462a8a80",
+      "name": "Call 'Draft_from_blog'"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "TaR4Csa0MTPMkn37",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/TaR4Csa0MTPMkn37",
+          "cachedResultName": "Socials Agent — Draft_from_project"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "project": "={{ $('Trigger').item.json.project }}",
+            "language": "={{ $('Trigger').item.json.language }}",
+            "source_row": "={{ $('Trigger').item.json.source_row }}",
+            "change": false
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "project",
+              "displayName": "project",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "language",
+              "displayName": "language",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "source_row",
+              "displayName": "source_row",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "change",
+              "displayName": "change",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "boolean",
+              "removed": false
+            },
+            {
+              "id": "comment",
+              "displayName": "comment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        -96,
+        48
+      ],
+      "id": "a7b32a89-4c9f-4e61-9ae4-16ea2887dc9d",
+      "name": "Call 'Draft_from_project'"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "newsletter_drafts",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "source_row",
+              "keyValue": "={{ $('Trigger').item.json.source_row }}"
+            },
+            {
+              "keyName": "language",
+              "keyValue": "={{ $('Trigger').item.json.language }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        496,
+        48
+      ],
+      "id": "8406902e-ff3f-4261-ab54-f7f44057c9f7",
+      "name": "Get a row",
+      "credentials": {
+        "supabaseApi": {
+          "id": "XbTsqF8wuG2gSZNT",
+          "name": "Supabase account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        672,
+        224
+      ],
+      "id": "b3fe3f0f-a22a-424c-bc69-dd0fba4450f4",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "jsCode": "// n8n Function node\n// Expects item.json with html_template + structured fields like:\n// blog_title, blog_text, blog_cta_label, blog_url, ...\n// Outputs the same JSON + html_rendered (final email HTML)\n\nreturn items.map(item => {\n  const data = item.json;\n\n  const base = String(data.image_base_url || '').replace(/\\/$/, '');\n\n  // -----------------------------\n  // Basic helpers\n  // -----------------------------\n  const t = (v) => (typeof v === 'string' ? v.trim() : (v ?? ''));\n\n  const full = (v) => {\n    const s = t(v);\n    if (!s) return '';\n    if (/^https?:\\/\\//i.test(s)) return s; // already absolute\n    return base + s;\n  };\n\n  const normalizeText = (value) => {\n    if (value == null) return '';\n    return String(value)\n      .replace(/\\r\\n/g, '\\n')\n      .replace(/\\r/g, '\\n')\n      .trim();\n  };\n\n  const escapeHtml = (str) =>\n    String(str)\n      .replace(/&/g, '&amp;')\n      .replace(/</g, '&lt;')\n      .replace(/>/g, '&gt;');\n\n  const escapeAttr = (str) =>\n    String(str)\n      .replace(/&/g, '&amp;')\n      .replace(/\"/g, '&quot;')\n      .replace(/</g, '&lt;')\n      .replace(/>/g, '&gt;');\n\n  // Plain text -> safe HTML for email text blocks\n  // Rule: every newline becomes <br>\n  // So:\n  // 1 enter  -> <br>\n  // 2 entery -> <br><br>\n  // 3 entery -> <br><br><br>\n  const formatPlainTextToEmailHtml = (rawText) => {\n    const normalized = normalizeText(rawText);\n    if (!normalized) return '';\n\n    return escapeHtml(normalized)\n      .replace(/\\u00A0/g, '&nbsp;') // preserve real NBSP chars\n      .replace(/\\n/g, '<br>');\n  };\n\n  // Estimate text \"visual lines\" for spacer calculation\n  // - counts explicit newlines\n  // - counts wrapped lines by average chars per line\n  const estimateVisualLines = (rawText, charsPerLine = 42) => {\n    const normalized = normalizeText(rawText);\n    if (!normalized) return 0;\n\n    const paragraphs = normalized.split('\\n');\n    let lines = 0;\n\n    for (const row of paragraphs) {\n      const clean = row.replace(/\\u00A0/g, ' ').replace(/\\s+/g, ' ').trim();\n\n      // Empty line still visually occupies a line break\n      if (!clean) {\n        lines += 1;\n        continue;\n      }\n\n      lines += Math.max(1, Math.ceil(clean.length / charsPerLine));\n    }\n\n    return lines;\n  };\n\n  // Dynamic spacer for CTA alignment\n  // Tune targetLines / lineHeightPx / maxSpacer for your design\n  const getSpacerFromText = (rawText, options = {}) => {\n    const {\n      charsPerLine = 42,\n      targetLines = 8,\n      lineHeightPx = 20,\n      maxSpacer = 80,\n      minSpacer = 8,\n    } = options;\n\n    const lines = estimateVisualLines(rawText, charsPerLine);\n    if (!rawText || !normalizeText(rawText)) return maxSpacer;\n\n    const spacer = Math.max(0, targetLines - lines) * lineHeightPx;\n    return Math.max(minSpacer, Math.min(maxSpacer, spacer));\n  };\n\n  // -----------------------------\n  // Supabase image helpers\n  // -----------------------------\n  const supabaseCollectionBase =\n    'https://izohjxqvhacjmutgnckf.supabase.co/storage/v1/object/public/Newsletter/collection_images/';\n  const supabasePatternBase =\n    'https://izohjxqvhacjmutgnckf.supabase.co/storage/v1/object/public/Newsletter/pattern_images/';\n\n  const supabaseImg = (baseUrl, nameRaw) => {\n    const name = t(nameRaw);\n    if (!name) return '';\n    return `${baseUrl}${name}.png`;\n  };\n\n  // -----------------------------\n  // HTML template\n  // -----------------------------\n  let html = t(data.html_template);\n  if (!html) {\n    throw new Error('html_template is missing on item.json');\n  }\n\n  // -----------------------------\n  // Token replacement helpers\n  // -----------------------------\n  const rep = (tokenRaw, value) => {\n    const val = (value ?? '').toString();\n\n    const token = String(tokenRaw)\n      .replace(/^\\[\\[\\s*/, '')\n      .replace(/\\s*\\]\\]$/, '')\n      .trim();\n\n    const escaped = token.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&');\n    const re = new RegExp(`\\\\[\\\\[\\\\s*${escaped}\\\\s*\\\\]\\\\]`, 'g');\n\n    html = html.replace(re, val);\n  };\n\n  const repText = (tokenRaw, value) => {\n    rep(tokenRaw, escapeHtml(t(value)));\n  };\n\n  const repMultilineText = (tokenRaw, value) => {\n    rep(tokenRaw, formatPlainTextToEmailHtml(value));\n  };\n\n  const repAttr = (tokenRaw, value) => {\n    rep(tokenRaw, escapeAttr(t(value)));\n  };\n\n  const repUrl = (tokenRaw, value) => {\n    rep(tokenRaw, escapeAttr(t(value)));\n  };\n\n  const repNumber = (tokenRaw, value) => {\n    const n = Number(value);\n    rep(tokenRaw, Number.isFinite(n) ? String(n) : '');\n  };\n\n  // -----------------------------\n  // Precomputed text blocks + spacers\n  // -----------------------------\n  const blogTextRaw = t(data.blog_text);\n  const projectTextRaw = t(data.project_text);\n  const collectionTextRaw = t(data.collection_text);\n  const patternTextRaw = t(data.pattern_text);\n\n  const magazineSpacer = getSpacerFromText(blogTextRaw, {\n    targetLines: 16,\n    lineHeightPx: 20,\n    maxSpacer: 110,\n    minSpacer: 8,\n    charsPerLine: 42,\n  });\n\n  const projectSpacer = getSpacerFromText(projectTextRaw, {\n    targetLines: 16,\n    lineHeightPx: 20,\n    maxSpacer: 120,\n    minSpacer: 8,\n    charsPerLine: 42,\n  });\n\n\n  // -----------------------------\n  // 1) Global / fonts / logo / background structures\n  // -----------------------------\n  repText('[[EMAIL_TITLE]]', data.blog_title);\n\n  repUrl('[[FONT_CASLONDORIC_URL]]', data.font_1);\n  repUrl('[[FONT_ROMNARROW_URL]]', data.font_2);\n\n  repUrl('[[STRUCTURE_BACKGROUND_IMAGE_1]]', full(data.structure_1));\n  repUrl('[[STRUCTURE_BACKGROUND_IMAGE_2]]', full(data.structure_2));\n\n  repUrl('[[LOGO_SRC]]', data.logo_src);\n  repAttr('[[LOGO_ALT]]', t(data.logo_alt) || 'OAKCENT');\n\n  // -----------------------------\n  // 2) Magazine (blog) block\n  // -----------------------------\n  repUrl('[[HERO_IMAGE_1_SRC]]', full(data.heroImgBlog));\n  repAttr('[[HERO_IMAGE_1_ALT]]', data.blog_title);\n\n  repUrl('[[MAGAZINE_SIDE_IMAGE_1_SRC]]', full(data.sideImgBlog_1));\n  repAttr('[[MAGAZINE_SIDE_IMAGE_1_ALT]]', data.blog_title);\n\n  repUrl('[[MAGAZINE_SIDE_IMAGE_2_SRC]]', full(data.sideImgBlog_2));\n  repAttr('[[MAGAZINE_SIDE_IMAGE_2_ALT]]', data.blog_title);\n\n  repUrl('[[GALLERY_IMAGE_1_SRC]]', full(data.galleryImgBlog));\n  repAttr('[[GALLERY_IMAGE_1_ALT]]', data.blog_title);\n\n  repText('[[MAGAZINE_LABEL]]', 'Magazine');\n  repText('[[MAGAZINE_TITLE]]', data.blog_title);\n  repMultilineText('[[MAGAZINE_TEXT]]', blogTextRaw);\n\n  repText('[[MAGAZINE_CTA_LABEL]]', data.blog_cta_label);\n  repUrl('[[MAGAZINE_CTA_URL]]', t(data.blog_url) || full('/magazine/custom-production'));\n  repNumber('[[MAGAZINE_CTA_SPACER]]', magazineSpacer);\n\n  // -----------------------------\n  // 3) Project block\n  // -----------------------------\n  repUrl('[[PROJECT_HERO_IMAGE_SRC]]', full(data.heroImgProject));\n  repAttr('[[PROJECT_HERO_IMAGE_ALT]]', data.project_title);\n\n  repUrl('[[PROJECT_IMAGE_1_SRC]]', full(data.firstBlock_img));\n  repAttr('[[PROJECT_IMAGE_1_ALT]]', data.project_title);\n\n  repUrl('[[PROJECT_IMAGE_2_SRC]]', full(data.secondBlock_img));\n  repAttr('[[PROJECT_IMAGE_2_ALT]]', data.project_title);\n\n  repText('[[PROJECT_TITLE]]', data.project_title);\n  repMultilineText('[[PROJECT_TEXT]]', projectTextRaw);\n\n  repText('[[PROJECT_CTA_LABEL]]', data.project_cta_label);\n  repUrl('[[PROJECT_CTA_URL]]', t(data.project_url) || full('/projects'));\n  repNumber('[[PROJECT_CTA_SPACER]]', projectSpacer);\n\n  // -----------------------------\n  // 4) Collection block\n  // -----------------------------\n  repText('[[COLLECTION_LABEL]]', 'Colour Collection');\n  repText('[[COLLECTION_TITLE]]', data.collection_title);\n\n  const collectionImageName = t(data.collection_name) || t(data.collection_title);\n  const collectionSupabaseSrc = supabaseImg(supabaseCollectionBase, collectionImageName);\n  const collectionImageSrcFinal = collectionSupabaseSrc || full(data.collection_image);\n\n  repUrl('[[COLLECTION_IMAGE_SRC]]', collectionImageSrcFinal);\n  repAttr('[[COLLECTION_IMAGE_ALT]]', data.collection_title);\n\n  repMultilineText('[[COLLECTION_TEXT]]', collectionTextRaw);\n  repText('[[COLLECTION_CTA_LABEL]]', data.collection_cta);\n\n  const collectionUrl = t(data.collection_url) || '/floor-collection/sand';\n  repUrl('[[COLLECTION_CTA_URL]]', full(collectionUrl));\n\n  // -----------------------------\n  // 5) Pattern block\n  // -----------------------------\n  repText('[[PATTERN_LABEL]]', 'Pattern Collection');\n  repText('[[PATTERN_TITLE]]', data.pattern_title);\n\n  const patternImageName = t(data.pattern_title);\n  const patternSupabaseSrc = supabaseImg(supabasePatternBase, patternImageName);\n  const patternImageSrcFinal = patternSupabaseSrc || full(data.pattern_img1);\n\n  repUrl('[[PATTERN_IMAGE_SRC]]', patternImageSrcFinal);\n  repAttr('[[PATTERN_IMAGE_ALT]]', patternImageName || t(data.pattern_title));\n\n  repMultilineText('[[PATTERN_TEXT]]', patternTextRaw);\n  repText('[[PATTERN_CTA_LABEL]]', data.pattern_cta);\n\n  const patternUrl = t(data.patternCollection_url) || '/floor-collection/heritage';\n  repUrl('[[PATTERN_CTA_URL]]', full(patternUrl));\n\n  // -----------------------------\n  // 6) CTA over forest background\n  // -----------------------------\n  repUrl('[[CTA_BACKGROUND_IMAGE]]', full(data.cta_background));\n  repMultilineText('[[CTA_HEADLINE]]', data.cta_text);\n  repText('[[CTA_BUTTON_LABEL]]', data.cta_button);\n\n  const ctaButtonUrl = t(data.cta_button_url) || t(data.cta_url) || '#';\n  repUrl('[[CTA_BUTTON_URL]]', ctaButtonUrl);\n\n  // -----------------------------\n  // 7) Socials\n  // -----------------------------\n  repUrl('[[SOCIAL_WEB_URL]]', t(data.soc_web_url) || '#');\n  repUrl('[[SOCIAL_WEB_ICON_SRC]]', full(data.soc_web_src));\n  repAttr('[[SOCIAL_WEB_ICON_ALT]]', t(data.soc_web_alt) || 'web');\n\n  repUrl('[[SOCIAL_INSTAGRAM_URL]]', t(data.soc_ig_url) || '#');\n  repUrl('[[SOCIAL_INSTAGRAM_ICON_SRC]]', full(data.soc_ig_src));\n  repAttr('[[SOCIAL_INSTAGRAM_ICON_ALT]]', t(data.soc_ig_alt) || 'instagram');\n\n  repUrl('[[SOCIAL_FACEBOOK_URL]]', t(data.soc_fb_url) || '#');\n  repUrl('[[SOCIAL_FACEBOOK_ICON_SRC]]', full(data.soc_fb_src));\n  repAttr('[[SOCIAL_FACEBOOK_ICON_ALT]]', t(data.soc_fb_alt) || 'facebook');\n\n  repUrl('[[SOCIAL_PINTEREST_URL]]', t(data.soc_pin_url) || '#');\n  repUrl('[[SOCIAL_PINTEREST_ICON_SRC]]', full(data.soc_pin_src));\n  repAttr('[[SOCIAL_PINTEREST_ICON_ALT]]', t(data.soc_pin_alt) || 'pinterest');\n\n  repUrl('[[SOCIAL_YOUTUBE_URL]]', t(data.soc_yt_url) || '#');\n  repUrl('[[SOCIAL_YOUTUBE_ICON_SRC]]', full(data.soc_yt_src));\n  repAttr('[[SOCIAL_YOUTUBE_ICON_ALT]]', t(data.soc_yt_alt) || 'youtube');\n\n  repUrl('[[SOCIAL_LINKEDIN_URL]]', t(data.soc_li_url) || '#');\n  repUrl('[[SOCIAL_LINKEDIN_ICON_SRC]]', full(data.soc_li_src));\n  repAttr('[[SOCIAL_LINKEDIN_ICON_ALT]]', t(data.soc_li_alt) || 'linkedin');\n\n  // -----------------------------\n  // 8) Footer\n  // -----------------------------\n  repMultilineText('[[FOOTER_UNSUBSCRIBE_TEXT_BEFORE_LINK]]', data.unsub_text);\n  repText('[[FOOTER_UNSUBSCRIBE_LINK_LABEL]]', t(data.unsub_label) || 'odhlásit');\n\n  repUrl('[[FOOTER_UNSUBSCRIBE_URL]]', t(data.unsub_url) || '#');\n  repText('[[FOOTER_COPYRIGHT_TEXT]]', data.copyright);\n\n  // -----------------------------\n  // Debug leftovers\n  // -----------------------------\n  const leftovers = html.match(/\\[\\[\\s*[A-Z0-9_]+\\s*\\]\\]/g) || [];\n\n  return {\n    json: {\n      ...data,\n      html_rendered: html,\n      debug_leftover_tokens: leftovers,\n      debug_spacers: {\n        magazine: magazineSpacer,\n        project: projectSpacer,\n      },\n    },\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        960,
+        224
+      ],
+      "id": "d3df0346-c0ac-496b-84ee-fb773cfa6dad",
+      "name": "Replace placeholders",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "sendTo": "eliaskrystof1@gmail.com",
+        "subject": "={{ $('Merge').item.json.email_subject.split(\";\")[0] }}",
+        "message": "={{ $json.html_rendered }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1408,
+        224
+      ],
+      "id": "249d6a2d-817c-4aa0-9904-a32fd9b9e9a4",
+      "name": "Send Preview",
+      "webhookId": "730018d1-1802-44bd-9121-e237ecfb8f42",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "1GoH9lTPDQt6wiH0",
+          "name": "Gmail account Kryštof"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "newsletter_drafts",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "post_id",
+              "condition": "eq",
+              "keyValue": "={{ $item(\"0\").$node[\"Create a row\"].json[\"post_id\"] }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "final_html",
+              "fieldValue": "={{ $json.output_html }}"
+            },
+            {
+              "fieldId": "revision",
+              "fieldValue": "1"
+            },
+            {
+              "fieldId": "status",
+              "fieldValue": "GENERATED"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1840,
+        224
+      ],
+      "id": "1564e2ae-ec61-4064-bcc8-ea635ae083f7",
+      "name": "Send HTML to database",
+      "credentials": {
+        "supabaseApi": {
+          "id": "XbTsqF8wuG2gSZNT",
+          "name": "Supabase account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "nr7rsyJ41A1ZZlez",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/nr7rsyJ41A1ZZlez",
+          "cachedResultName": "Socials Agent — Update_row_Gsheet"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "post_id": "={{ $('Get a row').item.json.post_id }}"
+          },
+          "matchingColumns": [
+            "post_id"
+          ],
+          "schema": [
+            {
+              "id": "post_id",
+              "displayName": "post_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "mode": "each",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        2048,
+        224
+      ],
+      "id": "34f73666-491e-4b3b-9189-f4b985830ae5",
+      "name": "Call 'Update_row_Gsheet'"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        320,
+        48
+      ],
+      "id": "767b533e-a2f1-4af0-8113-d68a3e8919b3",
+      "name": "Wait",
+      "webhookId": "3f564aa7-33ab-4c28-90d8-b05328503c85"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "U2f4DBEHzdxhPhuR",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/U2f4DBEHzdxhPhuR",
+          "cachedResultName": "Socials Agent — Create_Subject"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "blog_text": "={{ $('Call \\'Draft_from_blog\\'').item.json.blog_text }}",
+            "blog_title": "={{ $('Call \\'Draft_from_blog\\'').item.json.blog_title }}",
+            "post_id": "={{ $json.post_id }}",
+            "project_title": "={{ $json.project_title }}",
+            "project_text": "={{ $json.project_text }}",
+            "language": "={{ $json.language }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "project_title",
+              "displayName": "project_title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "project_text",
+              "displayName": "project_text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "blog_title",
+              "displayName": "blog_title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "blog_text",
+              "displayName": "blog_text",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "language",
+              "displayName": "language",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "post_id",
+              "displayName": "post_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        112,
+        48
+      ],
+      "id": "02641b70-fbf5-454f-adce-5d3a985c2e92",
+      "name": "Call 'Create_Subject'"
+    },
+    {
+      "parameters": {
+        "jsCode": "// n8n Function node\n// Expects your big JSON object (with html_template, blog_*, project_*, etc.) on item.json\n// Outputs the same JSON + html_rendered (final email HTML)\n\nreturn items.map(item => {\n  const data = item.json;\n\n  const base = (data.image_base_url || '').replace(/\\/$/, '');\n\n  const t = (v) => (typeof v === 'string' ? v.trim() : (v ?? ''));\n  const full = (v) => {\n    const s = t(v);\n    if (!s) return '';\n    if (/^https?:\\/\\//i.test(s)) return s; // already absolute\n    return base + s;\n  };\n\n  // NEW: Supabase bases for collection & pattern images\n  const supabaseCollectionBase = 'https://izohjxqvhacjmutgnckf.supabase.co/storage/v1/object/public/Newsletter/collection_images/';\n  const supabasePatternBase   = 'https://izohjxqvhacjmutgnckf.supabase.co/storage/v1/object/public/Newsletter/pattern_images/';\n\n  // Helper: build Supabase image URL from name, if provided\n  const supabaseImg = (baseUrl, nameRaw) => {\n    const name = t(nameRaw);\n    if (!name) return '';\n    // We assume filenames are exactly \"<name>.png\"\n    return `${baseUrl}${name}.png`;\n  };\n\n  let html = t(data.html_template);\n  if (!html) {\n    throw new Error('html_template is missing on item.json');\n  }\n\n  // ✅ UPDATED: whitespace-tolerant replacement for [[TOKEN]]\n  // Works with: [[TOKEN]], [[ TOKEN ]],  [[TOKEN]], url(' [[TOKEN]]'), href=\" [[TOKEN]]\"\n  const rep = (tokenRaw, value) => {\n    const val = (value ?? '').toString();\n\n    // Accept calls like rep('[[EMAIL_TITLE]]', ...) OR rep('EMAIL_TITLE', ...)\n    const token = String(tokenRaw)\n      .replace(/^\\[\\[\\s*/, '')\n      .replace(/\\s*\\]\\]$/, '')\n      .trim();\n\n    // Escape token for RegExp\n    const escaped = token.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&');\n\n    // Match [[TOKEN]] with any whitespace around TOKEN\n    const re = new RegExp(`\\\\[\\\\[\\\\s*${escaped}\\\\s*\\\\]\\\\]`, 'g');\n\n    html = html.replace(re, val);\n  };\n\n  //\n  // 1) Global / fonts / logo / background structures\n  //\n  rep('[[EMAIL_TITLE]]', t(data.blog_title));\n\n  rep('[[FONT_CASLONDORIC_URL]]', t(data.font_1));\n  rep('[[FONT_ROMNARROW_URL]]', t(data.font_2));\n\n  rep('[[STRUCTURE_BACKGROUND_IMAGE_1]]', full(data.structure_1));\n  rep('[[STRUCTURE_BACKGROUND_IMAGE_2]]', full(data.structure_2));\n\n  rep('[[LOGO_SRC]]', t(data.logo_src));\n  rep('[[LOGO_ALT]]', t(data.logo_alt) || 'OAKCENT');\n\n  //\n  // 2) Magazine (blog) block\n  //\n  rep('[[HERO_IMAGE_1_SRC]]', full(data.heroImgBlog));\n  rep('[[HERO_IMAGE_1_ALT]]', t(data.blog_title));\n\n  rep('[[MAGAZINE_SIDE_IMAGE_1_SRC]]', full(data.sideImgBlog_1));\n  rep('[[MAGAZINE_SIDE_IMAGE_1_ALT]]', t(data.blog_title));\n\n  rep('[[MAGAZINE_SIDE_IMAGE_2_SRC]]', full(data.sideImgBlog_2));\n  rep('[[MAGAZINE_SIDE_IMAGE_2_ALT]]', t(data.blog_title));\n\n  rep('[[GALLERY_IMAGE_1_SRC]]', full(data.galleryImgBlog));\n  rep('[[GALLERY_IMAGE_1_ALT]]', t(data.blog_title));\n\n  rep('[[MAGAZINE_LABEL]]', 'Magazine');\n  rep('[[MAGAZINE_TITLE]]', t(data.blog_title));\n\n  const blogText =\n    t(data.blog_text) ||\n    [data.blog_p1, data.blog_p2, data.blog_p3, data.blog_p4, data.blog_p5, data.blog_p6]\n      .map(t)\n      .filter(Boolean)\n      .join(' ');\n\n  rep('[[MAGAZINE_TEXT]]', blogText);\n\n  rep('[[MAGAZINE_PARAGRAPH_1]]', '');\n  rep('[[MAGAZINE_PARAGRAPH_2]]', '');\n  rep('[[MAGAZINE_PARAGRAPH_3]]', '');\n  rep('[[MAGAZINE_PARAGRAPH_4]]', '');\n  rep('[[MAGAZINE_PARAGRAPH_5]]', '');\n  rep('[[MAGAZINE_PARAGRAPH_6]]', '');\n\n  rep('[[MAGAZINE_CTA_LABEL]]', t(data.blog_cta_label));\n\n  const blogUrl = t(data.blog_url) || full('/magazine/custom-production');\n  rep('[[MAGAZINE_CTA_URL]]', blogUrl);\n\n  //\n  // 3) Project block\n  //\n  rep('[[PROJECT_HERO_IMAGE_SRC]]', full(data.heroImgProject));\n  rep('[[PROJECT_HERO_IMAGE_ALT]]', t(data.project_title));\n\n  rep('[[PROJECT_IMAGE_1_SRC]]', full(data.firstBlock_img));\n  rep('[[PROJECT_IMAGE_1_ALT]]', t(data.project_title));\n\n  rep('[[PROJECT_IMAGE_2_SRC]]', full(data.secondBlock_img));\n  rep('[[PROJECT_IMAGE_2_ALT]]', t(data.project_title));\n\n  rep('[[PROJECT_TITLE]]', t(data.project_title));\n\n  const projectText =\n    t(data.project_text) ||\n    [data.project_p1, data.project_p2, data.project_p3, data.project_p4, data.project_p5]\n      .map(t)\n      .filter(Boolean)\n      .join(' ');\n\n  rep('[[PROJECT_TEXT]]', projectText);\n\n  rep('[[PROJECT_PARAGRAPH_1]]', '');\n  rep('[[PROJECT_PARAGRAPH_2]]', '');\n  rep('[[PROJECT_PARAGRAPH_3]]', '');\n  rep('[[PROJECT_PARAGRAPH_4]]', '');\n  rep('[[PROJECT_PARAGRAPH_5]]', '');\n\n  rep('[[PROJECT_CTA_LABEL]]', t(data.project_cta_label));\n\n  const projectUrl = t(data.project_url) || full('/projects');\n  rep('[[PROJECT_CTA_URL]]', projectUrl);\n\n  //\n  // 4) Collection block\n  //\n  rep('[[COLLECTION_LABEL]]', 'Colour Collection');\n  rep('[[COLLECTION_TITLE]]', t(data.collection_title));\n\n  const collectionImageName = data.collection_name || data.collection_title;\n  const collectionSupabaseSrc = supabaseImg(supabaseCollectionBase, collectionImageName);\n  const collectionImageSrcFinal = collectionSupabaseSrc || full(data.collection_image);\n\n  rep('[[COLLECTION_IMAGE_SRC]]', collectionImageSrcFinal);\n  rep('[[COLLECTION_IMAGE_ALT]]', t(data.collection_title));\n\nconst collectionText =\n  t(data.collection_text) ||\n  t(data.collection_body) ||     \n  [data.collection_paragraph_1, data.collection_paragraph_2, data.collection_paragraph_3]\n    .map(t)\n    .filter(Boolean)\n    .join(' ');\n\nrep('[[COLLECTION_TEXT]]', collectionText);\n\nrep('[[COLLECTION_CTA_LABEL]]', t(data.collection_cta));\n\nconst collectionUrl = t(data.collection_url) || '/floor-collection/sand';\nrep('[[COLLECTION_CTA_URL]]', full(collectionUrl));\n\n  //\n  // 5) Pattern block\n  //\nrep('[[PATTERN_LABEL]]', 'Pattern Collection');\nrep('[[PATTERN_TITLE]]', t(data.pattern_title));\n\n\nconst patternImageName = t(data.pattern_title);\nconst patternSupabaseSrc = supabaseImg(supabasePatternBase, patternImageName);\nconst patternImageSrcFinal = patternSupabaseSrc || full(data.pattern_img1);\n\nrep('[[PATTERN_IMAGE_SRC]]', patternImageSrcFinal);\nrep('[[PATTERN_IMAGE_ALT]]', patternImageName || t(data.pattern_title));\n\n// ✅ text z DB\nconst patternText =\n  t(data.pattern_text) ||\n  t(data.pattern_body) ||\n  [data.pattern_paragraph_1, data.pattern_paragraph_2]\n    .map(t)\n    .filter(Boolean)\n    .join(' ');\n\nrep('[[PATTERN_TEXT]]', patternText);\n\nrep('[[PATTERN_CTA_LABEL]]', t(data.pattern_cta));\n\n// ✅ URL z DB\nconst patternUrl =\n  t(data.patternCollection_url) ||\n  t(data.pattern_collectionUrl) ||\n  '/floor-collection/heritage';\n\nrep('[[PATTERN_CTA_URL]]', full(patternUrl));\n\n  //\n  // 6) CTA over forest background\n  //\n  rep('[[CTA_BACKGROUND_IMAGE]]', full(data.cta_background));\n  rep('[[CTA_HEADLINE]]', t(data.cta_text));\n  rep('[[CTA_BUTTON_LABEL]]', t(data.cta_button));\n\n  const ctaButtonUrl =\n    t(data.cta_button_url) ||\n    t(data.cta_url) ||\n    '#';\n\n  rep('[[CTA_BUTTON_URL]]', ctaButtonUrl);\n\n  //\n  // 7) Socials\n  //\n  rep('[[SOCIAL_WEB_URL]]', t(data.soc_web_url) || '#');\n  rep('[[SOCIAL_WEB_ICON_SRC]]', full(data.soc_web_src));\n  rep('[[SOCIAL_WEB_ICON_ALT]]', t(data.soc_web_alt) || 'web');\n\n  rep('[[SOCIAL_INSTAGRAM_URL]]', t(data.soc_ig_url) || '#');\n  rep('[[SOCIAL_INSTAGRAM_ICON_SRC]]', full(data.soc_ig_src));\n  rep('[[SOCIAL_INSTAGRAM_ICON_ALT]]', t(data.soc_ig_alt) || 'instagram');\n\n  rep('[[SOCIAL_FACEBOOK_URL]]', t(data.soc_fb_url) || '#');\n  rep('[[SOCIAL_FACEBOOK_ICON_SRC]]', full(data.soc_fb_src));\n  rep('[[SOCIAL_FACEBOOK_ICON_ALT]]', t(data.soc_fb_alt) || 'facebook');\n\n  rep('[[SOCIAL_PINTEREST_URL]]', t(data.soc_pin_url) || '#');\n  rep('[[SOCIAL_PINTEREST_ICON_SRC]]', full(data.soc_pin_src));\n  rep('[[SOCIAL_PINTEREST_ICON_ALT]]', t(data.soc_pin_alt) || 'pinterest');\n\n  rep('[[SOCIAL_YOUTUBE_URL]]', t(data.soc_yt_url) || '#');\n  rep('[[SOCIAL_YOUTUBE_ICON_SRC]]', full(data.soc_yt_src));\n  rep('[[SOCIAL_YOUTUBE_ICON_ALT]]', t(data.soc_yt_alt) || 'youtube');\n\n  rep('[[SOCIAL_LINKEDIN_URL]]', t(data.soc_li_url) || '#');\n  rep('[[SOCIAL_LINKEDIN_ICON_SRC]]', full(data.soc_li_src));\n  rep('[[SOCIAL_LINKEDIN_ICON_ALT]]', t(data.soc_li_alt) || 'linkedin');\n\n  //\n  // 8) Footer\n  //\n  rep('[[FOOTER_UNSUBSCRIBE_TEXT_BEFORE_LINK]]', t(data.unsub_text));\n  rep('[[FOOTER_UNSUBSCRIBE_LINK_LABEL]]', t(data.unsub_label) || 'odhlásit');\n\n  const unsubUrl = t(data.unsub_url) || '#';\n  rep('[[FOOTER_UNSUBSCRIBE_URL]]', unsubUrl);\n\n  rep('[[FOOTER_COPYRIGHT_TEXT]]', t(data.copyright));\n\n  // Optional debug: see what tokens are still not replaced\n  const leftovers = (html.match(/\\[\\[\\s*[A-Z0-9_]+\\s*\\]\\]/g) || []);\n\n  return {\n    json: {\n      ...data,\n      html_rendered: html,\n      debug_leftover_tokens: leftovers,\n    },\n  };\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        976,
+        448
+      ],
+      "id": "1e5ae4b3-4317-4af9-8d62-4c6468fd930c",
+      "name": "Replace placeholders1",
+      "retryOnFail": true
+    }
+  ],
+  "pinData": {
+    "Trigger": [
+      {
+        "json": {
+          "source_row": 17,
+          "blog": "https://www.oakcent.com/blog/blogove-18/pravda-o-podlahovem-vytapeni-drevenych-podlahach-31",
+          "project": "https://www.oakcent.com/private-apartment-grzybowska",
+          "language": "czech",
+          "collection_title": "Sand",
+          "collection_cta": "Objevte kolekci Sand",
+          "collection_body": "Světlé odstíny kolekce Sand vnesly do realizace jemně teplé přírodní tóny a zklidňující energii dřeva v souladu s přírodou.",
+          "collection_url": "https://www.oakcent.com/kolekce-podlah-sand",
+          "pattern_title": "Planks",
+          "pattern_collectionName": "Planks z kolekce Heritage",
+          "pattern_collectionUrl": "https://www.oakcent.com/kolekce-heritage",
+          "pattern_body": "Vzor Planks nechal vyniknout přirozenou kresbu dřeva a dodal prostoru nadčasovou eleganci s čistými liniemi.",
+          "pattern_cta": "Prozkoumejte Planks",
+          "cta_text": "Hledáte autentické textury a barvy pro svůj projekt? Stáhněte si výběr vzorů Oakcent a nabídněte svým klientům vyjimečnost.",
+          "cta_button": "Stáhnout textury",
+          "subject": "",
+          "month": "March",
+          "targetGroup": "Architects & Designers"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ],
+    "Create a row": [
+      {
+        "json": {
+          "post_id": 60,
+          "created_at": "2026-04-13T13:22:37.530201+00:00",
+          "blog_title": null,
+          "blog_text": null,
+          "blog_cta_label": null,
+          "heroImgBlog": null,
+          "project_title": null,
+          "project_text": null,
+          "project_cta_label": null,
+          "heroImgProject": null,
+          "firstBlock_img": null,
+          "secondBlock_img": null,
+          "sideImgBlog_1": null,
+          "sideImgBlog_2": null,
+          "galleryImgBlog": null,
+          "campaign_odoo_id": null,
+          "language": "czech",
+          "source_row": 17,
+          "collection_title": "Sand",
+          "collection_text": "Světlé odstíny kolekce Sand vnesly do realizace jemně teplé přírodní tóny a zklidňující energii dřeva v souladu s přírodou.",
+          "collection_cta": "Objevte kolekci Sand",
+          "collection_url": "https://www.oakcent.com/kolekce-podlah-sand",
+          "pattern_title": "Planks",
+          "pattern_text": "Vzor Planks nechal vyniknout přirozenou kresbu dřeva a dodal prostoru nadčasovou eleganci s čistými liniemi.",
+          "pattern_cta": "Prozkoumejte Planks",
+          "patternCollection_name": "Planks z kolekce Heritage",
+          "patternCollection_url": "https://www.oakcent.com/kolekce-heritage",
+          "cta_text": "Hledáte autentické textury a barvy pro svůj projekt? Stáhněte si výběr vzorů Oakcent a nabídněte svým klientům vyjimečnost.",
+          "cta_button": "Stáhnout textury",
+          "final_html": null,
+          "odoo_post_id": null,
+          "revision": 0,
+          "draft_key": "17:czech:0",
+          "status": null,
+          "month": "March",
+          "email_subject": null,
+          "target_group": "Architects & Designers",
+          "email_from": null,
+          "blog_url": null,
+          "project_url": null
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ],
+    "Call 'Draft_from_blog'": [
+      {
+        "json": {
+          "post_id": 60,
+          "created_at": "2026-04-13T13:22:37.530201+00:00",
+          "blog_title": "Dřevo a podlahové vytápění",
+          "blog_text": "Správně nainstalovaná dřevěná podlaha s podlahovým vytápěním nabízí komfort a příjemný tepelný pocit; při dodržení zásad nehrozí poškození. V OAKCENT volíme vrstvené dubové podlahy cca 15 mm, pečlivou montáž a vhodné systémy vytápění včetně elektrického HeatFlow pro rovnoměrné a bezpečné rozložení tepla.",
+          "blog_cta_label": "Zjistit více",
+          "heroImgBlog": "/web/image/228340-63b3ac32/Oakcent-podlahove-vytapeno-cover-photo%402x.9939f126.webp",
+          "project_title": null,
+          "project_text": null,
+          "project_cta_label": null,
+          "heroImgProject": null,
+          "firstBlock_img": null,
+          "secondBlock_img": null,
+          "sideImgBlog_1": "/web/image/228348-961fcdb0/Oakcent-podlahove-vytapeni-1%402x.fbc85f96.webp?access_token=fd1d26af-7d09-4644-b4fc-d34a826a37b3",
+          "sideImgBlog_2": "/web/image/228349-3eb1ec6d/Oakcent-podlahove-vytapeni-magazin-2%402x.1c465a21.webp?access_token=5d4f5208-7f50-48c8-a7bc-289b60eda190",
+          "galleryImgBlog": "/web/image/228349-3eb1ec6d/Oakcent-podlahove-vytapeni-magazin-2%402x.1c465a21.webp?access_token=5d4f5208-7f50-48c8-a7bc-289b60eda190",
+          "campaign_odoo_id": null,
+          "language": "czech",
+          "source_row": 17,
+          "collection_title": "Sand",
+          "collection_text": "Světlé odstíny kolekce Sand vnesly do realizace jemně teplé přírodní tóny a zklidňující energii dřeva v souladu s přírodou.",
+          "collection_cta": "Objevte kolekci Sand",
+          "collection_url": "https://www.oakcent.com/kolekce-podlah-sand",
+          "pattern_title": "Planks",
+          "pattern_text": "Vzor Planks nechal vyniknout přirozenou kresbu dřeva a dodal prostoru nadčasovou eleganci s čistými liniemi.",
+          "pattern_cta": "Prozkoumejte Planks",
+          "patternCollection_name": "Planks z kolekce Heritage",
+          "patternCollection_url": "https://www.oakcent.com/kolekce-heritage",
+          "cta_text": "Hledáte autentické textury a barvy pro svůj projekt? Stáhněte si výběr vzorů Oakcent a nabídněte svým klientům vyjimečnost.",
+          "cta_button": "Stáhnout textury",
+          "final_html": null,
+          "odoo_post_id": null,
+          "revision": 0,
+          "draft_key": "17:czech:0",
+          "status": null,
+          "month": "March",
+          "email_subject": null,
+          "target_group": "Architects & Designers",
+          "email_from": null,
+          "blog_url": "https://www.oakcent.com/blog/blogove-18/pravda-o-podlahovem-vytapeni-drevenych-podlahach-31",
+          "project_url": null
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ],
+    "Call 'Draft_from_project'": [
+      {
+        "json": {
+          "post_id": 60,
+          "created_at": "2026-04-13T13:22:37.530201+00:00",
+          "blog_title": "Dřevo a podlahové vytápění",
+          "blog_text": "Správně nainstalovaná dřevěná podlaha s podlahovým vytápěním nabízí komfort a příjemný tepelný pocit; při dodržení zásad nehrozí poškození. V OAKCENT volíme vrstvené dubové podlahy cca 15 mm, pečlivou montáž a vhodné systémy vytápění včetně elektrického HeatFlow pro rovnoměrné a bezpečné rozložení tepla.",
+          "blog_cta_label": "Zjistit více",
+          "heroImgBlog": "/web/image/228340-63b3ac32/Oakcent-podlahove-vytapeno-cover-photo%402x.9939f126.webp",
+          "project_title": "Ink • Smoke • Sand",
+          "project_text": "Interiér v srdci Varšavy pracuje s kontrastem přírodních materiálů a pečlivě kalibrovaným světlem. Hlavní obytný prostor nabízí klidnou, architektonicky řízenou atmosféru, kde světlo, geometrie a sochařský mobiliář vytvářejí rytmus pobytu. Podlaha Oakcent s tlumeným povrchem snižuje odlesky a citlivě reaguje na denní světlo, propojuje zóny a zesiluje textury kamene a dřeva. Jemné řemeslné detaily v hranách a spárách podtrhují čistotu kompozice. Výsledkem je tichá, vyvážená scéna, která zve k pozornému rozhlédnutí.",
+          "project_cta_label": "Prozkoumejte projekt",
+          "heroImgProject": "/web/image/225446-23f60df9/Oakcent-completed-project-poland-private-apartment-grzybowska-all%402x.36dc0fec.webp",
+          "firstBlock_img": "/web/image/225454-d6f10464/Oakcent-completed-project-poland-private-apartment-grzybowska-kitchen%402x.cb5e1beb.webp",
+          "secondBlock_img": "/web/image/225461-c208adde/Oakcent-completed-project-poland-private-apartment-grzybowska-hall%402x.768b5c23.webp",
+          "sideImgBlog_1": "/web/image/228348-961fcdb0/Oakcent-podlahove-vytapeni-1%402x.fbc85f96.webp?access_token=fd1d26af-7d09-4644-b4fc-d34a826a37b3",
+          "sideImgBlog_2": "/web/image/228349-3eb1ec6d/Oakcent-podlahove-vytapeni-magazin-2%402x.1c465a21.webp?access_token=5d4f5208-7f50-48c8-a7bc-289b60eda190",
+          "galleryImgBlog": "/web/image/228349-3eb1ec6d/Oakcent-podlahove-vytapeni-magazin-2%402x.1c465a21.webp?access_token=5d4f5208-7f50-48c8-a7bc-289b60eda190",
+          "campaign_odoo_id": null,
+          "language": "czech",
+          "source_row": 17,
+          "collection_title": "Sand",
+          "collection_text": "Světlé odstíny kolekce Sand vnesly do realizace jemně teplé přírodní tóny a zklidňující energii dřeva v souladu s přírodou.",
+          "collection_cta": "Objevte kolekci Sand",
+          "collection_url": "https://www.oakcent.com/kolekce-podlah-sand",
+          "pattern_title": "Planks",
+          "pattern_text": "Vzor Planks nechal vyniknout přirozenou kresbu dřeva a dodal prostoru nadčasovou eleganci s čistými liniemi.",
+          "pattern_cta": "Prozkoumejte Planks",
+          "patternCollection_name": "Planks z kolekce Heritage",
+          "patternCollection_url": "https://www.oakcent.com/kolekce-heritage",
+          "cta_text": "Hledáte autentické textury a barvy pro svůj projekt? Stáhněte si výběr vzorů Oakcent a nabídněte svým klientům vyjimečnost.",
+          "cta_button": "Stáhnout textury",
+          "final_html": null,
+          "odoo_post_id": null,
+          "revision": 0,
+          "draft_key": "17:czech:0",
+          "status": null,
+          "month": "March",
+          "email_subject": null,
+          "target_group": "Architects & Designers",
+          "email_from": null,
+          "blog_url": "https://www.oakcent.com/blog/blogove-18/pravda-o-podlahovem-vytapeni-drevenych-podlahach-31",
+          "project_url": "https://www.oakcent.com/private-apartment-grzybowska"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ],
+    "Call 'Create_Subject'": [
+      {
+        "json": {
+          "post_id": 60,
+          "created_at": "2026-04-13T13:22:37.530201+00:00",
+          "blog_title": "Dřevo a podlahové vytápění",
+          "blog_text": "Správně nainstalovaná dřevěná podlaha s podlahovým vytápěním nabízí komfort a příjemný tepelný pocit; při dodržení zásad nehrozí poškození. V OAKCENT volíme vrstvené dubové podlahy cca 15 mm, pečlivou montáž a vhodné systémy vytápění včetně elektrického HeatFlow pro rovnoměrné a bezpečné rozložení tepla.",
+          "blog_cta_label": "Zjistit více",
+          "heroImgBlog": "/web/image/228340-63b3ac32/Oakcent-podlahove-vytapeno-cover-photo%402x.9939f126.webp",
+          "project_title": "Ink • Smoke • Sand",
+          "project_text": "Interiér v srdci Varšavy pracuje s kontrastem přírodních materiálů a pečlivě kalibrovaným světlem. Hlavní obytný prostor nabízí klidnou, architektonicky řízenou atmosféru, kde světlo, geometrie a sochařský mobiliář vytvářejí rytmus pobytu. Podlaha Oakcent s tlumeným povrchem snižuje odlesky a citlivě reaguje na denní světlo, propojuje zóny a zesiluje textury kamene a dřeva. Jemné řemeslné detaily v hranách a spárách podtrhují čistotu kompozice. Výsledkem je tichá, vyvážená scéna, která zve k pozornému rozhlédnutí.",
+          "project_cta_label": "Prozkoumejte projekt",
+          "heroImgProject": "/web/image/225446-23f60df9/Oakcent-completed-project-poland-private-apartment-grzybowska-all%402x.36dc0fec.webp",
+          "firstBlock_img": "/web/image/225454-d6f10464/Oakcent-completed-project-poland-private-apartment-grzybowska-kitchen%402x.cb5e1beb.webp",
+          "secondBlock_img": "/web/image/225461-c208adde/Oakcent-completed-project-poland-private-apartment-grzybowska-hall%402x.768b5c23.webp",
+          "sideImgBlog_1": "/web/image/228348-961fcdb0/Oakcent-podlahove-vytapeni-1%402x.fbc85f96.webp?access_token=fd1d26af-7d09-4644-b4fc-d34a826a37b3",
+          "sideImgBlog_2": "/web/image/228349-3eb1ec6d/Oakcent-podlahove-vytapeni-magazin-2%402x.1c465a21.webp?access_token=5d4f5208-7f50-48c8-a7bc-289b60eda190",
+          "galleryImgBlog": "/web/image/228349-3eb1ec6d/Oakcent-podlahove-vytapeni-magazin-2%402x.1c465a21.webp?access_token=5d4f5208-7f50-48c8-a7bc-289b60eda190",
+          "campaign_odoo_id": null,
+          "language": "czech",
+          "source_row": 17,
+          "collection_title": "Sand",
+          "collection_text": "Světlé odstíny kolekce Sand vnesly do realizace jemně teplé přírodní tóny a zklidňující energii dřeva v souladu s přírodou.",
+          "collection_cta": "Objevte kolekci Sand",
+          "collection_url": "https://www.oakcent.com/kolekce-podlah-sand",
+          "pattern_title": "Planks",
+          "pattern_text": "Vzor Planks nechal vyniknout přirozenou kresbu dřeva a dodal prostoru nadčasovou eleganci s čistými liniemi.",
+          "pattern_cta": "Prozkoumejte Planks",
+          "patternCollection_name": "Planks z kolekce Heritage",
+          "patternCollection_url": "https://www.oakcent.com/kolekce-heritage",
+          "cta_text": "Hledáte autentické textury a barvy pro svůj projekt? Stáhněte si výběr vzorů Oakcent a nabídněte svým klientům vyjimečnost.",
+          "cta_button": "Stáhnout textury",
+          "final_html": null,
+          "odoo_post_id": null,
+          "revision": 0,
+          "draft_key": "17:czech:0",
+          "status": null,
+          "month": "March",
+          "email_subject": "Přírodní harmonie dřeva a tepla podlaha Oakcent; Klidné tóny dubu v srdci Varšavy; Vrstvené dubové podlahy pro dokonalé teplo; Design, který ladí s denním světlem; Řemeslná preciznost v každém detailu; Objevte tichou atmosféru interiéru Oakcent",
+          "target_group": "Architects & Designers",
+          "email_from": null,
+          "blog_url": "https://www.oakcent.com/blog/blogove-18/pravda-o-podlahovem-vytapeni-drevenych-podlahach-31",
+          "project_url": "https://www.oakcent.com/private-apartment-grzybowska"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ],
+    "Get a row": [
+      {
+        "json": {
+          "post_id": 60,
+          "created_at": "2026-04-13T13:22:37.530201+00:00",
+          "blog_title": "Dřevo a podlahové vytápění",
+          "blog_text": "Správně nainstalovaná dřevěná podlaha s podlahovým vytápěním nabízí komfort a příjemný tepelný pocit; při dodržení zásad nehrozí poškození. V OAKCENT volíme vrstvené dubové podlahy cca 15 mm, pečlivou montáž a vhodné systémy vytápění včetně elektrického HeatFlow pro rovnoměrné a bezpečné rozložení tepla.",
+          "blog_cta_label": "Zjistit více",
+          "heroImgBlog": "/web/image/228340-63b3ac32/Oakcent-podlahove-vytapeno-cover-photo%402x.9939f126.webp",
+          "project_title": "Ink • Smoke • Sand",
+          "project_text": "Interiér v srdci Varšavy pracuje s kontrastem přírodních materiálů a pečlivě kalibrovaným světlem. Hlavní obytný prostor nabízí klidnou, architektonicky řízenou atmosféru, kde světlo, geometrie a sochařský mobiliář vytvářejí rytmus pobytu. Podlaha Oakcent s tlumeným povrchem snižuje odlesky a citlivě reaguje na denní světlo, propojuje zóny a zesiluje textury kamene a dřeva. Jemné řemeslné detaily v hranách a spárách podtrhují čistotu kompozice. Výsledkem je tichá, vyvážená scéna, která zve k pozornému rozhlédnutí.",
+          "project_cta_label": "Prozkoumejte projekt",
+          "heroImgProject": "/web/image/225446-23f60df9/Oakcent-completed-project-poland-private-apartment-grzybowska-all%402x.36dc0fec.webp",
+          "firstBlock_img": "/web/image/225454-d6f10464/Oakcent-completed-project-poland-private-apartment-grzybowska-kitchen%402x.cb5e1beb.webp",
+          "secondBlock_img": "/web/image/225461-c208adde/Oakcent-completed-project-poland-private-apartment-grzybowska-hall%402x.768b5c23.webp",
+          "sideImgBlog_1": "/web/image/228348-961fcdb0/Oakcent-podlahove-vytapeni-1%402x.fbc85f96.webp?access_token=fd1d26af-7d09-4644-b4fc-d34a826a37b3",
+          "sideImgBlog_2": "/web/image/228349-3eb1ec6d/Oakcent-podlahove-vytapeni-magazin-2%402x.1c465a21.webp?access_token=5d4f5208-7f50-48c8-a7bc-289b60eda190",
+          "galleryImgBlog": "/web/image/228349-3eb1ec6d/Oakcent-podlahove-vytapeni-magazin-2%402x.1c465a21.webp?access_token=5d4f5208-7f50-48c8-a7bc-289b60eda190",
+          "campaign_odoo_id": null,
+          "language": "czech",
+          "source_row": 17,
+          "collection_title": "Sand",
+          "collection_text": "Světlé odstíny kolekce Sand vnesly do realizace jemně teplé přírodní tóny a zklidňující energii dřeva v souladu s přírodou.",
+          "collection_cta": "Objevte kolekci Sand",
+          "collection_url": "https://www.oakcent.com/kolekce-podlah-sand",
+          "pattern_title": "Planks",
+          "pattern_text": "Vzor Planks nechal vyniknout přirozenou kresbu dřeva a dodal prostoru nadčasovou eleganci s čistými liniemi.",
+          "pattern_cta": "Prozkoumejte Planks",
+          "patternCollection_name": "Planks z kolekce Heritage",
+          "patternCollection_url": "https://www.oakcent.com/kolekce-heritage",
+          "cta_text": "Hledáte autentické textury a barvy pro svůj projekt? Stáhněte si výběr vzorů Oakcent a nabídněte svým klientům vyjimečnost.",
+          "cta_button": "Stáhnout textury",
+          "final_html": null,
+          "odoo_post_id": null,
+          "revision": 0,
+          "draft_key": "17:czech:0",
+          "status": null,
+          "month": "March",
+          "email_subject": "Přírodní harmonie dřeva a tepla podlaha Oakcent; Klidné tóny dubu v srdci Varšavy; Vrstvené dubové podlahy pro dokonalé teplo; Design, který ladí s denním světlem; Řemeslná preciznost v každém detailu; Objevte tichou atmosféru interiéru Oakcent",
+          "target_group": "Architects & Designers",
+          "email_from": null,
+          "blog_url": "https://www.oakcent.com/blog/blogove-18/pravda-o-podlahovem-vytapeni-drevenych-podlahach-31",
+          "project_url": "https://www.oakcent.com/private-apartment-grzybowska"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ],
+    "Merge": [
+      {
+        "json": {
+          "post_id": 60,
+          "created_at": "2026-04-13T13:22:37.530201+00:00",
+          "blog_title": "Dřevo a podlahové vytápění",
+          "blog_text": "Správně nainstalovaná dřevěná podlaha s podlahovým vytápěním nabízí komfort a příjemný tepelný pocit; při dodržení zásad nehrozí poškození. V OAKCENT volíme vrstvené dubové podlahy cca 15 mm, pečlivou montáž a vhodné systémy vytápění včetně elektrického HeatFlow pro rovnoměrné a bezpečné rozložení tepla.",
+          "blog_cta_label": "Zjistit více",
+          "heroImgBlog": "/web/image/228340-63b3ac32/Oakcent-podlahove-vytapeno-cover-photo%402x.9939f126.webp",
+          "project_title": "Ink • Smoke • Sand",
+          "project_text": "Interiér v srdci Varšavy pracuje s kontrastem přírodních materiálů a pečlivě kalibrovaným světlem. Hlavní obytný prostor nabízí klidnou, architektonicky řízenou atmosféru, kde světlo, geometrie a sochařský mobiliář vytvářejí rytmus pobytu. Podlaha Oakcent s tlumeným povrchem snižuje odlesky a citlivě reaguje na denní světlo, propojuje zóny a zesiluje textury kamene a dřeva. Jemné řemeslné detaily v hranách a spárách podtrhují čistotu kompozice. Výsledkem je tichá, vyvážená scéna, která zve k pozornému rozhlédnutí.",
+          "project_cta_label": "Prozkoumejte projekt",
+          "heroImgProject": "/web/image/225446-23f60df9/Oakcent-completed-project-poland-private-apartment-grzybowska-all%402x.36dc0fec.webp",
+          "firstBlock_img": "/web/image/225454-d6f10464/Oakcent-completed-project-poland-private-apartment-grzybowska-kitchen%402x.cb5e1beb.webp",
+          "secondBlock_img": "/web/image/225461-c208adde/Oakcent-completed-project-poland-private-apartment-grzybowska-hall%402x.768b5c23.webp",
+          "sideImgBlog_1": "/web/image/228348-961fcdb0/Oakcent-podlahove-vytapeni-1%402x.fbc85f96.webp?access_token=fd1d26af-7d09-4644-b4fc-d34a826a37b3",
+          "sideImgBlog_2": "/web/image/228349-3eb1ec6d/Oakcent-podlahove-vytapeni-magazin-2%402x.1c465a21.webp?access_token=5d4f5208-7f50-48c8-a7bc-289b60eda190",
+          "galleryImgBlog": "/web/image/228349-3eb1ec6d/Oakcent-podlahove-vytapeni-magazin-2%402x.1c465a21.webp?access_token=5d4f5208-7f50-48c8-a7bc-289b60eda190",
+          "campaign_odoo_id": null,
+          "language": "czech",
+          "source_row": 17,
+          "collection_title": "Sand",
+          "collection_text": "Světlé odstíny kolekce Sand vnesly do realizace jemně teplé přírodní tóny a zklidňující energii dřeva v souladu s přírodou.",
+          "collection_cta": "Objevte kolekci Sand",
+          "collection_url": "https://www.oakcent.com/kolekce-podlah-sand",
+          "pattern_title": "Planks",
+          "pattern_text": "Vzor Planks nechal vyniknout přirozenou kresbu dřeva a dodal prostoru nadčasovou eleganci s čistými liniemi.",
+          "pattern_cta": "Prozkoumejte Planks",
+          "patternCollection_name": "Planks z kolekce Heritage",
+          "patternCollection_url": "https://www.oakcent.com/kolekce-heritage",
+          "cta_text": "Hledáte autentické textury a barvy pro svůj projekt? Stáhněte si výběr vzorů Oakcent a nabídněte svým klientům vyjimečnost.",
+          "cta_button": "Stáhnout textury",
+          "final_html": null,
+          "odoo_post_id": null,
+          "revision": 0,
+          "draft_key": "17:czech:0",
+          "status": null,
+          "month": "March",
+          "email_subject": "Přírodní harmonie dřeva a tepla podlaha Oakcent; Klidné tóny dubu v srdci Varšavy; Vrstvené dubové podlahy pro dokonalé teplo; Design, který ladí s denním světlem; Řemeslná preciznost v každém detailu; Objevte tichou atmosféru interiéru Oakcent",
+          "target_group": "Architects & Designers",
+          "email_from": null,
+          "blog_url": "https://www.oakcent.com/blog/blogove-18/pravda-o-podlahovem-vytapeni-drevenych-podlahach-31",
+          "project_url": "https://www.oakcent.com/private-apartment-grzybowska",
+          "resource_id": "06a22a8b-580d-4d21-ab94-a0f7b640a1e5",
+          "logo_src": "https://izohjxqvhacjmutgnckf.supabase.co/storage/v1/object/public/Newsletter/logo-oakcent.png",
+          "font_1": "https://izohjxqvhacjmutgnckf.supabase.co/storage/v1/object/public/Newsletter/Fonts/CaslonDoric-Bold-Web.woff2",
+          "font_2": "https://izohjxqvhacjmutgnckf.supabase.co/storage/v1/object/public/Newsletter/Fonts/ROMNarrow-Regular.woff2",
+          "structure_1": "https://izohjxqvhacjmutgnckf.supabase.co/storage/v1/object/public/Newsletter/Struktura_1_HQ.png",
+          "structure_2": "https://izohjxqvhacjmutgnckf.supabase.co/storage/v1/object/public/Newsletter/Struktura_2_HQ.png",
+          "logo_alt": "OAKCENT",
+          "cta_background": "https://izohjxqvhacjmutgnckf.supabase.co/storage/v1/object/public/Newsletter/forest_small.png",
+          "soc_web_url": "https://www.oakcent.com/",
+          "soc_web_src": "https://izohjxqvhacjmutgnckf.supabase.co/storage/v1/object/public/Newsletter/Web_HQ.png\n",
+          "soc_web_alt": "web",
+          "soc_ig_url": "https://www.instagram.com/oakcent.collection",
+          "soc_ig_src": "https://izohjxqvhacjmutgnckf.supabase.co/storage/v1/object/public/Newsletter/Instagram_HQ.png\n",
+          "soc_ig_alt": "instagram\n",
+          "soc_fb_url": "https://www.oakcent.com/en/website/social/facebook",
+          "soc_fb_src": "https://izohjxqvhacjmutgnckf.supabase.co/storage/v1/object/public/Newsletter/Facebook_HQ.png\n",
+          "soc_fb_alt": "facebook",
+          "soc_pin_url": "https://cz.pinterest.com/oakcent/",
+          "soc_pin_src": "https://izohjxqvhacjmutgnckf.supabase.co/storage/v1/object/public/Newsletter/Pinterest_HQ.png\n",
+          "soc_pin_alt": "pinterest",
+          "soc_yt_url": "https://www.youtube.com/@oakcent.collection",
+          "soc_yt_src": "https://izohjxqvhacjmutgnckf.supabase.co/storage/v1/object/public/Newsletter/Youtube_HQ.png\n",
+          "soc_yt_alt": "youtube",
+          "soc_li_url": "www.linkedin.com/company/oakcent-exceptional-wooden-flooring",
+          "soc_li_src": "https://izohjxqvhacjmutgnckf.supabase.co/storage/v1/object/public/Newsletter/LinkedIn_HQ.png\n",
+          "soc_li_alt": "linkedin",
+          "unsub_text": "Pokud nechcete nadále dostávat emaily Oakcent, můžete se jednoduše",
+          "unsub_url": "https://www.oakcent.com/unsubscribe_from_list",
+          "unsub_label": "odhlásit",
+          "copyright": "© 2025 Oakcent, Všechna práva vyhrazena.",
+          "html_template": "<!doctype html>\r\n<html lang=\"und\" dir=\"auto\" xmlns=\"http://www.w3.org/1999/xhtml\" xmlns:v=\"urn:schemas-microsoft-com:vml\" xmlns:o=\"urn:schemas-microsoft-com:office:office\">\r\n\r\n<head>\r\n  <!--[if !mso]><!-->\r\n  <meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\">\r\n  <!--<![endif]-->\r\n  <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\r\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\r\n  <style type=\"text/css\">\r\n    #outlook a {\r\n      padding: 0;\r\n    }\r\n\r\n    body {\r\n      margin: 0;\r\n      padding: 0;\r\n      -webkit-text-size-adjust: 100%;\r\n      -ms-text-size-adjust: 100%;\r\n    }\r\n\r\n    table,\r\n    td {\r\n      border-collapse: collapse;\r\n      mso-table-lspace: 0pt;\r\n      mso-table-rspace: 0pt;\r\n    }\r\n\r\n    img {\r\n      border: 0;\r\n      height: auto;\r\n      line-height: 100%;\r\n      outline: none;\r\n      text-decoration: none;\r\n      -ms-interpolation-mode: bicubic;\r\n    }\r\n\r\n    p {\r\n      display: block;\r\n      margin: 13px 0;\r\n    }\r\n  </style>\r\n\r\n  <!--[if mso]>\r\n    <noscript>\r\n    <xml>\r\n    <o:OfficeDocumentSettings>\r\n      <o:AllowPNG/>\r\n      <o:PixelsPerInch>96</o:PixelsPerInch>\r\n    </o:OfficeDocumentSettings>\r\n    </xml>\r\n    </noscript>\r\n    <![endif]-->\r\n\r\n  <!--[if lte mso 11]>\r\n    <style type=\"text/css\">\r\n      .mj-outlook-group-fix { width:100% !important; }\r\n    </style>\r\n    <![endif]-->\r\n\r\n  <!--[if !mso]><!-->\r\n  <link href=\"https://fonts.googleapis.com/css?family=Droid+Sans:300,400,500,700\" rel=\"stylesheet\" type=\"text/css\">\r\n  <link href=\"https://fonts.googleapis.com/css?family=Roboto:300,400,500,700\" rel=\"stylesheet\" type=\"text/css\">\r\n  <link href=\"https://fonts.googleapis.com/css?family=Ubuntu:300,400,500,700\" rel=\"stylesheet\" type=\"text/css\">\r\n\r\n\r\n  <style type=\"text/css\">\r\n    @import url(https://fonts.googleapis.com/css?family=Droid+Sans:300,400,500,700);\r\n    @import url(https://fonts.googleapis.com/css?family=Roboto:300,400,500,700);\r\n    @import url(https://fonts.googleapis.com/css?family=Ubuntu:300,400,500,700);\r\n\r\n  </style>\r\n  <!--<![endif]-->\r\n\r\n  <style type=\"text/css\">\r\n    @media only screen and (min-width:480px) {\r\n      .mj-column-per-100 {\r\n        width: 100% !important;\r\n        max-width: 100%;\r\n      }\r\n\r\n      .mj-column-per-60 {\r\n        width: 60% !important;\r\n        max-width: 60%;\r\n      }\r\n\r\n      .mj-column-per-40 {\r\n        width: 40% !important;\r\n        max-width: 40%;\r\n      }\r\n\r\n      .mj-column-per-35 {\r\n        width: 35% !important;\r\n        max-width: 35%;\r\n      }\r\n\r\n      .mj-column-per-65 {\r\n        width: 65% !important;\r\n        max-width: 65%;\r\n      }\r\n    }\r\n  </style>\r\n\r\n  <style media=\"screen and (min-width:480px)\">\r\n    .moz-text-html .mj-column-per-100 {\r\n      width: 100% !important;\r\n      max-width: 100%;\r\n    }\r\n\r\n    .moz-text-html .mj-column-per-60 {\r\n      width: 60% !important;\r\n      max-width: 60%;\r\n    }\r\n\r\n    .moz-text-html .mj-column-per-40 {\r\n      width: 40% !important;\r\n      max-width: 40%;\r\n    }\r\n\r\n    .moz-text-html .mj-column-per-35 {\r\n      width: 35% !important;\r\n      max-width: 35%;\r\n    }\r\n\r\n    .moz-text-html .mj-column-per-65 {\r\n      width: 65% !important;\r\n      max-width: 65%;\r\n    }\r\n  </style>\r\n\r\n  <style type=\"text/css\">\r\n    @media only screen and (max-width:479px) {\r\n      table.mj-full-width-mobile {\r\n        width: 100% !important;\r\n      }\r\n\r\n      td.mj-full-width-mobile {\r\n        width: auto !important;\r\n      }\r\n    }\r\n  </style>\r\n</head>\r\n\r\n<body style=\"word-spacing:normal;background-color:#EDE8E4;\">\r\n  <div aria-roledescription=\"email\" style=\"background-color:#EDE8E4;\" role=\"article\" lang=\"und\" dir=\"auto\">\r\n\r\n    <!--[if mso | IE]><table align=\"center\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" class=\"\" role=\"presentation\" style=\"width:600px;\" width=\"600\" bgcolor=\"#EDE8E4\" ><tr><td style=\"line-height:0px;font-size:0px;mso-line-height-rule:exactly;\"><![endif]-->\r\n    <div style=\"background:#EDE8E4;background-color:#EDE8E4;margin:0px auto;max-width:600px;\">\r\n      <table align=\"center\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"background:#EDE8E4;background-color:#EDE8E4;width:100%;\">\r\n        <tbody>\r\n          <tr>\r\n            <td style=\"border:none;direction:ltr;font-size:0px;padding:20px 0px 20px 0px;text-align:center;\">\r\n\r\n              <!-- ========================================= -->\r\n              <!-- 1 INTRO: logo + hero image -->\r\n              <!-- ========================================= -->\r\n\r\n              <!--[if mso | IE]><tr><td class=\"\" width=\"600px\" ><table align=\"center\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" class=\"\" role=\"presentation\" style=\"width:600px;\" width=\"600\" bgcolor=\"#EDE8E4\" ><tr><td style=\"line-height:0px;font-size:0px;mso-line-height-rule:exactly;\"><v:rect style=\"width:600px;\" xmlns:v=\"urn:schemas-microsoft-com:vml\" fill=\"true\" stroke=\"false\"><v:fill origin=\"0.5, 0.5\" position=\"0.5, 0.5\" src=\" [[STRUCTURE_BACKGROUND_IMAGE_1]]\" color=\"#EDE8E4\" type=\"frame\" size=\"200px,auto\" /><v:textbox style=\"mso-fit-shape-to-text:true\" inset=\"0,0,0,0\"><![endif]-->\r\n              <div style=\"background:#EDE8E4 url(' [[STRUCTURE_BACKGROUND_IMAGE_1]]') right bottom / 200px auto no-repeat;background-position:right bottom;background-repeat:no-repeat;background-size:200px auto;margin:0px auto;max-width:600px;\">\r\n                <div style=\"line-height:0;font-size:0;\">\r\n                  <table align=\"center\" background=\" [[STRUCTURE_BACKGROUND_IMAGE_1]]\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"background:#EDE8E4 url(' [[STRUCTURE_BACKGROUND_IMAGE_1]]') right bottom / 200px auto no-repeat;background-position:right bottom;background-repeat:no-repeat;background-size:200px auto;width:100%;\">\r\n                    <tbody>\r\n                      <tr>\r\n                        <td style=\"border:none;direction:ltr;font-size:0px;padding:0px 0px 0px 0px;text-align:center;\">\r\n                          <div class=\"mj-column-per-100 mj-outlook-group-fix\" style=\"font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;\">\r\n                            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" width=\"100%\">\r\n                              <tbody>\r\n                                <tr>\r\n                                  <td style=\"border:none;vertical-align:top;padding:20px 20px 20px 20px;\">\r\n                                    <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"\" width=\"100%\">\r\n                                      <tbody>\r\n                                        <tr>\r\n                                          <td align=\"center\" style=\"font-size:0px;padding:0px 0px 16px 0px;word-break:break-word;\">\r\n                                            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"border-collapse:collapse;border-spacing:0px;\">\r\n                                              <tbody>\r\n                                                <tr>\r\n                                                  <td style=\"width:180px;\">\r\n                                                    <img alt=\" [[LOGO_ALT]]\" src=\" [[LOGO_SRC]]\" style=\"border:0;display:block;outline:none;text-decoration:none;height:auto;width:100%;font-size:14px;\" width=\"180\" height=\"auto\" />\r\n                                                  </td>\r\n                                                </tr>\r\n                                              </tbody>\r\n                                            </table>\r\n                                          </td>\r\n                                        </tr>\r\n\r\n                                        <tr>\r\n                                          <td align=\"center\" style=\"font-size:0px;padding:10px 0px 0px 0px;word-break:break-word;\">\r\n                                            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"border-collapse:collapse;border-spacing:0px;\">\r\n                                              <tbody>\r\n                                                <tr>\r\n                                                  <td style=\"width:560px;\">\r\n                                                    <img alt=\" [[HERO_IMAGE_1_ALT]]\" src=\" [[HERO_IMAGE_1_SRC]]\" style=\"border:0;display:block;outline:none;text-decoration:none;height:auto;width:100%;font-size:14px;\" width=\"560\" height=\"auto\" />\r\n                                                  </td>\r\n                                                </tr>\r\n                                              </tbody>\r\n                                            </table>\r\n                                          </td>\r\n                                        </tr>\r\n\r\n                                      </tbody>\r\n                                    </table>\r\n                                  </td>\r\n                                </tr>\r\n                              </tbody>\r\n                            </table>\r\n                          </div>\r\n                        </td>\r\n                      </tr>\r\n                    </tbody>\r\n                  </table>\r\n                </div>\r\n              </div>\r\n              <!--[if mso | IE]></v:textbox></v:rect></td></tr></table></td></tr><tr><td class=\"\" width=\"600px\" ><![endif]-->\r\n              <div style=\"height:24px;line-height:24px;\">&#8202;</div>\r\n              <!--[if mso | IE]></td></tr><![endif]-->\r\n\r\n              <!-- ========================================= -->\r\n              <!-- 2 MAGAZINE SECTION -->\r\n              <!-- ========================================= -->\r\n\r\n              <!-- top decor -->\r\n              <!--[if mso | IE]><tr><td class=\"\" width=\"600px\" ><table align=\"center\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" class=\"\" role=\"presentation\" style=\"width:600px;\" width=\"600\" bgcolor=\"#EDE8E4\" ><tr><td style=\"line-height:0px;font-size:0px;mso-line-height-rule:exactly;\"><v:rect style=\"width:600px;\" xmlns:v=\"urn:schemas-microsoft-com:vml\" fill=\"true\" stroke=\"false\"><v:fill origin=\"0.5, -0.5\" position=\"0.5, -0.5\" src=\" [[STRUCTURE_BACKGROUND_IMAGE_2]]\" color=\"#EDE8E4\" type=\"frame\" size=\"200px,auto\" /><v:textbox style=\"mso-fit-shape-to-text:true\" inset=\"0,0,0,0\"><![endif]-->\r\n              <div style=\"background:#EDE8E4 url(' [[STRUCTURE_BACKGROUND_IMAGE_2]]') right top / 200px auto no-repeat;background-position:right top;background-repeat:no-repeat;background-size:200px auto;margin:0px auto;max-width:600px;\">\r\n                <div style=\"line-height:0;font-size:0;\">\r\n                  <table align=\"center\" background=\" [[STRUCTURE_BACKGROUND_IMAGE_2]]\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"background:#EDE8E4 url(' [[STRUCTURE_BACKGROUND_IMAGE_2]]') right top / 200px auto no-repeat;background-position:right top;background-repeat:no-repeat;background-size:200px auto;width:100%;\">\r\n                    <tbody>\r\n                      <tr>\r\n                        <td style=\"border:none;direction:ltr;font-size:0px;padding:0px 0px 0px 0px;text-align:center;\">\r\n                          <div class=\"mj-column-per-100 mj-outlook-group-fix\" style=\"font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;\">\r\n                            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" width=\"100%\">\r\n                              <tbody>\r\n                                <tr>\r\n                                  <td style=\"border:none;vertical-align:top;padding:0px 0px 0px 0px;\">\r\n                                    <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"\" width=\"100%\">\r\n                                      <tbody>\r\n                                        <tr>\r\n                                          <td style=\"font-size:0px;word-break:break-word;\">\r\n                                            <div style=\"height:70px;line-height:70px;\">&#8202;</div>\r\n                                          </td>\r\n                                        </tr>\r\n                                      </tbody>\r\n                                    </table>\r\n                                  </td>\r\n                                </tr>\r\n                              </tbody>\r\n                            </table>\r\n                          </div>\r\n                        </td>\r\n                      </tr>\r\n                    </tbody>\r\n                  </table>\r\n                </div>\r\n              </div>\r\n              <!--[if mso | IE]></v:textbox></v:rect></td></tr></table></td></tr><![endif]-->\r\n\r\n              <!-- main magazine block + bottom decor -->\r\n              <!--[if mso | IE]><tr><td class=\"\" width=\"600px\" ><table align=\"center\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" class=\"\" role=\"presentation\" style=\"width:600px;\" width=\"600\" bgcolor=\"#EDE8E4\" ><tr><td style=\"line-height:0px;font-size:0px;mso-line-height-rule:exactly;\"><v:rect style=\"width:600px;\" xmlns:v=\"urn:schemas-microsoft-com:vml\" fill=\"true\" stroke=\"false\"><v:fill origin=\"0.5, 0.5\" position=\"0.5, 0.5\" src=\" [[STRUCTURE_BACKGROUND_IMAGE_2]]\" color=\"#EDE8E4\" type=\"frame\" size=\"200px,auto\" /><v:textbox style=\"mso-fit-shape-to-text:true\" inset=\"0,0,0,0\"><![endif]-->\r\n              <div style=\"background:#EDE8E4 url(' [[STRUCTURE_BACKGROUND_IMAGE_2]]') right bottom / 200px auto no-repeat;background-position:right bottom;background-repeat:no-repeat;background-size:200px auto;margin:0px auto;max-width:600px;\">\r\n                <div style=\"line-height:0;font-size:0;\">\r\n                  <table align=\"center\" background=\" [[STRUCTURE_BACKGROUND_IMAGE_2]]\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"background:#EDE8E4 url(' [[STRUCTURE_BACKGROUND_IMAGE_2]]') right bottom / 200px auto no-repeat;background-position:right bottom;background-repeat:no-repeat;background-size:200px auto;width:100%;\">\r\n                    <tbody>\r\n                      <tr>\r\n                        <td style=\"border:none;direction:ltr;font-size:0px;padding:0px 0px 0px 0px;text-align:center;\">\r\n\r\n                          <!-- Left: text -->\r\n                          <div class=\"mj-column-per-60 mj-outlook-group-fix\" style=\"font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:middle;width:100%;\">\r\n                            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" width=\"100%\">\r\n                              <tbody>\r\n                                <tr>\r\n                                  <td style=\"border:none;vertical-align:middle;padding:20px 0px 20px 20px;\">\r\n                                    <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"\" width=\"100%\">\r\n                                      <tbody>\r\n\r\n                                        <tr>\r\n                                          <td style=\"font-size:0px;word-break:break-word;\">\r\n                                            <div style=\"height:18px;line-height:18px;\">&#8202;</div>\r\n                                          </td>\r\n                                        </tr>\r\n\r\n                                        <tr>\r\n                                          <td align=\"left\" style=\"font-size:0px;padding:0px 8px 8px 0px;word-break:break-word;\">\r\n                                            <div style=\"font-family:Tahoma, Arial, sans-serif;font-size:24px;font-weight:bold;line-height:1.15;text-align:left;color:#5C5957;\"> [[MAGAZINE_TITLE]]</div>\r\n                                          </td>\r\n                                        </tr>\r\n\r\n                                        <tr>\r\n                                          <td align=\"left\" style=\"font-size:0px;padding:40px 18px 0px 0px;word-break:break-word;\">\r\n                                            <div style=\"font-family:Calibri, Arial, sans-serif;font-size:14px;letter-spacing:-0.02em;font-weight:400;line-height:1.45;text-align:left;color:#5C5957;\">\r\n                                               [[MAGAZINE_TEXT]]\r\n                                            </div>\r\n                                          </td>\r\n                                        </tr>\r\n\r\n                                        <tr>\r\n                                          <td style=\"font-size:0px;word-break:break-word;\">\r\n                                            <div style=\"height:[[MAGAZINE_CTA_SPACER]]px;line-height:[[MAGAZINE_CTA_SPACER]]px;\">&#8202;</div>\r\n                                          </td>\r\n                                        </tr>\r\n\r\n                                        <tr>\r\n                                          <td align=\"left\" style=\"font-size:0px;padding:12px 0px 0px 0px;word-break:break-word;\">\r\n                                            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"border-collapse:separate;line-height:100%;\">\r\n                                              <tbody>\r\n                                                <tr>\r\n                                                  <td align=\"center\" bgcolor=\"#EDE8E4\" role=\"presentation\" style=\"border:1px solid #5C5957;border-radius:0px;cursor:auto;mso-padding-alt:10px 25px 10px 25px;text-align:center;background:#EDE8E4;\" valign=\"middle\">\r\n                                                    <a href=\" [[MAGAZINE_CTA_URL]]\" style=\"display:inline-block;background:#EDE8E4;color:#5C5957;font-family:Calibri, Arial, sans-serif;font-size:14px;letter-spacing:-0.02em;font-weight:normal;line-height:120%;margin:0;text-decoration:none;text-transform:none;padding:10px 25px 10px 25px;mso-padding-alt:0px;border-radius:0px;\" target=\"_blank\"> [[MAGAZINE_CTA_LABEL]]</a>\r\n                                                  </td>\r\n                                                </tr>\r\n                                              </tbody>\r\n                                            </table>\r\n                                          </td>\r\n                                        </tr>\r\n\r\n                                        <tr>\r\n                                          <td style=\"font-size:0px;word-break:break-word;\">\r\n                                            <div style=\"height:18px;line-height:18px;\">&#8202;</div>\r\n                                          </td>\r\n                                        </tr>\r\n\r\n                                      </tbody>\r\n                                    </table>\r\n                                  </td>\r\n                                </tr>\r\n                              </tbody>\r\n                            </table>\r\n                          </div>\r\n\r\n                          <!-- Right: 2 images -->\r\n                          <div class=\"mj-column-per-40 mj-outlook-group-fix\" style=\"font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;\">\r\n                            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" width=\"100%\">\r\n                              <tbody>\r\n                                <tr>\r\n                                  <td style=\"border:none;vertical-align:top;padding:12px 20px 20px 0px;\">\r\n                                    <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"\" width=\"100%\">\r\n                                      <tbody>\r\n\r\n                                        <tr>\r\n                                          <td align=\"center\" style=\"font-size:0px;padding:6px 0px 12px 0px;word-break:break-word;\">\r\n                                            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"border-collapse:collapse;border-spacing:0px;\">\r\n                                              <tbody>\r\n                                                <tr>\r\n                                                  <td style=\"width:220px;\">\r\n                                                    <img alt=\" [[MAGAZINE_SIDE_IMAGE_1_ALT]]\" src=\" [[MAGAZINE_SIDE_IMAGE_1_SRC]]\" style=\"border:0;display:block;outline:none;text-decoration:none;height:auto;width:100%;font-size:14px;\" width=\"220\" height=\"auto\" />\r\n                                                  </td>\r\n                                                </tr>\r\n                                              </tbody>\r\n                                            </table>\r\n                                          </td>\r\n                                        </tr>\r\n\r\n                                        <tr>\r\n                                          <td style=\"font-size:0px;word-break:break-word;\">\r\n                                            <div style=\"height:12px;line-height:12px;\">&#8202;</div>\r\n                                          </td>\r\n                                        </tr>\r\n\r\n                                        <tr>\r\n                                          <td align=\"center\" style=\"font-size:0px;padding:12px 0px 6px 0px;word-break:break-word;\">\r\n                                            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"border-collapse:collapse;border-spacing:0px;\">\r\n                                              <tbody>\r\n                                                <tr>\r\n                                                  <td style=\"width:220px;\">\r\n                                                    <img alt=\" [[MAGAZINE_SIDE_IMAGE_2_ALT]]\" src=\" [[MAGAZINE_SIDE_IMAGE_2_SRC]]\" style=\"border:0;display:block;outline:none;text-decoration:none;height:auto;width:100%;font-size:14px;\" width=\"220\" height=\"auto\" />\r\n                                                  </td>\r\n                                                </tr>\r\n                                              </tbody>\r\n                                            </table>\r\n                                          </td>\r\n                                        </tr>\r\n\r\n                                      </tbody>\r\n                                    </table>\r\n                                  </td>\r\n                                </tr>\r\n                              </tbody>\r\n                            </table>\r\n                          </div>\r\n\r\n                        </td>\r\n                      </tr>\r\n                    </tbody>\r\n                  </table>\r\n                </div>\r\n              </div>\r\n\r\n              <div style=\"height:36px;line-height:36px;\">&#8202;</div>\r\n\r\n              <!-- ========================================= -->\r\n              <!-- 3 PROJECT HERO IMAGE -->\r\n              <!-- ========================================= -->\r\n\r\n              <div style=\"background:#DECFC6;background-color:#DECFC6;margin:0px auto;max-width:600px;\">\r\n                <table align=\"center\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"background:#DECFC6;background-color:#DECFC6;width:100%;\">\r\n                  <tbody>\r\n                    <tr>\r\n                      <td style=\"border:none;direction:ltr;font-size:0px;padding:0px 0px 0px 0px;text-align:center;\">\r\n                        <div class=\"mj-column-per-100 mj-outlook-group-fix\" style=\"font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;\">\r\n                          <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" width=\"100%\">\r\n                            <tbody>\r\n                              <tr>\r\n                                <td style=\"border:none;vertical-align:top;padding:32px 20px 12px 20px;\">\r\n                                  <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"\" width=\"100%\">\r\n                                    <tbody>\r\n                                      <tr>\r\n                                        <td align=\"center\" style=\"font-size:0px;padding:0px 0px 0px 0px;word-break:break-word;\">\r\n                                          <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"border-collapse:collapse;border-spacing:0px;\">\r\n                                            <tbody>\r\n                                              <tr>\r\n                                                <td style=\"width:560px;\">\r\n                                                  <img alt=\" [[PROJECT_HERO_IMAGE_ALT]]\" src=\" [[PROJECT_HERO_IMAGE_SRC]]\" style=\"border:0;display:block;outline:none;text-decoration:none;height:auto;width:100%;font-size:14px;\" width=\"560\" height=\"auto\" />\r\n                                                </td>\r\n                                              </tr>\r\n                                            </tbody>\r\n                                          </table>\r\n                                        </td>\r\n                                      </tr>\r\n                                    </tbody>\r\n                                  </table>\r\n                                </td>\r\n                              </tr>\r\n                            </tbody>\r\n                          </table>\r\n                        </div>\r\n                      </td>\r\n                    </tr>\r\n                  </tbody>\r\n                </table>\r\n              </div>\r\n\r\n              <!-- ========================================= -->\r\n              <!-- 4 PROJECT (40/60) -->\r\n              <!-- ========================================= -->\r\n\r\n              <div style=\"background:#DECFC6;background-color:#DECFC6;margin:0px auto;max-width:600px;\">\r\n                <table align=\"center\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"background:#DECFC6;background-color:#DECFC6;width:100%;\">\r\n                  <tbody>\r\n                    <tr>\r\n                      <td style=\"border:none;direction:ltr;font-size:0px;padding:0px 0px 0px 0px;text-align:center;\">\r\n\r\n                        <div class=\"mj-column-per-40 mj-outlook-group-fix\" style=\"font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;\">\r\n                          <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" width=\"100%\">\r\n                            <tbody>\r\n                              <tr>\r\n                                <td style=\"border:none;vertical-align:top;padding:20px 0px 20px 20px;\">\r\n                                  <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"\" width=\"100%\">\r\n                                    <tbody>\r\n\r\n                                      <tr>\r\n                                        <td align=\"center\" style=\"font-size:0px;padding:6px 0px 6px 0px;word-break:break-word;\">\r\n                                          <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"border-collapse:collapse;border-spacing:0px;\">\r\n                                            <tbody>\r\n                                              <tr>\r\n                                                <td style=\"width:220px;\">\r\n                                                  <img alt=\" [[PROJECT_IMAGE_1_ALT]]\" src=\" [[PROJECT_IMAGE_1_SRC]]\" style=\"border:0;display:block;outline:none;text-decoration:none;height:224px;width:100%;font-size:14px;\" width=\"220\" height=\"224\" />\r\n                                                </td>\r\n                                              </tr>\r\n                                            </tbody>\r\n                                          </table>\r\n                                        </td>\r\n                                      </tr>\r\n\r\n                                      <tr>\r\n                                        <td align=\"center\" style=\"font-size:0px;padding:6px 0px 6px 0px;word-break:break-word;\">\r\n                                          <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"border-collapse:collapse;border-spacing:0px;\">\r\n                                            <tbody>\r\n                                              <tr>\r\n                                                <td style=\"width:220px;\">\r\n                                                  <img alt=\" [[PROJECT_IMAGE_2_ALT]]\" src=\" [[PROJECT_IMAGE_2_SRC]]\" style=\"border:0;display:block;outline:none;text-decoration:none;height:224px;width:100%;font-size:14px;\" width=\"220\" height=\"224\" />\r\n                                                </td>\r\n                                              </tr>\r\n                                            </tbody>\r\n                                          </table>\r\n                                        </td>\r\n                                      </tr>\r\n\r\n                                    </tbody>\r\n                                  </table>\r\n                                </td>\r\n                              </tr>\r\n                            </tbody>\r\n                          </table>\r\n                        </div>\r\n\r\n                        <div class=\"mj-column-per-60 mj-outlook-group-fix\" style=\"font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:middle;width:100%;\">\r\n                          <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" width=\"100%\">\r\n                            <tbody>\r\n                              <tr>\r\n                                <td style=\"border:none;vertical-align:middle;padding:20px 20px 20px 12px;\">\r\n                                  <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"\" width=\"100%\">\r\n                                    <tbody>\r\n\r\n                                      <tr>\r\n                                        <td style=\"font-size:0px;word-break:break-word;\">\r\n                                          <div style=\"height:14px;line-height:14px;\">&#8202;</div>\r\n                                        </td>\r\n                                      </tr>\r\n\r\n                                      <tr>\r\n                                        <td align=\"left\" style=\"font-size:0px;padding:40px 18px 8px 18px;word-break:break-word;\">\r\n                                          <div style=\"font-family:Tahoma, Arial, sans-serif;font-size:22px;font-weight:bold;line-height:1.15;text-align:left;color:#5C5957;\"> [[PROJECT_TITLE]]</div>\r\n                                        </td>\r\n                                      </tr>\r\n\r\n                                      <tr>\r\n                                        <td align=\"left\" style=\"font-size:0px;padding:40px 18px 0px 18px;word-break:break-word;\">\r\n                                          <div style=\"font-family:Calibri, Arial, sans-serif;font-size:14px;letter-spacing:-0.02em;font-weight:400;line-height:1.45;text-align:left;color:#5C5957;\">\r\n                                             [[PROJECT_TEXT]]\r\n                                          </div>\r\n                                        </td>\r\n                                      </tr>\r\n\r\n                                      <tr>\r\n                                        <td style=\"font-size:0px;word-break:break-word;\">\r\n                                          <div style=\"height:[[PROJECT_CTA_SPACER]]px;line-height:[[PROJECT_CTA_SPACER]]px;\">&#8202;</div>\r\n                                        </td>\r\n                                      </tr>\r\n\r\n                                      <tr>\r\n                                        <td align=\"left\" style=\"font-size:0px;padding:12px 18px 0px 18px;word-break:break-word;\">\r\n                                          <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"border-collapse:separate;line-height:100%;\">\r\n                                            <tbody>\r\n                                              <tr>\r\n                                                <td align=\"center\" bgcolor=\"#DECFC6\" role=\"presentation\" style=\"border:1px solid #5C5957;border-radius:0px;cursor:auto;mso-padding-alt:10px 25px 10px 25px;text-align:center;background:#DECFC6;\" valign=\"middle\">\r\n                                                  <a href=\" [[PROJECT_CTA_URL]]\" style=\"display:inline-block;background:#DECFC6;color:#5C5957;font-family:Calibri, Arial, sans-serif;font-size:14px;letter-spacing:-0.02em;font-weight:normal;line-height:120%;margin:0;text-decoration:none;text-transform:none;padding:10px 25px 10px 25px;mso-padding-alt:0px;border-radius:0px;\" target=\"_blank\"> [[PROJECT_CTA_LABEL]]</a>\r\n                                                </td>\r\n                                              </tr>\r\n                                            </tbody>\r\n                                          </table>\r\n                                        </td>\r\n                                      </tr>\r\n\r\n                                      <tr>\r\n                                        <td style=\"font-size:0px;word-break:break-word;\">\r\n                                          <div style=\"height:14px;line-height:14px;\">&#8202;</div>\r\n                                        </td>\r\n                                      </tr>\r\n\r\n                                    </tbody>\r\n                                  </table>\r\n                                </td>\r\n                              </tr>\r\n                            </tbody>\r\n                          </table>\r\n                        </div>\r\n\r\n                      </td>\r\n                    </tr>\r\n                  </tbody>\r\n                </table>\r\n              </div>\r\n\r\n              <div style=\"height:42px;line-height:42px;\">&#8202;</div>\r\n\r\n              <!-- ========================================= -->\r\n              <!-- 5 COLLECTION -->\r\n              <!-- ========================================= -->\r\n\r\n              <div style=\"background:#EDE8E4 url(' [[STRUCTURE_BACKGROUND_IMAGE_2]]') right top / 180px auto no-repeat;background-position:right top;background-repeat:no-repeat;background-size:180px auto;margin:0px auto;max-width:600px;\">\r\n                <div style=\"line-height:0;font-size:0;\">\r\n                  <table align=\"center\" background=\" [[STRUCTURE_BACKGROUND_IMAGE_2]]\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"background:#EDE8E4 url(' [[STRUCTURE_BACKGROUND_IMAGE_2]]') right top / 180px auto no-repeat;background-position:right top;background-repeat:no-repeat;background-size:180px auto;width:100%;\">\r\n                    <tbody>\r\n                      <tr>\r\n                        <td style=\"border:none;direction:ltr;font-size:0px;padding:24px 20px 0px 20px;text-align:center;\">\r\n\r\n                          <div class=\"mj-column-per-35 mj-outlook-group-fix\" style=\"font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;\">\r\n                            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" width=\"100%\">\r\n                              <tbody>\r\n                                <tr>\r\n                                  <td style=\"border:none;vertical-align:top;padding:0px 12px 0px 0px;\">\r\n                                    <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"\" width=\"100%\">\r\n                                      <tbody>\r\n                                        <tr>\r\n                                          <td align=\"center\" style=\"font-size:0px;padding:6px 0px 6px 0px;word-break:break-word;\">\r\n                                            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"border-collapse:collapse;border-spacing:0px;\">\r\n                                              <tbody>\r\n                                                <tr>\r\n                                                  <td style=\"width:150px;\">\r\n                                                    <img alt=\" [[COLLECTION_IMAGE_ALT]]\" src=\" [[COLLECTION_IMAGE_SRC]]\" style=\"border:0;display:block;outline:none;text-decoration:none;height:auto;width:100%;font-size:14px;\" width=\"150\" height=\"auto\" />\r\n                                                  </td>\r\n                                                </tr>\r\n                                              </tbody>\r\n                                            </table>\r\n                                          </td>\r\n                                        </tr>\r\n                                      </tbody>\r\n                                    </table>\r\n                                  </td>\r\n                                </tr>\r\n                              </tbody>\r\n                            </table>\r\n                          </div>\r\n\r\n                          <div class=\"mj-column-per-65 mj-outlook-group-fix\" style=\"font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;\">\r\n                            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" width=\"100%\">\r\n                              <tbody>\r\n                                <tr>\r\n                                  <td style=\"border:none;border-left:1px solid #cdc5bf;vertical-align:top;padding:0px 0px 0px 16px;\">\r\n                                    <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"\" width=\"100%\">\r\n                                      <tbody>\r\n                                        <tr>\r\n                                          <td align=\"left\" style=\"font-size:0px;padding:6px 0px 4px 0px;word-break:break-word;\">\r\n                                            <div style=\"font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans','Helvetica Neue', sans-serif;font-size:12px;font-weight:400;letter-spacing:0.02em;line-height:1.55;text-align:left;color:#6b6b6b;\"> [[COLLECTION_LABEL]]</div>\r\n                                          </td>\r\n                                        </tr>\r\n                                        <tr>\r\n                                          <td align=\"left\" style=\"font-size:0px;padding:0px 0px 4px 0px;word-break:break-word;\">\r\n                                            <div style=\"font-family:Tahoma, Arial, sans-serif;font-size:20px;font-weight:400;line-height:1.55;text-align:left;color:#5C5957;\"><strong> [[COLLECTION_TITLE]]</strong></div>\r\n                                          </td>\r\n                                        </tr>\r\n                                        <tr>\r\n                                          <td align=\"left\" style=\"font-size:0px;padding:0px 0px 0px 0px;word-break:break-word;\">\r\n                                            <div style=\"font-family:Calibri, Arial, sans-serif;font-size:14px;letter-spacing:-0.02em;font-weight:400;line-height:1.35;text-align:left;color:#5C5957;\">\r\n                                               [[COLLECTION_TEXT]]\r\n                                            </div>\r\n                                          </td>\r\n                                        </tr>\r\n                                        <tr>\r\n                                          <td style=\"font-size:0px;word-break:break-word;\">\r\n                                            <div style=\"height:18px;line-height:18px;\">&#8202;</div>\r\n                                          </td>\r\n                                        </tr>\r\n                                        <tr>\r\n                                          <td align=\"left\" style=\"font-size:0px;padding:0px 0px 0px 0px;word-break:break-word;\">\r\n                                            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"border-collapse:separate;line-height:100%;\">\r\n                                              <tbody>\r\n                                                <tr>\r\n                                                  <td align=\"center\" bgcolor=\"#EDE8E4\" role=\"presentation\" style=\"border:1px solid #5C5957;border-radius:0px;cursor:auto;mso-padding-alt:10px 25px 10px 25px;text-align:center;background:#EDE8E4;\" valign=\"middle\">\r\n                                                    <a href=\" [[COLLECTION_CTA_URL]]\" style=\"display:inline-block;background:#EDE8E4;color:#5C5957;font-family:Calibri, Arial, sans-serif;font-size:14px;letter-spacing:-0.02em;font-weight:normal;line-height:120%;margin:0;text-decoration:none;text-transform:none;padding:10px 25px 10px 25px;mso-padding-alt:0px;border-radius:0px;\" target=\"_blank\"> [[COLLECTION_CTA_LABEL]]</a>\r\n                                                  </td>\r\n                                                </tr>\r\n                                              </tbody>\r\n                                            </table>\r\n                                          </td>\r\n                                        </tr>\r\n                                      </tbody>\r\n                                    </table>\r\n                                  </td>\r\n                                </tr>\r\n                              </tbody>\r\n                            </table>\r\n                          </div>\r\n\r\n                        </td>\r\n                      </tr>\r\n                    </tbody>\r\n                  </table>\r\n                </div>\r\n              </div>\r\n\r\n              <div style=\"height:18px;line-height:18px;\">&#8202;</div>\r\n\r\n              <!-- divider row under text only -->\r\n              <div style=\"background:#EDE8E4;background-color:#EDE8E4;margin:0px auto;max-width:600px;\">\r\n                <table align=\"center\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"background:#EDE8E4;background-color:#EDE8E4;width:100%;\">\r\n                  <tbody>\r\n                    <tr>\r\n                      <td style=\"border:none;direction:ltr;font-size:0px;padding:0px 20px 0px 20px;text-align:center;\">\r\n                        <div class=\"mj-column-per-35 mj-outlook-group-fix\" style=\"font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;\">\r\n                          <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" width=\"100%\">\r\n                            <tbody>\r\n                              <tr>\r\n                                <td style=\"border:none;vertical-align:top;padding:0px 0px 0px 0px;\">\r\n                                  <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"\" width=\"100%\">\r\n                                    <tbody></tbody>\r\n                                  </table>\r\n                                </td>\r\n                              </tr>\r\n                            </tbody>\r\n                          </table>\r\n                        </div>\r\n\r\n                        <div class=\"mj-column-per-65 mj-outlook-group-fix\" style=\"font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;\">\r\n                          <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" width=\"100%\">\r\n                            <tbody>\r\n                              <tr>\r\n                                <td style=\"border:none;vertical-align:top;padding:0px 0px 0px 16px;\">\r\n                                  <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"\" width=\"100%\">\r\n                                    <tbody>\r\n                                      <tr>\r\n                                        <td align=\"left\" style=\"font-size:0px;padding:0px 0px 0px 0px;word-break:break-word;\">\r\n                                          <p style=\"border-top:solid 1px #cdc5bf;font-size:1px;margin:0px;width:100%;\"></p>\r\n                                        </td>\r\n                                      </tr>\r\n                                    </tbody>\r\n                                  </table>\r\n                                </td>\r\n                              </tr>\r\n                            </tbody>\r\n                          </table>\r\n                        </div>\r\n\r\n                      </td>\r\n                    </tr>\r\n                  </tbody>\r\n                </table>\r\n              </div>\r\n\r\n              <div style=\"height:18px;line-height:18px;\">&#8202;</div>\r\n\r\n              <!-- ========================================= -->\r\n              <!-- 6 PATTERN -->\r\n              <!-- ========================================= -->\r\n\r\n              <div style=\"background:#EDE8E4 url(' [[STRUCTURE_BACKGROUND_IMAGE_2]]') right bottom / 180px auto no-repeat;background-position:right bottom;background-repeat:no-repeat;background-size:180px auto;margin:0px auto;max-width:600px;\">\r\n                <div style=\"line-height:0;font-size:0;\">\r\n                  <table align=\"center\" background=\" [[STRUCTURE_BACKGROUND_IMAGE_2]]\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"background:#EDE8E4 url(' [[STRUCTURE_BACKGROUND_IMAGE_2]]') right bottom / 180px auto no-repeat;background-position:right bottom;background-repeat:no-repeat;background-size:180px auto;width:100%;\">\r\n                    <tbody>\r\n                      <tr>\r\n                        <td style=\"border:none;direction:ltr;font-size:0px;padding:0px 20px 0px 20px;text-align:center;\">\r\n\r\n                          <div class=\"mj-column-per-35 mj-outlook-group-fix\" style=\"font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;\">\r\n                            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" width=\"100%\">\r\n                              <tbody>\r\n                                <tr>\r\n                                  <td style=\"border:none;vertical-align:top;padding:0px 12px 0px 0px;\">\r\n                                    <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"\" width=\"100%\">\r\n                                      <tbody>\r\n                                        <tr>\r\n                                          <td align=\"center\" style=\"font-size:0px;padding:6px 0px 6px 0px;word-break:break-word;\">\r\n                                            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"border-collapse:collapse;border-spacing:0px;\">\r\n                                              <tbody>\r\n                                                <tr>\r\n                                                  <td style=\"width:150px;\">\r\n                                                    <img alt=\" [[PATTERN_IMAGE_ALT]]\" src=\" [[PATTERN_IMAGE_SRC]]\" style=\"border:0;display:block;outline:none;text-decoration:none;height:auto;width:100%;font-size:14px;\" width=\"150\" height=\"auto\" />\r\n                                                  </td>\r\n                                                </tr>\r\n                                              </tbody>\r\n                                            </table>\r\n                                          </td>\r\n                                        </tr>\r\n                                      </tbody>\r\n                                    </table>\r\n                                  </td>\r\n                                </tr>\r\n                              </tbody>\r\n                            </table>\r\n                          </div>\r\n\r\n                          <div class=\"mj-column-per-65 mj-outlook-group-fix\" style=\"font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;\">\r\n                            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" width=\"100%\">\r\n                              <tbody>\r\n                                <tr>\r\n                                  <td style=\"border:none;border-left:1px solid #cdc5bf;vertical-align:top;padding:0px 0px 0px 16px;\">\r\n                                    <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"\" width=\"100%\">\r\n                                      <tbody>\r\n                                        <tr>\r\n                                          <td align=\"left\" style=\"font-size:0px;padding:6px 0px 4px 0px;word-break:break-word;\">\r\n                                            <div style=\"font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans','Helvetica Neue', sans-serif;font-size:12px;font-weight:400;letter-spacing:0.02em;line-height:1.55;text-align:left;color:#6b6b6b;\"> [[PATTERN_LABEL]]</div>\r\n                                          </td>\r\n                                        </tr>\r\n                                        <tr>\r\n                                          <td align=\"left\" style=\"font-size:0px;padding:0px 0px 4px 0px;word-break:break-word;\">\r\n                                            <div style=\"font-family:Tahoma, Arial, sans-serif;font-size:20px;font-weight:400;line-height:1.55;text-align:left;color:#5C5957;\"><strong> [[PATTERN_TITLE]]</strong></div>\r\n                                          </td>\r\n                                        </tr>\r\n                                        <tr>\r\n                                          <td align=\"left\" style=\"font-size:0px;padding:0px 0px 0px 0px;word-break:break-word;\">\r\n                                            <div style=\"font-family:Calibri, Arial, sans-serif;font-size:14px;letter-spacing:-0.02em;font-weight:400;line-height:1.35;text-align:left;color:#5C5957;\">\r\n                                               [[PATTERN_TEXT]]\r\n                                            </div>\r\n                                          </td>\r\n                                        </tr>\r\n                                        <tr>\r\n                                          <td style=\"font-size:0px;word-break:break-word;\">\r\n                                            <div style=\"height:18px;line-height:18px;\">&#8202;</div>\r\n                                          </td>\r\n                                        </tr>\r\n                                        <tr>\r\n                                          <td align=\"left\" style=\"font-size:0px;padding:0px 0px 0px 0px;word-break:break-word;\">\r\n                                            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"border-collapse:separate;line-height:100%;\">\r\n                                              <tbody>\r\n                                                <tr>\r\n                                                  <td align=\"center\" bgcolor=\"#EDE8E4\" role=\"presentation\" style=\"border:1px solid #5C5957;border-radius:0px;cursor:auto;mso-padding-alt:10px 25px 10px 25px;text-align:center;background:#EDE8E4;\" valign=\"middle\">\r\n                                                    <a href=\" [[PATTERN_CTA_URL]]\" style=\"display:inline-block;background:#EDE8E4;color:#5C5957;font-family:Calibri, Arial, sans-serif;font-size:14px;letter-spacing:-0.02em;font-weight:normal;line-height:120%;margin:0;text-decoration:none;text-transform:none;padding:10px 25px 10px 25px;mso-padding-alt:0px;border-radius:0px;\" target=\"_blank\"> [[PATTERN_CTA_LABEL]]</a>\r\n                                                  </td>\r\n                                                </tr>\r\n                                              </tbody>\r\n                                            </table>\r\n                                          </td>\r\n                                        </tr>\r\n                                      </tbody>\r\n                                    </table>\r\n                                  </td>\r\n                                </tr>\r\n                              </tbody>\r\n                            </table>\r\n                          </div>\r\n\r\n                        </td>\r\n                      </tr>\r\n                    </tbody>\r\n                  </table>\r\n                </div>\r\n              </div>\r\n\r\n              <div style=\"height:36px;line-height:36px;\">&#8202;</div>\r\n\r\n              <!-- ========================================= -->\r\n              <!-- 7 GALLERY IMAGE -->\r\n              <!-- ========================================= -->\r\n\r\n              <div style=\"background:#EDE8E4;background-color:#EDE8E4;margin:0px auto;max-width:600px;\">\r\n                <table align=\"center\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"background:#EDE8E4;background-color:#EDE8E4;width:100%;\">\r\n                  <tbody>\r\n                    <tr>\r\n                      <td style=\"border:none;direction:ltr;font-size:0px;padding:0px 20px 0px 20px;text-align:center;\">\r\n                        <div class=\"mj-column-per-100 mj-outlook-group-fix\" style=\"font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;\">\r\n                          <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" width=\"100%\">\r\n                            <tbody>\r\n                              <tr>\r\n                                <td style=\"border:none;vertical-align:top;padding:20px 0px 20px 0px;\">\r\n                                  <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"\" width=\"100%\">\r\n                                    <tbody>\r\n                                      <tr>\r\n                                        <td align=\"center\" style=\"font-size:0px;padding:10px 0px 10px 0px;word-break:break-word;\">\r\n                                          <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"border-collapse:collapse;border-spacing:0px;\">\r\n                                            <tbody>\r\n                                              <tr>\r\n                                                <td style=\"width:560px;\">\r\n                                                  <img alt=\" [[GALLERY_IMAGE_1_ALT]]\" src=\" [[GALLERY_IMAGE_1_SRC]]\" style=\"border:0;display:block;outline:none;text-decoration:none;height:auto;width:100%;font-size:14px;\" width=\"560\" height=\"auto\" />\r\n                                                </td>\r\n                                              </tr>\r\n                                            </tbody>\r\n                                          </table>\r\n                                        </td>\r\n                                      </tr>\r\n                                    </tbody>\r\n                                  </table>\r\n                                </td>\r\n                              </tr>\r\n                            </tbody>\r\n                          </table>\r\n                        </div>\r\n                      </td>\r\n                    </tr>\r\n                  </tbody>\r\n                </table>\r\n              </div>\r\n\r\n              <div style=\"height:44px;line-height:44px;\">&#8202;</div>\r\n\r\n              <!-- ========================================= -->\r\n              <!-- 8 DARK CTA + SOCIALS + FOOTER -->\r\n              <!-- ========================================= -->\r\n\r\n              <!--[if mso | IE]><tr><td class=\"\" width=\"600px\" ><table align=\"center\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" class=\"\" role=\"presentation\" style=\"width:600px;\" width=\"600\" bgcolor=\"rgba(0,0,0,0.7)\" ><tr><td style=\"line-height:0px;font-size:0px;mso-line-height-rule:exactly;\"><v:rect style=\"width:600px;\" xmlns:v=\"urn:schemas-microsoft-com:vml\" fill=\"true\" stroke=\"false\"><v:fill origin=\"0, 0\" position=\"0, 0\" src=\" [[CTA_BACKGROUND_IMAGE]]\" color=\"rgba(0,0,0,0.7)\" type=\"frame\" size=\"750px,auto\" /><v:textbox style=\"mso-fit-shape-to-text:true\" inset=\"0,0,0,0\"><![endif]-->\r\n              <div style=\"background:rgba(0,0,0,0.7) url(' [[CTA_BACKGROUND_IMAGE]]') center center / 750px auto no-repeat;background-position:center center;background-repeat:no-repeat;background-size:750px auto;margin:0px auto;max-width:600px;\">\r\n                <div style=\"line-height:0;font-size:0;\">\r\n                  <table align=\"center\" background=\" [[CTA_BACKGROUND_IMAGE]]\" border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"background:rgba(0,0,0,0.7) url(' [[CTA_BACKGROUND_IMAGE]]') center center / 750px auto no-repeat;background-position:center center;background-repeat:no-repeat;background-size:750px auto;width:100%;\">\r\n                    <tbody>\r\n                      <tr>\r\n                        <td style=\"border:none;direction:ltr;font-size:0px;padding:0px 0px 0px 0px;text-align:center;\">\r\n                          <div class=\"mj-column-per-100 mj-outlook-group-fix\" style=\"font-size:0px;text-align:left;direction:ltr;display:inline-block;vertical-align:top;width:100%;\">\r\n                            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" width=\"100%\">\r\n                              <tbody>\r\n                                <tr>\r\n                                  <td style=\"border:none;vertical-align:top;padding:36px 16px 26px 16px;\">\r\n                                    <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"\" width=\"100%\">\r\n                                      <tbody>\r\n\r\n                                        <tr>\r\n                                          <td align=\"center\" style=\"font-size:0px;padding:0px 0px 18px 0px;word-break:break-word;\">\r\n                                            <div style=\"font-family:Calibri, Arial, sans-serif;font-size:22px;letter-spacing:-0.02em;font-weight:bold;line-height:1.2;text-align:center;color:#ffffff;\"> [[CTA_HEADLINE]]</div>\r\n                                          </td>\r\n                                        </tr>\r\n\r\n                                        <tr>\r\n                                          <td style=\"font-size:0px;word-break:break-word;\">\r\n                                            <div style=\"height:10px;line-height:10px;\">&#8202;</div>\r\n                                          </td>\r\n                                        </tr>\r\n\r\n                                        <tr>\r\n                                          <td align=\"center\" style=\"font-size:0px;padding:0px 0px 0px 0px;word-break:break-word;\">\r\n                                            <table border=\"0\" cellpadding=\"0\" cellspacing=\"0\" role=\"presentation\" style=\"border-collapse:separate;line-height:100%;\">\r\n                                              <tbody>\r\n                                                <tr>\r\n                                                  <td align=\"center\" bgcolor=\"#ffffff\" role=\"presentation\" style=\"border:none;border-radius:0px;cursor:auto;mso-padding-alt:10px 25px;text-align:center;background:#ffffff;\" valign=\"middle\">\r\n                                                    <a href=\" [[CTA_BUTTON_URL]]\" style=\"display:inline-block;background:#ffffff;color:#111827;font-family:Calibri, Arial, sans-serif;font-size:14px;letter-spacing:-0.02em;font-weight:bold;line-height:120%;margin:0;text-decoration:none;text-transform:none;padding:10px 25px;mso-padding-alt:0px;border-radius:0px;\" target=\"_blank\"> [[CTA_BUTTON_LABEL]]</a>\r\n                                                  </td>\r\n                                                </tr>\r\n                                              </tbody>\r\n                                            </table>\r\n                                          </td>\r\n                                        </tr>\r\n\r\n                                        <tr>\r\n                                          <td style=\"font-size:0px;word-break:break-word;\">\r\n                                            <div style=\"height:26px;line-height:26px;\">&#8202;</div>\r\n                                          </td>\r\n                                        </tr>\r\n\r\n                                        <!-- Social icons -->\r\n                                        <tr>\r\n                                          <td align=\"center\" style=\"font-size:0px;padding:0px 180px 0px 180px;word-break:break-word;\">\r\n                                            <table cellpadding=\"0\" cellspacing=\"0\" width=\"100%\" border=\"0\" style=\"color:#5C5957;font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans','Helvetica Neue', sans-serif;font-size:14px;line-height:1.55;table-layout:auto;width:100%;border:none;\">\r\n                                              <tr>\r\n                                                <td style=\"padding:0 6px; text-align:center; vertical-align:middle;\">\r\n                                                  <a href=\" [[SOCIAL_WEB_URL]]\">\r\n                                                    <img src=\" [[SOCIAL_WEB_ICON_SRC]]\" alt=\" [[SOCIAL_WEB_ICON_ALT]]\" width=\"20\" style=\"display:block; border:0; margin:0 auto;\" />\r\n                                                  </a>\r\n                                                </td>\r\n                                                <td style=\"padding:0 6px; text-align:center; vertical-align:middle;\">\r\n                                                  <a href=\" [[SOCIAL_INSTAGRAM_URL]]\">\r\n                                                    <img src=\" [[SOCIAL_INSTAGRAM_ICON_SRC]]\" alt=\" [[SOCIAL_INSTAGRAM_ICON_ALT]]\" width=\"20\" style=\"display:block; border:0; margin:0 auto;\" />\r\n                                                  </a>\r\n                                                </td>\r\n                                                <td style=\"padding:0 6px; text-align:center; vertical-align:middle;\">\r\n                                                  <a href=\" [[SOCIAL_FACEBOOK_URL]]\">\r\n                                                    <img src=\" [[SOCIAL_FACEBOOK_ICON_SRC]]\" alt=\" [[SOCIAL_FACEBOOK_ICON_ALT]]\" width=\"20\" style=\"display:block; border:0; margin:0 auto;\" />\r\n                                                  </a>\r\n                                                </td>\r\n                                                <td style=\"padding:0 6px; text-align:center; vertical-align:middle;\">\r\n                                                  <a href=\" [[SOCIAL_PINTEREST_URL]]\">\r\n                                                    <img src=\" [[SOCIAL_PINTEREST_ICON_SRC]]\" alt=\" [[SOCIAL_PINTEREST_ICON_ALT]]\" width=\"20\" style=\"display:block; border:0; margin:0 auto;\" />\r\n                                                  </a>\r\n                                                </td>\r\n                                                <td style=\"padding:0 6px; text-align:center; vertical-align:middle;\">\r\n                                                  <a href=\" [[SOCIAL_YOUTUBE_URL]]\">\r\n                                                    <img src=\" [[SOCIAL_YOUTUBE_ICON_SRC]]\" alt=\" [[SOCIAL_YOUTUBE_ICON_ALT]]\" width=\"20\" style=\"display:block; border:0; margin:0 auto;\" />\r\n                                                  </a>\r\n                                                </td>\r\n                                                <td style=\"padding:0 6px; text-align:center; vertical-align:middle;\">\r\n                                                  <a href=\" [[SOCIAL_LINKEDIN_URL]]\">\r\n                                                    <img src=\" [[SOCIAL_LINKEDIN_ICON_SRC]]\" alt=\" [[SOCIAL_LINKEDIN_ICON_ALT]]\" width=\"20\" style=\"display:block; border:0; margin:0 auto;\" />\r\n                                                  </a>\r\n                                                </td>\r\n                                              </tr>\r\n                                            </table>\r\n                                          </td>\r\n                                        </tr>\r\n\r\n                                        <tr>\r\n                                          <td style=\"font-size:0px;word-break:break-word;\">\r\n                                            <div style=\"height:22px;line-height:22px;\">&#8202;</div>\r\n                                          </td>\r\n                                        </tr>\r\n\r\n                                        <!-- Unsubscribe + copyright -->\r\n                                        <tr>\r\n                                          <td align=\"center\" style=\"font-size:0px;padding:0px 34px 6px 34px;word-break:break-word;\">\r\n                                            <div style=\"font-family:Tahoma, Arial, sans-serif;font-size:10px;font-weight:400;line-height:1.4;text-align:center;color:#EDE8E4;\">\r\n                                               [[FOOTER_UNSUBSCRIBE_TEXT_BEFORE_LINK]]\r\n                                              <a href=\" [[FOOTER_UNSUBSCRIBE_URL]]\" style=\"color:#EDE8E4; text-decoration:underline;\"> [[FOOTER_UNSUBSCRIBE_LINK_LABEL]]</a>.\r\n                                            </div>\r\n                                          </td>\r\n                                        </tr>\r\n\r\n                                        <tr>\r\n                                          <td align=\"center\" style=\"font-size:0px;padding:0px 34px 0px 34px;word-break:break-word;\">\r\n                                            <div style=\"font-family:Tahoma, Arial, sans-serif;font-size:10px;font-weight:400;line-height:1.4;text-align:center;color:#EDE8E4;\"> [[FOOTER_COPYRIGHT_TEXT]]</div>\r\n                                          </td>\r\n                                        </tr>\r\n\r\n                                      </tbody>\r\n                                    </table>\r\n                                  </td>\r\n                                </tr>\r\n                              </tbody>\r\n                            </table>\r\n                          </div>\r\n                        </td>\r\n                      </tr>\r\n                    </tbody>\r\n                  </table>\r\n                </div>\r\n              </div>\r\n              <!--[if mso | IE]></v:textbox></v:rect></td></tr></table></td></tr></table><![endif]-->\r\n\r\n            </td>\r\n          </tr>\r\n        </tbody>\r\n      </table>\r\n    </div>\r\n    <!--[if mso | IE]></td></tr></table><![endif]-->\r\n\r\n  </div>\r\n</body>\r\n\r\n</html>",
+          "image_base_url": "https://oakcent.com"
+        },
+        "binary": {},
+        "pairedItem": [
+          {
+            "item": 0
+          },
+          {
+            "item": 0,
+            "input": 1
+          }
+        ]
+      }
+    ]
+  },
+  "connections": {
+    "Supabase Data": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "Send Preview",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Trigger": {
+      "main": [
+        [
+          {
+            "node": "Supabase Data",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Create a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a row": {
+      "main": [
+        [
+          {
+            "node": "Call 'Draft_from_blog'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'Draft_from_blog'": {
+      "main": [
+        [
+          {
+            "node": "Call 'Draft_from_project'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'Draft_from_project'": {
+      "main": [
+        [
+          {
+            "node": "Call 'Create_Subject'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a row": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Replace placeholders",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build output": {
+      "main": [
+        [
+          {
+            "node": "Send HTML to database",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Replace placeholders": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Preview": {
+      "main": [
+        [
+          {
+            "node": "Build output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send HTML to database": {
+      "main": [
+        [
+          {
+            "node": "Call 'Update_row_Gsheet'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Get a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'Create_Subject'": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "cae1f34a-f9fc-435b-839e-52d40fd9a3bd",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "331d746bc1a63563201e278bbfd6be74ef21f3e48d7328285e9bf034335c85dd"
+  },
+  "id": "Bsauh8A9GrYVS2N7",
+  "tags": [
+    {
+      "updatedAt": "2026-01-14T22:06:07.839Z",
+      "createdAt": "2026-01-14T22:06:07.839Z",
+      "id": "hTKjx840Lt0Pvnpo",
+      "name": "Main"
+    },
+    {
+      "updatedAt": "2026-01-14T22:03:19.715Z",
+      "createdAt": "2026-01-14T22:03:19.715Z",
+      "id": "ovTLfrcCyllneaEm",
+      "name": "Sub"
+    }
+  ]
+}

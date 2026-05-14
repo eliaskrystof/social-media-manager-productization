@@ -1,0 +1,413 @@
+{
+  "name": "SoMe_Automation_Update_Planned_Post_ext",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ext_Update_Scheduled_Post",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        32,
+        48
+      ],
+      "id": "5ef4351a-44eb-463e-91cc-f0bd0d81d5f4",
+      "name": "Webhook",
+      "webhookId": "cb928b57-6858-4b21-ac79-89581fef3387"
+    },
+    {
+      "parameters": {
+        "content": "## **1. **\nVytvoří obrázek pro post",
+        "height": 420,
+        "width": 920,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -16,
+        -96
+      ],
+      "typeVersion": 1,
+      "id": "d7652686-9cde-48c8-a890-9622986640bc",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "SoMe_user_db",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "master_table_id",
+              "keyValue": "={{ $('Webhook').item.json.body.sheetId }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        208,
+        48
+      ],
+      "id": "c4fa6f63-3700-4fb5-99e6-78226bbb60dd",
+      "name": "Get Credentials",
+      "credentials": {
+        "supabaseApi": {
+          "id": "2oNjiFHjAgVX7z4h",
+          "name": "Supabase Origamis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('Get Credentials').item.json.master_table_id }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "SoMe_content",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        560,
+        -64
+      ],
+      "id": "15fe23e8-b409-4346-9e82-66afcf24cd13",
+      "name": "Update Status in Master Table",
+      "credentials": {
+        "googleApi": {
+          "id": "aHVI3CAM5JAErt7B",
+          "name": "Google Service Account account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "some_post_plan_selfhost_external",
+        "matchType": "allFilters",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "source_row",
+              "condition": "eq",
+              "keyValue": "={{ $json.body.row }}"
+            },
+            {
+              "keyName": "user_id",
+              "condition": "eq",
+              "keyValue": "={{ $('Get Credentials').item.json.user_id }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "caption_instagram",
+              "fieldValue": "={{ $('Webhook').first().json.body.content.text_ig }}"
+            },
+            {
+              "fieldId": "credits_instagram",
+              "fieldValue": "={{ $('Webhook').first().json.body.content.credits_ig }}"
+            },
+            {
+              "fieldId": "hashtags",
+              "fieldValue": "={{ $('Webhook').first().json.body.content.hashtags_ig}}"
+            },
+            {
+              "fieldId": "caption_facebook",
+              "fieldValue": "={{ $('Webhook').first().json.body.content.text_fb }}"
+            },
+            {
+              "fieldId": "credits_facebook",
+              "fieldValue": "={{ $('Webhook').first().json.body.content.credits_fb }}"
+            },
+            {
+              "fieldId": "instagram_planned_date",
+              "fieldValue": "={{ $('Webhook').first().json.body.content.ig_planned_date }}"
+            },
+            {
+              "fieldId": "facebook_planned_date",
+              "fieldValue": "={{ $('Webhook').first().json.body.content.fb_planned_date }}"
+            },
+            {
+              "fieldId": "instagram_post_time",
+              "fieldValue": "={{ $('Webhook').first().json.body.content.ig_post_time }}"
+            },
+            {
+              "fieldId": "facebook_post_time",
+              "fieldValue": "={{ $('Webhook').first().json.body.content.fb_post_time }}"
+            },
+            {
+              "fieldId": "caption_linkedin",
+              "fieldValue": "={{ $('Webhook').first().json.body.content.text_li }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        384,
+        48
+      ],
+      "id": "2b3d3c5f-b8f9-41c8-b9fc-5ce2fe4dbdac",
+      "name": "Update entry in Post Plan",
+      "credentials": {
+        "supabaseApi": {
+          "id": "2oNjiFHjAgVX7z4h",
+          "name": "Supabase Origamis"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "6WcGcViiXxQk11Qg",
+          "mode": "list",
+          "cachedResultName": "SoMe_Automation_Progress_Log"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "master_table_id": "={{ $('Webhook').item.json.body.sheetId }}",
+            "task_type": "post_prep",
+            "job_id": "={{ $execution.id }}",
+            "message": "=Updating planned post {{ $('Webhook').item.json.body.content.ID }} complete"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "message",
+              "displayName": "message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "master_table_id",
+              "displayName": "master_table_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "task_type",
+              "displayName": "task_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "job_id",
+              "displayName": "job_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        752,
+        -64
+      ],
+      "id": "5e7b9689-4bb9-4e39-83a9-5d2885109ab2",
+      "name": "Log_done"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "6WcGcViiXxQk11Qg",
+          "mode": "list",
+          "cachedResultName": "SoMe_Automation_Progress_Log"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "master_table_id": "={{ $('Webhook').item.json.body.sheetId }}",
+            "task_type": "post_prep",
+            "job_id": "={{ $execution.id }}",
+            "message": "=Updating planned post {{ $('Webhook').item.json.body.content.ID }} failed. We are sorry. The admin has been notified of this error."
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "message",
+              "displayName": "message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "master_table_id",
+              "displayName": "master_table_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "task_type",
+              "displayName": "task_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "job_id",
+              "displayName": "job_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        592,
+        160
+      ],
+      "id": "1285a2f1-624e-4f17-9904-d764ff5aeadd",
+      "name": "Log_error"
+    },
+    {
+      "parameters": {
+        "errorMessage": "={{$json[\"error\"][\"node\"][\"name\"]}} failed: {{$json[\"error\"][\"message\"]}}"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        752,
+        160
+      ],
+      "id": "27400a90-685c-4fb4-a6d9-51a6ed940623",
+      "name": "Stop and Error"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Get Credentials",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Credentials": {
+      "main": [
+        [
+          {
+            "node": "Update entry in Post Plan",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update entry in Post Plan": {
+      "main": [
+        [
+          {
+            "node": "Update Status in Master Table",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Log_error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update Status in Master Table": {
+      "main": [
+        [
+          {
+            "node": "Log_done",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log_error": {
+      "main": [
+        [
+          {
+            "node": "Stop and Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "NmGg5uZ3m1rjeYmB"
+  },
+  "versionId": "07ac72b5-5cc3-4653-9269-e6209ca8f00f",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "2b07eec16886132e3cd818fdfac587c65db27d72fe33b2ee54f787b58f4dff76"
+  },
+  "id": "ioawqzDF2UFIZjVM",
+  "tags": []
+}

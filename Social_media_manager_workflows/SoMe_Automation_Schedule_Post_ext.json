@@ -1,0 +1,1855 @@
+{
+  "name": "SoMe_Automation_Schedule_Post_ext",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ext_Schedule_Post",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        240
+      ],
+      "id": "223513fe-f490-4575-ab2b-765519f50f9d",
+      "name": "Webhook",
+      "webhookId": "46ef9ddb-b0ac-4d0b-8de2-9b73d23564c9"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "resource": "fileFolder",
+        "searchMethod": "query",
+        "queryString": "='{{ $json.folder_id }}' in parents",
+        "filter": {},
+        "options": {
+          "fields": [
+            "id",
+            "name"
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        608,
+        240
+      ],
+      "id": "ef012de8-0fe7-4c94-b7d1-d21cb53126a7",
+      "name": "Search Master Folder",
+      "credentials": {
+        "googleApi": {
+          "id": "aHVI3CAM5JAErt7B",
+          "name": "Google Service Account account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.name.toLowerCase() }}",
+                    "rightValue": "facebook",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "e7008e23-7a7f-45fb-b0dd-9e7940b0b6fb"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "490a2125-e19b-4e5b-855f-8e0d3f65a99c",
+                    "leftValue": "={{ $json.name.toLowerCase() }}",
+                    "rightValue": "instagram",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "db6a14f5-f2a5-423f-94ca-596fabc4af86",
+                    "leftValue": "={{ $json.name.toLowerCase() }}",
+                    "rightValue": "linkedin",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        768,
+        240
+      ],
+      "id": "d651b0ff-2ea7-4778-90df-2ddd3b7ee3c7",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "resource": "fileFolder",
+        "searchMethod": "query",
+        "queryString": "='{{ $json.id }}' in parents",
+        "filter": {},
+        "options": {
+          "fields": [
+            "id",
+            "name",
+            "mimeType"
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        960,
+        112
+      ],
+      "id": "7bb781da-0820-434f-b95a-cfae215590c2",
+      "name": "Search Facebook Subfolder",
+      "alwaysOutputData": false,
+      "credentials": {
+        "googleApi": {
+          "id": "aHVI3CAM5JAErt7B",
+          "name": "Google Service Account account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "resource": "fileFolder",
+        "searchMethod": "query",
+        "queryString": "='{{ $json.id }}' in parents",
+        "filter": {},
+        "options": {
+          "fields": [
+            "id",
+            "name",
+            "mimeType"
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        960,
+        288
+      ],
+      "id": "dd586b90-ec26-4d2e-b2dd-379b032ef76b",
+      "name": "Search Instagram Subfolder",
+      "alwaysOutputData": false,
+      "credentials": {
+        "googleApi": {
+          "id": "aHVI3CAM5JAErt7B",
+          "name": "Google Service Account account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "numberInputs": 3
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        1440,
+        272
+      ],
+      "id": "462406a0-e928-4de1-9e3a-588748795cf2",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "SoMe_user_db",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "master_table_id",
+              "keyValue": "={{ $json.body.sheetId }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        128,
+        240
+      ],
+      "id": "92ca547d-a9f7-40b4-af8a-2214b37b50ac",
+      "name": "Get Credentials",
+      "credentials": {
+        "supabaseApi": {
+          "id": "2oNjiFHjAgVX7z4h",
+          "name": "Supabase Origamis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Input: expects the Webhook output JSON to be accessible\n// Adjust if needed for your workflow\nconst link = $('Webhook').first().json.body.content['Odkaz na fotky'];\n\nlet id = null;\n\n// Try different Google Drive link formats\nif (link) {\n  // Match file/d/<ID>\n  let match = link.match(/\\/file\\/d\\/([^/]+)/);\n  if (match) {\n    id = match[1];\n  }\n\n  // Match folders/<ID>\n  if (!id) {\n    match = link.match(/\\/folders\\/([^/?]+)/);\n    if (match) {\n      id = match[1];\n    }\n  }\n\n  // Match open?id=<ID>\n  if (!id) {\n    match = link.match(/[?&]id=([^&]+)/);\n    if (match) {\n      id = match[1];\n    }\n  }\n}\n\n// Return as node output\nreturn [\n  {\n    json: {\n      driveId: id\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -16,
+        624
+      ],
+      "id": "4f7d7724-2e3a-4608-ad71-f1557db97046",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3f4d0e1e-a160-4c74-9975-266cc530a276",
+              "name": "folder_id",
+              "value": "={{ $('Webhook').first().json.body.content.photos_link.match(/\\/folders\\/([^?]+)/)[1] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        400,
+        240
+      ],
+      "id": "f90da2de-32e1-4bee-bb41-7bc14ba7a9bf",
+      "name": "Get folder ID"
+    },
+    {
+      "parameters": {
+        "action": "generate",
+        "dataPropertyName": "user_id"
+      },
+      "type": "n8n-nodes-base.crypto",
+      "typeVersion": 1,
+      "position": [
+        624,
+        720
+      ],
+      "id": "cb21ab87-9c53-4c3b-96a5-cc2a05108f9c",
+      "name": "Crypto"
+    },
+    {
+      "parameters": {
+        "content": "## **1. Init**\nInicializace a nastavení\n",
+        "height": 660,
+        "width": 596,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -64,
+        -64
+      ],
+      "typeVersion": 1,
+      "id": "1dc1ddf2-f813-4d75-92e7-ad4d87145973",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "## **2. Plánování postu**\nZíská potřebné informace od uživatele",
+        "height": 660,
+        "width": 1204,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        528,
+        -64
+      ],
+      "typeVersion": 1,
+      "id": "7b3a1ca1-3c95-4436-9da4-1be72979d7cf",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## **3. Ukládání do databáze**\nUloží informace do databáze časy pro jednotlivé platformy",
+        "height": 660,
+        "width": 600,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1728,
+        -64
+      ],
+      "typeVersion": 1,
+      "id": "1e535c96-5596-4c91-8903-9acf3a9ea18c",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('Get Credentials').item.json.master_table_id }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "SoMe_content",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "row_number": "={{ $json.source_row }}",
+            "FÁZE PLÁNOVÁNÍ": "=scheduled ({{ $now.format('dd/MM/yy hh:mm:ss') }})"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "ŘÁDEK",
+              "displayName": "ŘÁDEK",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "INSTAGRAM TEXT",
+              "displayName": "INSTAGRAM TEXT",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "KREDITY IG: FOTO/VIDEO/JINÉ ",
+              "displayName": "KREDITY IG: FOTO/VIDEO/JINÉ ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "HASHTAGS # IG",
+              "displayName": "HASHTAGS # IG",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "FACEBOOK TEXT",
+              "displayName": "FACEBOOK TEXT",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "KREDITY FB: FOTO/VIDEO/JINÉ ",
+              "displayName": "KREDITY FB: FOTO/VIDEO/JINÉ ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "LINKEDIN TEXT",
+              "displayName": "LINKEDIN TEXT",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ODKAZ NA FOTO/VIDEO PŘÍSPĚVKŮ",
+              "displayName": "ODKAZ NA FOTO/VIDEO PŘÍSPĚVKŮ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "DATUM POSTU - INSTAGRAM",
+              "displayName": "DATUM POSTU - INSTAGRAM",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "DATUM POSTU - FACEBOOK",
+              "displayName": "DATUM POSTU - FACEBOOK",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "DATUM POSTU - LINKEDIN",
+              "displayName": "DATUM POSTU - LINKEDIN",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ČAS POSTU INSTAGRAM",
+              "displayName": "ČAS POSTU INSTAGRAM",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ČAS POSTU FACEBOOK",
+              "displayName": "ČAS POSTU FACEBOOK",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ČAS POSTU LINKEDIN",
+              "displayName": "ČAS POSTU LINKEDIN",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Checkbox",
+              "displayName": "Checkbox",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "FÁZE PLÁNOVÁNÍ",
+              "displayName": "FÁZE PLÁNOVÁNÍ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "NÁHLED ",
+              "displayName": "NÁHLED ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Obrázky",
+              "displayName": "Obrázky",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        2048,
+        128
+      ],
+      "id": "aaedf001-9ccc-4246-bbac-7455b8ca7230",
+      "name": "Update status in Master Table",
+      "credentials": {
+        "googleApi": {
+          "id": "aHVI3CAM5JAErt7B",
+          "name": "Google Service Account account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "some_post_plan_selfhost_external",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "caption_instagram",
+              "fieldValue": "={{ $('Webhook').item.json.body.content.text_ig }}"
+            },
+            {
+              "fieldId": "credits_instagram",
+              "fieldValue": "={{ $('Webhook').item.json.body.content.credits_ig }}"
+            },
+            {
+              "fieldId": "hashtags",
+              "fieldValue": "={{ $('Webhook').item.json.body.content.hashtags_ig }}"
+            },
+            {
+              "fieldId": "caption_facebook",
+              "fieldValue": "={{ $('Webhook').item.json.body.content.text_fb}}"
+            },
+            {
+              "fieldId": "instagram_planned_date",
+              "fieldValue": "={{ \n  $('Webhook').first().json.body.action_for_instagram === false\n    ? null\n    : (\n        $('Webhook').first().json.body.content.ig_planned_date &&\n        String($('Webhook').first().json.body.content.ig_planned_date).trim()\n      )\n      ? $('Webhook').first().json.body.content.ig_planned_date\n      : $today\n}}"
+            },
+            {
+              "fieldId": "facebook_planned_date",
+              "fieldValue": "={{ \n  $('Webhook').first().json.body.action_for_facebook === false\n    ? null\n    : (\n        $('Webhook').first().json.body.content.fb_planned_date &&\n        String($('Webhook').first().json.body.content.fb_planned_date).trim()\n      )\n      ? $('Webhook').first().json.body.content.fb_planned_date\n      : $today\n}}"
+            },
+            {
+              "fieldId": "instagram_post_time",
+              "fieldValue": "={{ \n  $('Webhook').first().json.body.content.ig_post_time && String($('Webhook').first().json.body.content.ig_post_time).trim()\n    ? $('Webhook').first().json.body.content.ig_post_time\n    : null\n}}"
+            },
+            {
+              "fieldId": "facebook_post_time",
+              "fieldValue": "={{ \n  $('Webhook').first().json.body.content.fb_post_time && String($('Webhook').first().json.body.content.fb_post_time).trim()\n    ? $('Webhook').first().json.body.content.fb_post_time\n    : null\n}}"
+            },
+            {
+              "fieldId": "source_row",
+              "fieldValue": "={{ $('Webhook').item.json.body.row }}"
+            },
+            {
+              "fieldId": "facebook_attachments",
+              "fieldValue": "={{ $json.facebook_attachments || null }}"
+            },
+            {
+              "fieldId": "instagram_attachments",
+              "fieldValue": "={{ $json.instagram_attachments || null }}"
+            },
+            {
+              "fieldId": "user_id",
+              "fieldValue": "={{ $('Get Credentials').item.json.user_id }}"
+            },
+            {
+              "fieldId": "status",
+              "fieldValue": "waiting"
+            },
+            {
+              "fieldId": "linkedin_attachments",
+              "fieldValue": "={{ $json.linkedin_attachments || null }}"
+            },
+            {
+              "fieldId": "caption_linkedin",
+              "fieldValue": "={{ $('Webhook').item.json.body.content.text_li }}"
+            },
+            {
+              "fieldId": "linkedin_planned_date",
+              "fieldValue": "={{ \n  $('Webhook').first().json.body.action_for_linkedin === false\n    ? null\n    : (\n        $('Webhook').first().json.body.content.li_planned_date &&\n        String($('Webhook').first().json.body.content.li_planned_date).trim()\n      )\n      ? $('Webhook').first().json.body.content.li_planned_date\n      : $today\n}}"
+            },
+            {
+              "fieldId": "linkedin_post_time",
+              "fieldValue": "={{ \n  $('Webhook').first().json.body.content.li_post_time && String($('Webhook').first().json.body.content.li_post_time).trim()\n    ? $('Webhook').first().json.body.content.li_post_time\n    : null\n}}"
+            },
+            {
+              "fieldId": "publish_fb",
+              "fieldValue": "={{ \n  $('Webhook').first().json.body.action_for_facebook === false \n    ? 'no' \n    : 'yes' \n}}"
+            },
+            {
+              "fieldId": "publish_ig",
+              "fieldValue": "={{ \n  $('Webhook').first().json.body.action_for_instagram === false \n    ? 'no' \n    : 'yes' \n}}"
+            },
+            {
+              "fieldId": "publish_li",
+              "fieldValue": "={{ \n  $('Webhook').first().json.body.action_for_linkedin === false \n    ? 'no' \n    : 'yes' \n}}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1888,
+        288
+      ],
+      "id": "5adbb7b9-c12e-455f-a0e6-200e985564db",
+      "name": "Create an entry in Post Plan",
+      "alwaysOutputData": false,
+      "credentials": {
+        "supabaseApi": {
+          "id": "2oNjiFHjAgVX7z4h",
+          "name": "Supabase Origamis"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('Get Credentials').item.json.master_table_id }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "SoMe_content",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "row_number": "={{ $('Webhook').item.json.body.row }}",
+            "Status": "=Error in scheduling:  {{ $json.error }}"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "ID",
+              "displayName": "ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "TEXT IG",
+              "displayName": "TEXT IG",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": " CREDITS INSTAGRAM",
+              "displayName": " CREDITS INSTAGRAM",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "HASHTAGS INSTAGRAM",
+              "displayName": "HASHTAGS INSTAGRAM",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "TEXT FB",
+              "displayName": "TEXT FB",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "CREDITS FACEBOOK",
+              "displayName": "CREDITS FACEBOOK",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "TEXT LINKEDIN",
+              "displayName": "TEXT LINKEDIN",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "PREVIEW",
+              "displayName": "PREVIEW",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Odkaz na fotky",
+              "displayName": "Odkaz na fotky",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Instagram planned date",
+              "displayName": "Instagram planned date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Facebook planned date",
+              "displayName": "Facebook planned date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Linkedin planned date",
+              "displayName": "Linkedin planned date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Instagram post time",
+              "displayName": "Instagram post time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Facebook post time",
+              "displayName": "Facebook post time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Linkedin post time",
+              "displayName": "Linkedin post time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Checkbox",
+              "displayName": "Checkbox",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        2048,
+        400
+      ],
+      "id": "740d8d58-a159-405f-9e91-c52343eeae38",
+      "name": "Send error to Master Table",
+      "credentials": {
+        "googleApi": {
+          "id": "aHVI3CAM5JAErt7B",
+          "name": "Google Service Account account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "6WcGcViiXxQk11Qg",
+          "mode": "list",
+          "cachedResultName": "SoMe_Automation_Progress_Log"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "master_table_id": "={{ $('Webhook').item.json.body.sheetId }}",
+            "task_type": "post_prep",
+            "message": "=Scheduling post {{ $('Webhook').item.json.body.content.ID }} started",
+            "job_id": "={{ $execution.id }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "message",
+              "displayName": "message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "master_table_id",
+              "displayName": "master_table_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "task_type",
+              "displayName": "task_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "job_id",
+              "displayName": "job_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        272,
+        240
+      ],
+      "id": "c7e65137-6df1-4dc3-81c1-ff020b2c1a1d",
+      "name": "Log_init"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "6WcGcViiXxQk11Qg",
+          "mode": "list",
+          "cachedResultName": "SoMe_Automation_Progress_Log"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "master_table_id": "={{ $('Webhook').item.json.body.sheetId }}",
+            "task_type": "post_prep",
+            "message": "=Scheduling post {{ $('Webhook').item.json.body.content.ID }} complete",
+            "job_id": "={{ $execution.id }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "message",
+              "displayName": "message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "master_table_id",
+              "displayName": "master_table_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "task_type",
+              "displayName": "task_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "job_id",
+              "displayName": "job_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        2208,
+        128
+      ],
+      "id": "db042d09-d078-4b43-98da-7bea6dd43722",
+      "name": "Log_done"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "6WcGcViiXxQk11Qg",
+          "mode": "list",
+          "cachedResultName": "SoMe_Automation_Progress_Log"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "master_table_id": "={{ $('Webhook').item.json.body.sheetId }}",
+            "task_type": "post_prep",
+            "message": "=Scheduling post {{ $('Webhook').item.json.body.content.ID }} failed",
+            "job_id": "={{ $execution.id }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "message",
+              "displayName": "message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "master_table_id",
+              "displayName": "master_table_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "task_type",
+              "displayName": "task_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "job_id",
+              "displayName": "job_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        2208,
+        400
+      ],
+      "id": "d2a71a91-5ed8-4501-b5e2-96682b1a5592",
+      "name": "Log_error"
+    },
+    {
+      "parameters": {
+        "jsCode": "const merged = Object.assign({}, ...($json.data || []));\n\nreturn [\n  {\n    json: merged\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1760,
+        288
+      ],
+      "id": "38c4bb7e-9013-459d-8806-46f1687a41e2",
+      "name": "Ascend to top level"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        1584,
+        288
+      ],
+      "id": "ae43d3a8-8ef7-46e7-beec-5f9c08b8d9af",
+      "name": "Flatten merged output"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "resource": "fileFolder",
+        "searchMethod": "query",
+        "queryString": "='{{ $json.id }}' in parents",
+        "filter": {},
+        "options": {
+          "fields": [
+            "id",
+            "name",
+            "mimeType"
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        960,
+        464
+      ],
+      "id": "3960ddfc-06c4-4a27-9ad1-6d320379aa0e",
+      "name": "Search LinkedIn Subfolder",
+      "alwaysOutputData": false,
+      "credentials": {
+        "googleApi": {
+          "id": "aHVI3CAM5JAErt7B",
+          "name": "Google Service Account account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "C4SqONTqGko6lHJT",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/C4SqONTqGko6lHJT",
+          "cachedResultName": "SoMe_Automation_Donwload_file_ext"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "file_id": "={{ $json.id }}",
+            "platform": "facebook",
+            "file_name": "={{ $json.name }}",
+            "mimeType": "={{ $json.mimeType }}",
+            "source_row": "={{ $('Webhook').item.json.body.row }}",
+            "user_name": "={{ $('Get Credentials').item.json.user_name.toLower.replaceAll(\" \",\"_\") }}"
+          },
+          "matchingColumns": [
+            "file_id"
+          ],
+          "schema": [
+            {
+              "id": "file_id",
+              "displayName": "file_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "platform",
+              "displayName": "platform",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "file_name",
+              "displayName": "file_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "mimeType",
+              "displayName": "mimeType",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "source_row",
+              "displayName": "source_row",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number",
+              "removed": false
+            },
+            {
+              "id": "user_name",
+              "displayName": "user_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "mode": "each",
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        1120,
+        112
+      ],
+      "id": "5a121120-2912-4913-aeae-1a1f121f0baf",
+      "name": "Download Facebook media",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "C4SqONTqGko6lHJT",
+          "mode": "list",
+          "cachedResultName": "SoMe_Automation_Donwload_file_ext"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "file_id": "={{ $json.id }}",
+            "platform": "instagram",
+            "file_name": "={{ $json.name }}",
+            "mimeType": "={{ $json.mimeType }}",
+            "source_row": "={{ $('Webhook').item.json.body.row }}",
+            "user_name": "={{ $('Get Credentials').item.json.user_name.toLower.replaceAll(\" \",\"_\") }}"
+          },
+          "matchingColumns": [
+            "file_id"
+          ],
+          "schema": [
+            {
+              "id": "file_id",
+              "displayName": "file_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "platform",
+              "displayName": "platform",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "file_name",
+              "displayName": "file_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "mimeType",
+              "displayName": "mimeType",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "source_row",
+              "displayName": "source_row",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number",
+              "removed": false
+            },
+            {
+              "id": "user_name",
+              "displayName": "user_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "mode": "each",
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        1120,
+        288
+      ],
+      "id": "fd72f05e-55a9-408c-94ac-8a15801e87af",
+      "name": "Download Instagram Media",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "C4SqONTqGko6lHJT",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/C4SqONTqGko6lHJT",
+          "cachedResultName": "SoMe_Automation_Donwload_file_ext"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "file_id": "={{ $json.id }}",
+            "platform": "linkedin",
+            "file_name": "={{ $json.name }}",
+            "mimeType": "={{ $json.mimeType }}",
+            "source_row": "={{ $('Webhook').item.json.body.row }}",
+            "user_name": "={{ $('Get Credentials').item.json.user_name.toLower.replaceAll(\" \",\"_\") }}"
+          },
+          "matchingColumns": [
+            "file_id"
+          ],
+          "schema": [
+            {
+              "id": "file_id",
+              "displayName": "file_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "platform",
+              "displayName": "platform",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "file_name",
+              "displayName": "file_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "mimeType",
+              "displayName": "mimeType",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "source_row",
+              "displayName": "source_row",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number",
+              "removed": false
+            },
+            {
+              "id": "user_name",
+              "displayName": "user_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "mode": "each",
+        "options": {
+          "waitForSubWorkflow": true
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        1120,
+        464
+      ],
+      "id": "f170cc90-660c-4f47-b98a-9f00e5901e2d",
+      "name": "Download LinkedIn media",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "fileName",
+              "renameField": true,
+              "outputFieldName": "facebook_attachments"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        1280,
+        112
+      ],
+      "id": "17e5d9ab-4ed6-428c-97f0-7485a4a4cc11",
+      "name": "FB media to array"
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "fileName",
+              "renameField": true,
+              "outputFieldName": "instagram_attachments"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        1280,
+        288
+      ],
+      "id": "2b964c5b-e22f-4328-9314-909909a8b0d4",
+      "name": "IG media to array"
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "fileName",
+              "renameField": true,
+              "outputFieldName": "linkedin_attachments"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        1280,
+        464
+      ],
+      "id": "0e9fa439-a7af-4189-a654-df42ffaee12a",
+      "name": "LI media to array"
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "n8n.princparket.cz",
+            "user-agent": "Mozilla/5.0 (compatible; Google-Apps-Script; beanserver; +https://script.google.com; id: UAEmdDd_5NVPsrLm33vDxP5DnoxE3Di6Wulc)",
+            "content-length": "1655",
+            "accept-encoding": "gzip, deflate, br",
+            "content-type": "application/json",
+            "via": "1.1 Caddy",
+            "x-forwarded-for": "35.187.134.110",
+            "x-forwarded-host": "n8n.princparket.cz",
+            "x-forwarded-proto": "https"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "sheetId": "1JOya4Be0BD1FC0bA8nYgbIm7thSsYfjd01EGR7gnsgM",
+            "row": 3,
+            "content": {
+              "id": 2,
+              "text_ig": "✨ Zahalte svůj domov do elegance s naší novou kolekcí nábytku. Navrženy s precizností a vášní, naše kusy přinášejí styl a pohodlí na nové úrovni. Prozkoumejte, jak náš design může zvýraznit vaši jedinečnou estetiku a učinit váš prostor opravdu výjimečným. 📍 Zveme vás na osobní setkání s krásou řemesla v našich prodejnách. Jaký je váš oblíbený kus z nové kolekce? Podělte se s námi v komentářích!",
+              "credits_ig": "",
+              "hashtags_ig": "#design, #homeinterior, #premiumfurniture",
+              "text_fb": "✨ Zahalte svůj domov do elegance s naší novou kolekcí nábytku. Navrženy s precizností a vášní, naše kusy přinášejí styl a pohodlí na nové úrovni. Prozkoumejte, jak náš design může zvýraznit vaši jedinečnou estetiku a učinit váš prostor opravdu výjimečným. 📍 Zveme vás na osobní setkání s krásou řemesla v našich prodejnách. Jaký je váš oblíbený kus z nové kolekce? Podělte se s námi v komentářích!",
+              "credits_fb": "",
+              "text_li": "Test, jen jestli to funguje.",
+              "photos_link": "https://drive.google.com/drive/folders/1JmiXarqhG99nH15y0iePZAZSz4fP26Ys",
+              "ig_planned_date": "2026-04-12",
+              "fb_planned_date": "2026-04-12",
+              "li_planned_date": "2026-04-12",
+              "ig_post_time": "16:00:00",
+              "fb_post_time": "16:00:00",
+              "li_post_time": "16:00:00",
+              "checked": true,
+              "status": "updated (11/04/26 03:38:50)",
+              "preview": "Stáhnout Náhled",
+              "images": true
+            },
+            "action_name": "Schedule Posts",
+            "user_input": "",
+            "image_source": "yes",
+            "action_for_facebook": true,
+            "action_for_instagram": true,
+            "action_for_linkedin": false
+          },
+          "webhookUrl": "https://n8n.princparket.cz/webhook/ext_Schedule_Post",
+          "executionMode": "production"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Get Credentials",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search Master Folder": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Search Facebook Subfolder",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Search Instagram Subfolder",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Search LinkedIn Subfolder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search Facebook Subfolder": {
+      "main": [
+        [
+          {
+            "node": "Download Facebook media",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search Instagram Subfolder": {
+      "main": [
+        [
+          {
+            "node": "Download Instagram Media",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Flatten merged output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Credentials": {
+      "main": [
+        [
+          {
+            "node": "Log_init",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        []
+      ]
+    },
+    "Get folder ID": {
+      "main": [
+        [
+          {
+            "node": "Search Master Folder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create an entry in Post Plan": {
+      "main": [
+        [
+          {
+            "node": "Update status in Master Table",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send error to Master Table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Log_init": {
+      "main": [
+        [
+          {
+            "node": "Get folder ID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update status in Master Table": {
+      "main": [
+        [
+          {
+            "node": "Log_done",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send error to Master Table": {
+      "main": [
+        [
+          {
+            "node": "Log_error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ascend to top level": {
+      "main": [
+        [
+          {
+            "node": "Create an entry in Post Plan",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Flatten merged output": {
+      "main": [
+        [
+          {
+            "node": "Ascend to top level",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search LinkedIn Subfolder": {
+      "main": [
+        [
+          {
+            "node": "Download LinkedIn media",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Facebook media": {
+      "main": [
+        [
+          {
+            "node": "FB media to array",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Instagram Media": {
+      "main": [
+        [
+          {
+            "node": "IG media to array",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download LinkedIn media": {
+      "main": [
+        [
+          {
+            "node": "LI media to array",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FB media to array": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IG media to array": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "LI media to array": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "NmGg5uZ3m1rjeYmB"
+  },
+  "versionId": "44f51bb0-2eee-4f0a-8221-04201eb578e9",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "2b07eec16886132e3cd818fdfac587c65db27d72fe33b2ee54f787b58f4dff76"
+  },
+  "id": "07NwzD9YMYjbS28B",
+  "tags": []
+}

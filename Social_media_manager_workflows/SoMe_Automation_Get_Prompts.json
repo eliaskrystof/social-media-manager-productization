@@ -1,0 +1,217 @@
+{
+  "name": "SoMe_Automation_Get_Prompts",
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "instagram_prompt_id"
+            },
+            {
+              "name": "facebook_prompt_id"
+            },
+            {
+              "name": "linkedin_prompt_id"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -160,
+        32
+      ],
+      "id": "eb9547ac-0590-45d5-97cf-0476ed1b53b2",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "documentURL": "={{ $('When Executed by Another Workflow').item.json.facebook_prompt_id }}"
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        80,
+        -144
+      ],
+      "id": "7d3d775e-6f70-4c6c-9a61-8fe5fceb32c2",
+      "name": "Get a document",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "BnCoEnWKeeKxghrr",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "documentURL": "={{ $('When Executed by Another Workflow').item.json.instagram_prompt_id }}"
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        80,
+        32
+      ],
+      "id": "129143ab-10c1-491a-9e42-2f77ee5b8489",
+      "name": "Get a document1",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "BnCoEnWKeeKxghrr",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "documentURL": "={{ $('When Executed by Another Workflow').item.json.linkedin_prompt_id }}"
+      },
+      "type": "n8n-nodes-base.googleDocs",
+      "typeVersion": 2,
+      "position": [
+        80,
+        160
+      ],
+      "id": "d3f023ad-f959-40cd-b77d-baf616b608fb",
+      "name": "Get a document2",
+      "credentials": {
+        "googleDocsOAuth2Api": {
+          "id": "BnCoEnWKeeKxghrr",
+          "name": "Google Docs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "numberInputs": 3
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        384,
+        32
+      ],
+      "id": "a12cf39d-c0ea-424e-9bbc-4b276c55cec2",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "10d0b7ff-7908-4a0d-9d62-e1372b3a9108",
+              "name": "facebook_prompt",
+              "value": "={{ $json.content[0] }}",
+              "type": "string"
+            },
+            {
+              "id": "9c5e1450-d73a-4343-b7f6-e545ad83fd8d",
+              "name": "instagram_prompt",
+              "value": "={{ $json.content[1] }}",
+              "type": "string"
+            },
+            {
+              "id": "7ce157dc-5dca-4097-b8d8-de516e776d3e",
+              "name": "linkedin_prompt",
+              "value": "={{ $json.content[2] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        608,
+        32
+      ],
+      "id": "da58e1a3-e7a0-4624-9610-6315b805b874",
+      "name": "Edit Fields"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Get a document",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get a document1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get a document2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a document": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a document1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Get a document2": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "e553667f-837f-41f3-ab44-79753639ba59",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "2b07eec16886132e3cd818fdfac587c65db27d72fe33b2ee54f787b58f4dff76"
+  },
+  "id": "wuBpeRRW0VTWasLv",
+  "tags": []
+}

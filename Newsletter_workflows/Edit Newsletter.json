@@ -1,0 +1,1277 @@
+{
+  "name": "Edit Newsletter",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "edit-newsletter",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "faf098e2-1fdc-4a0b-b29b-dbfbc9de1446",
+      "name": "Webhook",
+      "webhookId": "5b931053-f7bb-464f-8285-a6f758f03813"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "body.newsletters[0].languages",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "91702f36-8494-4936-93b1-8c6c55e1de6c",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.section }}",
+                    "rightValue": "blog",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "b765b83e-7fca-4f97-a054-69c15385c35a"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "2da2c86a-e994-4ea0-b477-357428de44b1",
+                    "leftValue": "={{ $json.section }}",
+                    "rightValue": "project",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "5a248df2-1ab9-47d3-95ec-a934f099a5c8",
+                    "leftValue": "={{ $json.section }}",
+                    "rightValue": "collection",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "ab4699b0-ffd8-4ba2-9167-ea9326fa351d",
+                    "leftValue": "={{ $json.section }}",
+                    "rightValue": "pattern",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        768,
+        -32
+      ],
+      "id": "c8ca2d68-5136-499e-90d4-5f638a2ef796",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();   // all incoming items\nconst out = [];\n\nfor (const item of items) {\n  const lang = item.json;\n\n  const base = {\n    rowNumber: lang.rowNumber,\n    language: lang.language,\n  };\n\n  if (lang.blog?.change) {\n    out.push({\n      json: {\n        ...base,\n        section: 'blog',\n        data: lang.blog,\n      },\n    });\n  }\n\n  if (lang.project?.change) {\n    out.push({\n      json: {\n        ...base,\n        section: 'project',\n        data: lang.project,\n      },\n    });\n  }\n\n  if (lang.collection?.change) {\n    out.push({\n      json: {\n        ...base,\n        section: 'collection',\n        data: lang.collection,\n      },\n    });\n  }\n\n  if (lang.pattern?.change) {\n    out.push({\n      json: {\n        ...base,\n        section: 'pattern',\n        data: lang.pattern,\n      },\n    });\n  }\n}\n\nreturn out;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        464,
+        0
+      ],
+      "id": "fa104318-d6da-47a1-9fd9-7ecf302ed2fe",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "ZQsRZ5F5SAulrXLn",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/ZQsRZ5F5SAulrXLn",
+          "cachedResultName": "Socials Agent — Draft_from_blog"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "change": true,
+            "blog": "={{ $('Code in JavaScript').item.json.data.blog1 }}",
+            "language": "={{ $('Code in JavaScript').item.json.language }}",
+            "source_row": "={{ $('Webhook').item.json.body.newsletters[0].rowNumber }}",
+            "comment": "={{ $('Code in JavaScript').item.json.data.comment }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "blog",
+              "displayName": "blog",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "language",
+              "displayName": "language",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "source_row",
+              "displayName": "source_row",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number",
+              "removed": false
+            },
+            {
+              "id": "change",
+              "displayName": "change",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "boolean",
+              "removed": false
+            },
+            {
+              "id": "comment",
+              "displayName": "comment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        1296,
+        -208
+      ],
+      "id": "874ee6ff-3a04-4bc6-ae2f-6f30d4459eaa",
+      "name": "Call 'Draft_from_blog'"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "TaR4Csa0MTPMkn37",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/TaR4Csa0MTPMkn37",
+          "cachedResultName": "Socials Agent — Draft_from_project"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "change": false
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "project",
+              "displayName": "project",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "language",
+              "displayName": "language",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "source_row",
+              "displayName": "source_row",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "change",
+              "displayName": "change",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "boolean",
+              "removed": false
+            },
+            {
+              "id": "comment",
+              "displayName": "comment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        1296,
+        -80
+      ],
+      "id": "ce7fa5fd-8b88-4d14-aeff-b8f11550b8bf",
+      "name": "Call 'Draft_from_project'"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "nr7rsyJ41A1ZZlez",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/nr7rsyJ41A1ZZlez",
+          "cachedResultName": "Socials Agent — Update_row_Gsheet"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "post_id": "={{ $('Get row for blog update').item.json.post_id }}"
+          },
+          "matchingColumns": [
+            "post_id"
+          ],
+          "schema": [
+            {
+              "id": "post_id",
+              "displayName": "post_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        1504,
+        -208
+      ],
+      "id": "46868685-d13b-4a83-8e26-c38b77c3e0e6",
+      "name": "Call 'Update_row_Gsheet'"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "nr7rsyJ41A1ZZlez",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/nr7rsyJ41A1ZZlez",
+          "cachedResultName": "Socials Agent — Update_row_Gsheet"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "post_id": "={{ $('Get row for project update').item.json.post_id }}"
+          },
+          "matchingColumns": [
+            "post_id"
+          ],
+          "schema": [
+            {
+              "id": "post_id",
+              "displayName": "post_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        1504,
+        -80
+      ],
+      "id": "4782bab1-a77b-45e4-9a1a-71f4851b59a1",
+      "name": "Call 'Update_row_Gsheet'1"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "nr7rsyJ41A1ZZlez",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/nr7rsyJ41A1ZZlez",
+          "cachedResultName": "Socials Agent — Update_row_Gsheet"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "post_id": "={{ $('Get row for collection update').item.json.post_id }}"
+          },
+          "matchingColumns": [
+            "post_id"
+          ],
+          "schema": [
+            {
+              "id": "post_id",
+              "displayName": "post_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        1504,
+        80
+      ],
+      "id": "7e10b3cb-3239-4aa8-a2de-a21f7b757df6",
+      "name": "Call 'Update_row_Gsheet'2"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "nr7rsyJ41A1ZZlez",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/nr7rsyJ41A1ZZlez",
+          "cachedResultName": "Socials Agent — Update_row_Gsheet"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "post_id": "={{ $('Get row for pattern update').item.json.post_id }}"
+          },
+          "matchingColumns": [
+            "post_id"
+          ],
+          "schema": [
+            {
+              "id": "post_id",
+              "displayName": "post_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "number",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        1504,
+        240
+      ],
+      "id": "fb4a1b96-d951-4942-a3bc-a53edc076470",
+      "name": "Call 'Update_row_Gsheet'3"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "newsletter_drafts",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "source_row",
+              "keyValue": "={{ $('Webhook').item.json.body.newsletters[0].rowNumber }}"
+            },
+            {
+              "keyName": "language",
+              "keyValue": "={{ $json.language }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        992,
+        80
+      ],
+      "id": "47b3173e-5440-4206-9bfb-31752f4c4d51",
+      "name": "Get row for collection update",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "XbTsqF8wuG2gSZNT",
+          "name": "Supabase account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "newsletter_drafts",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "post_id",
+              "condition": "eq",
+              "keyValue": "={{ $('Get row for collection update').item.json.post_id }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "collection_title",
+              "fieldValue": "={{ $('Switch').item.json.data.title }}"
+            },
+            {
+              "fieldId": "collection_text",
+              "fieldValue": "={{ $('Switch').item.json.data.body }}"
+            },
+            {
+              "fieldId": "collection_cta",
+              "fieldValue": "={{ $('Switch').item.json.data.cta }}"
+            },
+            {
+              "fieldId": "collection_url",
+              "fieldValue": "={{ $('Switch').item.json.data.url }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1120,
+        80
+      ],
+      "id": "3c1a4f25-05ab-4e94-b365-3f1dde71eeb1",
+      "name": "Update collection entry",
+      "credentials": {
+        "supabaseApi": {
+          "id": "XbTsqF8wuG2gSZNT",
+          "name": "Supabase account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "newsletter_drafts",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "source_row",
+              "keyValue": "={{ $('Webhook').item.json.body.newsletters[0].rowNumber }}"
+            },
+            {
+              "keyName": "language",
+              "keyValue": "={{ $json.language }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1072,
+        -208
+      ],
+      "id": "8f3ef196-73e8-4066-93aa-d70963762c83",
+      "name": "Get row for blog update",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "XbTsqF8wuG2gSZNT",
+          "name": "Supabase account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "newsletter_drafts",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "source_row",
+              "keyValue": "={{ $('Webhook').item.json.body.newsletters[0].rowNumber }}"
+            },
+            {
+              "keyName": "language",
+              "keyValue": "={{ $json.language }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1072,
+        -80
+      ],
+      "id": "42cdcdd5-9566-49fb-a16f-c4a61958fd86",
+      "name": "Get row for project update",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "XbTsqF8wuG2gSZNT",
+          "name": "Supabase account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "newsletter_drafts",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "source_row",
+              "keyValue": "={{ $('Webhook').item.json.body.newsletters[0].rowNumber }}"
+            },
+            {
+              "keyName": "language",
+              "keyValue": "={{ $json.language }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        992,
+        240
+      ],
+      "id": "ec1ae1fc-12fe-46e2-9f8f-e55dd32155fe",
+      "name": "Get row for pattern update",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "XbTsqF8wuG2gSZNT",
+          "name": "Supabase account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "newsletter_drafts",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "post_id",
+              "condition": "eq",
+              "keyValue": "={{ $('Get row for pattern update').item.json.post_id }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "pattern_title",
+              "fieldValue": "={{ $('Switch').item.json.data.title }}"
+            },
+            {
+              "fieldId": "pattern_text",
+              "fieldValue": "={{ $('Switch').item.json.data.body }}"
+            },
+            {
+              "fieldId": "pattern_cta",
+              "fieldValue": "={{ $('Switch').item.json.data.cta }}"
+            },
+            {
+              "fieldId": "patternCollection_name",
+              "fieldValue": "={{ $('Switch').item.json.data.collectionName }}"
+            },
+            {
+              "fieldId": "patternCollection_url",
+              "fieldValue": "={{ $('Switch').item.json.data.collectionUrl }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        1120,
+        240
+      ],
+      "id": "f9ebfe07-7b8e-41e5-87be-f0ac31a7f5ec",
+      "name": "Update pattern entry",
+      "credentials": {
+        "supabaseApi": {
+          "id": "XbTsqF8wuG2gSZNT",
+          "name": "Supabase account 3"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        2048,
+        16
+      ],
+      "id": "019776c8-e903-428a-b00d-ff6066fb4f92",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "14CkOky3jXC9rcwen1GmEy6U1ALrfHjDRD1HAjsoycQg",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 445110406,
+          "mode": "list",
+          "cachedResultName": "Návrh tabulky Newsletterů",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/14CkOky3jXC9rcwen1GmEy6U1ALrfHjDRD1HAjsoycQg/edit#gid=445110406"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "row_number": "={{ $('Webhook').item.json.body.newsletters[0].rowNumber }}",
+            "status": "UPDATED"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "Month",
+              "displayName": "Month",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "No.",
+              "displayName": "No.",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Topic",
+              "displayName": "Topic",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Target group (databáze)",
+              "displayName": "Target group (databáze)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Subject",
+              "displayName": "Subject",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "1. blog",
+              "displayName": "1. blog",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "2. project",
+              "displayName": "2. project",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "3. color collection",
+              "displayName": "3. color collection",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "4. pattern collection",
+              "displayName": "4. pattern collection",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "5. CTA content",
+              "displayName": "5. CTA content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "5. CTA link",
+              "displayName": "5. CTA link",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Vytvořit obsah",
+              "displayName": "Vytvořit obsah",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "CZ content",
+              "displayName": "CZ content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "EN content",
+              "displayName": "EN content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "PL content",
+              "displayName": "PL content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "DE content",
+              "displayName": "DE content",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "date and time",
+              "displayName": "date and time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "sender",
+              "displayName": "sender",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2224,
+        16
+      ],
+      "id": "3c2571fd-2d91-4537-8d26-9d9decd31f43",
+      "name": "Update row in sheet",
+      "credentials": {
+        "googleApi": {
+          "id": "O03CqHPT0yrBvxCy",
+          "name": "Google Sheets service account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "origamis.app.n8n.cloud",
+            "user-agent": "Mozilla/5.0 (compatible; Google-Apps-Script; beanserver; +https://script.google.com; id: UAEmdDd_gTpSg_Bxa2I0aChIN19Gfc8RzqA)",
+            "content-length": "1092",
+            "accept-encoding": "gzip, br",
+            "cdn-loop": "cloudflare; loops=1; subreqs=1",
+            "cf-connecting-ip": "107.178.194.102",
+            "cf-ew-via": "15",
+            "cf-ipcountry": "US",
+            "cf-ray": "9bcd0714c05efa11-ORD",
+            "cf-visitor": "{\"scheme\":\"https\"}",
+            "cf-worker": "n8n.cloud",
+            "content-type": "application/json",
+            "x-forwarded-for": "107.178.194.102, 172.70.130.243",
+            "x-forwarded-host": "origamis.app.n8n.cloud",
+            "x-forwarded-port": "443",
+            "x-forwarded-proto": "https",
+            "x-forwarded-server": "traefik-prod-users-gwc-54-58b646fcb5-cdgwt",
+            "x-is-trusted": "yes",
+            "x-real-ip": "107.178.194.102"
+          },
+          "params": {},
+          "query": {},
+          "body": {
+            "newsletters": [
+              {
+                "rowNumber": 2,
+                "languages": [
+                  {
+                    "language": "czech",
+                    "blog": {
+                      "change": true,
+                      "comment": "",
+                      "subject": null,
+                      "blog1": "https://www.oakcent.cz/magazin/zakazkova-vyroba"
+                    },
+                    "project": {
+                      "change": true,
+                      "comment": "",
+                      "project2": "https://www.oakcent.com/projects/bernard-visitor-center"
+                    },
+                    "collection": {
+                      "change": true,
+                      "name": "Sand",
+                      "title": "Sand",
+                      "body": "Světlé odstíny kolekce Sand vnesly do realizace jemně teplé přírodní tóny a zklidňující energii dřeva v souladu s přírodou.",
+                      "img1": "https://drive.google.com/file/d/1I_6z-pmk4PyWngNELDOLPvc8xzDQ-BG7/view?usp=sharing",
+                      "img2": null,
+                      "cta": "Objevte kolekci Sand",
+                      "url": "https://www.oakcent.cz/kolekce-podlah/sand"
+                    },
+                    "pattern": {
+                      "change": true,
+                      "name": "Planks",
+                      "title": "Planks",
+                      "collectionName": "Planks z kolekce Heritage",
+                      "body": "Vzor Planks nechal vyniknout přirozenou kresbu dřeva a dodal prostoru nadčasovou eleganci s čistými liniemi.",
+                      "img1": "https://drive.google.com/file/d/1kr--XA8A0kDTlildJ9CfarMkuwe8ONDL/view?usp=sharing",
+                      "img2": null,
+                      "cta": "Prozkoumejte Planks",
+                      "collectionUrl": "https://www.oakcent.cz/kolekce-heritage"
+                    }
+                  }
+                ]
+              }
+            ]
+          },
+          "webhookUrl": "https://origamis.app.n8n.cloud/webhook-test/edit-newsletter",
+          "executionMode": "test"
+        },
+        "pairedItem": {
+          "item": 0
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Get row for blog update",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get row for project update",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get row for collection update",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get row for pattern update",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'Draft_from_blog'": {
+      "main": [
+        [
+          {
+            "node": "Call 'Update_row_Gsheet'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'Draft_from_project'": {
+      "main": [
+        [
+          {
+            "node": "Call 'Update_row_Gsheet'1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row for collection update": {
+      "main": [
+        [
+          {
+            "node": "Update collection entry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update collection entry": {
+      "main": [
+        [
+          {
+            "node": "Call 'Update_row_Gsheet'2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row for blog update": {
+      "main": [
+        [
+          {
+            "node": "Call 'Draft_from_blog'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row for project update": {
+      "main": [
+        [
+          {
+            "node": "Call 'Draft_from_project'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row for pattern update": {
+      "main": [
+        [
+          {
+            "node": "Update pattern entry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update pattern entry": {
+      "main": [
+        [
+          {
+            "node": "Call 'Update_row_Gsheet'3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'Update_row_Gsheet'": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'Update_row_Gsheet'1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'Update_row_Gsheet'2": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'Update_row_Gsheet'3": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false,
+    "errorWorkflow": "kZ0g33IU9OGVQGTB"
+  },
+  "versionId": "8d1cae41-0958-4dc3-adfe-0c3e3d90a0b7",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "331d746bc1a63563201e278bbfd6be74ef21f3e48d7328285e9bf034335c85dd"
+  },
+  "id": "4ragnMkHURbWI6Pp",
+  "tags": [
+    {
+      "updatedAt": "2026-01-14T22:03:09.472Z",
+      "createdAt": "2026-01-14T22:03:09.472Z",
+      "id": "xLAiVS0zmvQzWdop",
+      "name": "Webhook"
+    }
+  ]
+}

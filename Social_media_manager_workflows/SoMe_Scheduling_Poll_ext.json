@@ -1,0 +1,879 @@
+{
+  "name": "SoMe_Scheduling_Poll_ext",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 5
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        112,
+        80
+      ],
+      "id": "037e3802-06d8-4e34-83e3-c4b7e4e8198d",
+      "name": "Every day at 0500"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        112,
+        288
+      ],
+      "id": "0d1edc8e-5892-4fc7-b4f7-8ab681ca2a33",
+      "name": "When clicking ‘Test workflow’",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "pV2vZcf6zRfZaTBh",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/pV2vZcf6zRfZaTBh",
+          "cachedResultName": "SoMe_Automation_Post_Facebook_ext"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $('Split FB Posts').item.json.id }}",
+            "user_id": "={{ $('Facebook posts with Current Date').item.json.user_id }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "user_id",
+              "displayName": "user_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "mode": "each",
+        "options": {
+          "waitForSubWorkflow": false
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        1600,
+        80
+      ],
+      "id": "f9bd3519-cfc7-47f2-8b32-e985f2d70555",
+      "name": "Execute Facebook Posting"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "LHawp0TtQwbyAsAp",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/LHawp0TtQwbyAsAp",
+          "cachedResultName": "SoMe_Automation_Post_Instagram_ext"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "id": "={{ $('Split IG Posts').item.json.id }}",
+            "user_id": "={{ $('Instagram posts with Current Date').item.json.user_id }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "user_id",
+              "displayName": "user_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "mode": "each",
+        "options": {
+          "waitForSubWorkflow": false
+        }
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        1600,
+        288
+      ],
+      "id": "ce7fa27f-de82-42ef-bc3b-454838dbffa8",
+      "name": "Execute Instagram Posting"
+    },
+    {
+      "parameters": {
+        "path": "ext_Publish",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        112,
+        464
+      ],
+      "id": "56574a9a-9705-447f-8c2e-877a953f812b",
+      "name": "Webhook",
+      "webhookId": "c570778e-1e06-41d1-9ac6-290df3567cb2"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1792,
+        224
+      ],
+      "id": "cedf84d5-5ed3-4f89-8f80-f54cf9b40b08",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "content": "## **1. Získávání dat**\nZíská posty které mají datum zveřejnění dnes",
+        "height": 720,
+        "width": 1252,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -288,
+        -848
+      ],
+      "typeVersion": 1,
+      "id": "c3357924-1157-4c76-85e8-19a75684336b",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "## **2. Čekání na čas postu**\nČeká na čas kdy je potřeba zveřejnit post a následně ho zveřejní",
+        "height": 720,
+        "width": 616,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1152,
+        -96
+      ],
+      "typeVersion": 1,
+      "id": "6a4d2355-b466-4df4-b63f-fa9394db8de1",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## **3. Ukládání do databáze**\nUloží do databáze status",
+        "height": 720,
+        "width": 772,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1760,
+        -96
+      ],
+      "typeVersion": 1,
+      "id": "0b15ac6c-e202-4fb3-a1f7-66cf7eed196d",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "G6UDte49T7psdupP",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/G6UDte49T7psdupP",
+          "cachedResultName": "SoMe_Automation_Post_LinkedIn_ext"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "user_id": "={{ $('LinkedIn posts with Current Date').item.json.user_id }}",
+            "id": "={{ $('Split LI Posts').item.json.id }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            },
+            {
+              "id": "user_id",
+              "displayName": "user_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string"
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "mode": "each",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        1600,
+        464
+      ],
+      "id": "c03a3ecb-95c5-44fb-8dbc-6360b4831b35",
+      "name": "Execute LinkedIn Posting"
+    },
+    {
+      "parameters": {
+        "resume": "specificTime",
+        "dateTime": "={{ $json.facebook_post_time ?? $now }}"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1312,
+        80
+      ],
+      "id": "1c6b8b57-1185-4642-a80f-871477760b9f",
+      "name": "Wait until Facebook scheduled time",
+      "webhookId": "6e21b332-05d5-413b-b6d0-e54d2cfc2e21"
+    },
+    {
+      "parameters": {
+        "resume": "specificTime",
+        "dateTime": "={{ $json.instagram_post_time ?? $now }}"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1312,
+        288
+      ],
+      "id": "5caef7a3-dd21-47d4-985f-032f68fc69ff",
+      "name": "Wait until Instagram scheduled",
+      "webhookId": "ed130e3b-8be4-4012-b4a3-b8e3f68a5fab"
+    },
+    {
+      "parameters": {
+        "resume": "specificTime",
+        "dateTime": "={{ $json.linkedin_post_time ?? $now }}"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1312,
+        464
+      ],
+      "id": "eca0c2e7-60ab-44a7-83e1-024408ea1669",
+      "name": "Wait until LinkedIn scheduled time",
+      "webhookId": "ed130e3b-8be4-4012-b4a3-b8e3f68a5fab"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('Get credentials').item.json.master_table_id }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "SoMe_content",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        2432,
+        208
+      ],
+      "id": "30912cad-a4ab-4bc1-8b72-46255e6978d0",
+      "name": "Update Done Status",
+      "credentials": {
+        "googleApi": {
+          "id": "aHVI3CAM5JAErt7B",
+          "name": "Google Service Account account"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "bd08ca39-a8eb-4da9-b52d-6ec3cb53d225",
+              "leftValue": "={{ \n  ['publish_fb', 'publish_ig', 'publish_li']\n    .every(key => ['done', 'no'].includes($json[key]))\n}}",
+              "rightValue": "done",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        2160,
+        224
+      ],
+      "id": "06dc4b9e-a402-4f38-a03d-35ee0b26c5ec",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "some_post_plan_selfhost_external",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "keyValue": "={{ $json.id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        2016,
+        224
+      ],
+      "id": "115a1c16-eaa6-4b25-bf5d-cd9a8f9da5ef",
+      "name": "Get a row",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "2oNjiFHjAgVX7z4h",
+          "name": "Supabase Origamis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "some_post_plan_selfhost_external",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "condition": "eq",
+              "keyValue": "={{ $json.id }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "status",
+              "fieldValue": "posted"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        2304,
+        208
+      ],
+      "id": "9bcf7bd1-80bb-41c2-be88-ef55bfe3b6cb",
+      "name": "Update a row",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "2oNjiFHjAgVX7z4h",
+          "name": "Supabase Origamis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "some_post_plan_selfhost_external",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "facebook_planned_date",
+              "keyValue": "={{ $today.format('MM/dd/yyyy') }}"
+            },
+            {
+              "keyName": "publish_fb",
+              "keyValue": "yes"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        432,
+        80
+      ],
+      "id": "d268f3b2-b514-483f-8406-862d065b73e1",
+      "name": "Facebook posts with Current Date",
+      "credentials": {
+        "supabaseApi": {
+          "id": "2oNjiFHjAgVX7z4h",
+          "name": "Supabase Origamis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "some_post_plan_selfhost_external",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "instagram_planned_date",
+              "keyValue": "={{ $today.format('MM/dd/yyyy') }}"
+            },
+            {
+              "keyName": "publish_ig",
+              "keyValue": "yes"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        432,
+        288
+      ],
+      "id": "559da9df-07cb-4da4-b8c4-72d1f5ee0f06",
+      "name": "Instagram posts with Current Date",
+      "credentials": {
+        "supabaseApi": {
+          "id": "2oNjiFHjAgVX7z4h",
+          "name": "Supabase Origamis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "some_post_plan_selfhost_external",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "linkedin_planned_date",
+              "keyValue": "={{ $today.format('MM/dd/yyyy') }}"
+            },
+            {
+              "keyName": "publish_li",
+              "keyValue": "yes"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        432,
+        464
+      ],
+      "id": "9808e8aa-f06d-40b3-a2f7-68106592a9fe",
+      "name": "LinkedIn posts with Current Date",
+      "credentials": {
+        "supabaseApi": {
+          "id": "2oNjiFHjAgVX7z4h",
+          "name": "Supabase Origamis"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "=id",
+        "include": "allOtherFields",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        896,
+        288
+      ],
+      "id": "c10061f9-ee5d-40b1-bd61-c7795d3580af",
+      "name": "Split IG Posts"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "=id",
+        "include": "allOtherFields",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        896,
+        80
+      ],
+      "id": "28a576a4-a5f9-4f2a-b73d-fb492bf3b771",
+      "name": "Split FB Posts"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "=id",
+        "include": "allOtherFields",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        896,
+        464
+      ],
+      "id": "fa8260fe-5f6f-49d0-a4d6-006fc22540a0",
+      "name": "Split LI Posts"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        256,
+        288
+      ],
+      "id": "e4744f4f-c63b-4125-95e2-f98ff12fcaf5",
+      "name": "Pass trigger"
+    }
+  ],
+  "pinData": {
+    "Webhook": [
+      {
+        "json": {
+          "headers": {
+            "host": "n8n.princparket.cz",
+            "user-agent": "Mozilla/5.0 (compatible; Google-Apps-Script; beanserver; +https://script.google.com; id: UAEmdDd_fw0ZSZO4hU3nM0Yvs9wnq2LGj0g)",
+            "accept-encoding": "gzip, deflate, br",
+            "via": "1.1 Caddy",
+            "x-forwarded-for": "34.116.22.77",
+            "x-forwarded-host": "n8n.princparket.cz",
+            "x-forwarded-proto": "https"
+          },
+          "params": {},
+          "query": {},
+          "body": {},
+          "webhookUrl": "https://n8n.princparket.cz/webhook/ext_Publish",
+          "executionMode": "production"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Every day at 0500": {
+      "main": [
+        [
+          {
+            "node": "Pass trigger",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Test workflow’": {
+      "main": [
+        [
+          {
+            "node": "Pass trigger",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Pass trigger",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Facebook Posting": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Instagram Posting": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Get a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute LinkedIn Posting": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait until Facebook scheduled time": {
+      "main": [
+        [
+          {
+            "node": "Execute Facebook Posting",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait until Instagram scheduled": {
+      "main": [
+        [
+          {
+            "node": "Execute Instagram Posting",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait until LinkedIn scheduled time": {
+      "main": [
+        [
+          {
+            "node": "Execute LinkedIn Posting",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Update a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a row": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update a row": {
+      "main": [
+        [
+          {
+            "node": "Update Done Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Facebook posts with Current Date": {
+      "main": [
+        [
+          {
+            "node": "Split FB Posts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Instagram posts with Current Date": {
+      "main": [
+        [
+          {
+            "node": "Split IG Posts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "LinkedIn posts with Current Date": {
+      "main": [
+        [
+          {
+            "node": "Split LI Posts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split IG Posts": {
+      "main": [
+        [
+          {
+            "node": "Wait until Instagram scheduled",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split FB Posts": {
+      "main": [
+        [
+          {
+            "node": "Wait until Facebook scheduled time",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split LI Posts": {
+      "main": [
+        [
+          {
+            "node": "Wait until LinkedIn scheduled time",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pass trigger": {
+      "main": [
+        [
+          {
+            "node": "Instagram posts with Current Date",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Facebook posts with Current Date",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "LinkedIn posts with Current Date",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": "NmGg5uZ3m1rjeYmB"
+  },
+  "versionId": "f3bb96a2-4663-497d-bf78-ba75f1c36656",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "2b07eec16886132e3cd818fdfac587c65db27d72fe33b2ee54f787b58f4dff76"
+  },
+  "id": "he5fRTZi7CPYNgjC",
+  "tags": []
+}

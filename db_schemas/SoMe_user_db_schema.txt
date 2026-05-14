@@ -1,0 +1,22 @@
+create table public."SoMe_user_db" (
+  entry_id uuid not null default gen_random_uuid (),
+  user_added_at timestamp with time zone not null default now(),
+  user_name text null,
+  fb_page_id text null,
+  ig_user_id text null,
+  fb_access_token text null,
+  ig_access_token text null,
+  master_table_id text null,
+  master_folder_id text null,
+  reference_email text null,
+  access_tokens_last_updated timestamp with time zone null,
+  user_id uuid null,
+  prompts_folder_id text null,
+  images_folder_id text null,
+  prompt_doc_id text null,
+  linkedin_user_token text null,
+  linkedin_refresh_token text null,
+  linkedin_user_id text null,
+  constraint SoMe_user_db_pkey primary key (entry_id),
+  constraint SoMe_user_db_user_id_key unique (user_id)
+) TABLESPACE pg_default;
