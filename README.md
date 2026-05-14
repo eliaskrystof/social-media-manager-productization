@@ -20,6 +20,7 @@ Start with:
 - `docs/architecture-audit.md`
 - `docs/current-processes.md`
 - `docs/legacy-workflow-map.md`
+- `docs/target-data-model.md`
 - `docs/project-foundation.md`
 
 ## Current Direction

@@ -151,3 +151,8 @@ Recommended future deployment path:
 8. Start implementation only after the audit baseline and project foundation are committed.
 
 See also: `docs/owner-inputs-needed.md`.
+
+Current product design documents:
+
+- `docs/legacy-workflow-map.md`
+- `docs/target-data-model.md`
