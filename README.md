@@ -15,6 +15,13 @@ The new product should be treated as a fresh implementation. The existing n8n wo
 
 Some legacy exports/scripts are intentionally redacted before Git tracking. Secret values such as service-role keys must be replaced with placeholders and restored only through safe local environment configuration when needed.
 
+Start with:
+
+- `docs/architecture-audit.md`
+- `docs/current-processes.md`
+- `docs/legacy-workflow-map.md`
+- `docs/project-foundation.md`
+
 ## Current Direction
 
 - Build the product from scratch.
