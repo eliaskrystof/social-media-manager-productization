@@ -99,6 +99,7 @@ The most useful next inputs are:
 1. Review `docs/target-data-model.md`.
 2. Review `docs/mvp-application-scope.md`.
 3. Review `docs/implementation-readiness-plan.md`.
-4. Confirm or choose a working product name/codename.
-5. Confirm seeded local user vs real auth for the first implementation milestone.
-6. Confirm media handling for the first milestone.
+4. Review `docs/architecture-decisions.md`.
+5. Confirm or choose a working product name/codename.
+6. Confirm seeded local user vs real auth for the first implementation milestone.
+7. Confirm media handling for the first milestone.

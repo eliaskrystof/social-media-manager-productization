@@ -49,6 +49,7 @@ Out of scope for this phase:
 - Google Sheets baseline captured.
 - LinkedIn solo branch comparison documented.
 - Implementation readiness plan drafted.
+- Architecture decisions drafted.
 
 ## Still Needed For Audit Completion
 
@@ -129,7 +130,7 @@ Needed before coding:
 
 - review `docs/implementation-readiness-plan.md`,
 - confirm or defer open decisions,
-- create `docs/architecture-decisions.md`.
+- review `docs/architecture-decisions.md`.
 
 ## Audit Completion Definition
 
@@ -148,5 +149,5 @@ Only after this should implementation begin.
 
 1. Review `docs/legacy-status-and-state-map.md`.
 2. Review `docs/legacy-linkedin-comparison.md`.
-3. Create `docs/architecture-decisions.md`.
+3. Review `docs/architecture-decisions.md`.
 4. Update `docs/owner-inputs-needed.md` with any remaining concrete asks.

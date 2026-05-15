@@ -153,4 +153,5 @@ Current product design documents:
 - `docs/target-data-model.md`
 - `docs/mvp-application-scope.md`
 - `docs/implementation-readiness-plan.md`
+- `docs/architecture-decisions.md`
 - `docs/audit-completion-checklist.md`
