@@ -25,6 +25,7 @@ Start with:
 - `docs/legacy-linkedin-comparison.md`
 - `docs/target-data-model.md`
 - `docs/mvp-application-scope.md`
+- `docs/implementation-readiness-plan.md`
 - `docs/audit-completion-checklist.md`
 - `docs/project-foundation.md`
 
@@ -37,14 +38,10 @@ Start with:
 - Start local-first for testing.
 - Preserve the option to move n8n and database infrastructure to a remote server later.
 
-## Recommended Initial Git Setup
+## Git Status
 
 Git is expected to track all project documentation, architecture decisions, workflow references, schemas, and future application code.
 
-When Git is available on this machine:
+The repository is initialized and connected to GitHub:
 
-```powershell
-git init
-git add .
-git commit -m "Initial project audit and documentation"
-```
+- `https://github.com/eliaskrystof/social-media-manager-productization.git`

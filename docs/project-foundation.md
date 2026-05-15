@@ -57,15 +57,9 @@ Current repository preparation:
 
 - `.gitignore` has been added.
 - `README.md` has been added.
-- Git itself is not currently available in the shell PATH, so the repository has not yet been initialized with `git init`.
-
-Once Git is installed or available in PATH, initialize the repository:
-
-```powershell
-git init
-git add .
-git commit -m "Initial project audit and documentation"
-```
+- Git repository has been initialized.
+- GitHub remote has been configured.
+- Audit and reference documentation has been committed and pushed.
 
 ## Databases
 
@@ -142,13 +136,11 @@ Recommended future deployment path:
 ## Immediate Next Steps
 
 1. Finish current audit and process documentation.
-2. Install or expose Git in PATH.
-3. Initialize Git repository.
-4. Commit the audit/docs baseline.
-5. Define the new product data model.
-6. Decide local database direction for the first prototype.
-7. Decide local n8n setup approach.
-8. Complete audit/prep checklist before starting implementation.
+2. Review the target data model.
+3. Review the MVP application scope.
+4. Review the implementation readiness plan.
+5. Create architecture decision records.
+6. Complete audit/prep checklist before starting implementation.
 
 See also: `docs/owner-inputs-needed.md`.
 
@@ -160,4 +152,5 @@ Current product design documents:
 - `docs/legacy-linkedin-comparison.md`
 - `docs/target-data-model.md`
 - `docs/mvp-application-scope.md`
+- `docs/implementation-readiness-plan.md`
 - `docs/audit-completion-checklist.md`

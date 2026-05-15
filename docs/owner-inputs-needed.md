@@ -6,18 +6,18 @@ This document lists what is needed from the project owner to continue product wo
 
 ## Access / Local Setup
 
-- Install Git or make Git available in PATH.
-- Confirm whether this workspace should become the main Git repository.
-- Provide preferred remote Git host when ready, for example GitHub/GitLab/Bitbucket.
-- Confirm whether future local development should use Docker Desktop.
-- Confirm whether local n8n should run through Docker, npm, or another setup.
-- Confirm whether local Postgres should run through Docker, native install, Supabase CLI, or a managed test project.
+- Git is available and the repository is initialized.
+- This workspace is confirmed as the main working folder.
+- GitHub is confirmed as the remote Git host.
+- Docker is confirmed as the preferred local infrastructure direction.
+- Local n8n and local Postgres are expected to run through Docker.
+- First database direction is local Postgres first, with future portability to Supabase or remote Postgres.
 
 ## Product Decisions
 
 - Confirm the product name or working codename.
-- Confirm whether first MVP should focus only on social media orchestration.
-- Confirm that newsletter stays out of MVP unless explicitly reintroduced.
+- Confirm whether first MVP should focus only on social media orchestration. Current assumption: yes.
+- Confirm that newsletter stays out of MVP unless explicitly reintroduced. Current assumption: yes.
 - Confirm initial supported channels:
   - Instagram
   - Facebook
@@ -29,12 +29,8 @@ This document lists what is needed from the project owner to continue product wo
 
 ## Infrastructure Direction
 
-- Decide first database direction:
-  - Supabase test project,
-  - local Postgres,
-  - both, with local first.
-- Decide whether Supabase Auth is preferred for MVP.
-- Decide whether Supabase Storage is preferred for MVP media.
+- Decide whether Supabase Auth is preferred for MVP or should remain optional.
+- Decide whether media should begin as metadata-only, local file references, local object storage, or Supabase Storage later.
 - Decide whether n8n remains a long-term orchestration component or only a transitional execution engine.
 - Decide expected future deployment target for n8n:
   - VPS,
@@ -100,9 +96,9 @@ Before implementation:
 
 The most useful next inputs are:
 
-1. Make Git available so the repository can be initialized and committed.
-2. Confirm local stack preference: Docker or non-Docker.
-3. Decide first database path: Supabase test project or local Postgres.
-4. Provide/anonymize a sample Google Sheet export.
-5. Provide notes on the LinkedIn solo branch improvements.
-6. Confirm MVP scope: social media only, no newsletter.
+1. Review `docs/target-data-model.md`.
+2. Review `docs/mvp-application-scope.md`.
+3. Review `docs/implementation-readiness-plan.md`.
+4. Confirm or choose a working product name/codename.
+5. Confirm seeded local user vs real auth for the first implementation milestone.
+6. Confirm media handling for the first milestone.

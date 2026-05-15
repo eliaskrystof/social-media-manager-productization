@@ -46,6 +46,9 @@ Out of scope for this phase:
 - Legacy workflow map created.
 - Target product data model proposed.
 - MVP application scope drafted.
+- Google Sheets baseline captured.
+- LinkedIn solo branch comparison documented.
+- Implementation readiness plan drafted.
 
 ## Still Needed For Audit Completion
 
@@ -120,16 +123,13 @@ Needed:
 
 ### 6. Implementation Readiness Plan
 
-Status: not started.
+Status: drafted.
 
 Needed before coding:
 
-- implementation sequence,
-- first milestone definition,
-- first DB migration plan,
-- first n8n stub/adapter plan,
-- testing/verification approach,
-- branching/commit workflow.
+- review `docs/implementation-readiness-plan.md`,
+- confirm or defer open decisions,
+- create `docs/architecture-decisions.md`.
 
 ## Audit Completion Definition
 
@@ -148,5 +148,5 @@ Only after this should implementation begin.
 
 1. Review `docs/legacy-status-and-state-map.md`.
 2. Review `docs/legacy-linkedin-comparison.md`.
-3. Create `docs/implementation-readiness-plan.md`.
+3. Create `docs/architecture-decisions.md`.
 4. Update `docs/owner-inputs-needed.md` with any remaining concrete asks.
