@@ -542,10 +542,12 @@ Need owner input:
 
 ## Recommended Next Step
 
-Create the implementation scaffold:
+Before implementation, finish the audit/prep phase:
 
-1. define stack choices for Next.js package setup,
-2. add local environment examples,
-3. add Docker/Postgres/n8n notes or compose file only if it matches the existing local setup,
-4. create initial DB migrations,
-5. create the Next.js app skeleton.
+1. review this MVP scope,
+2. capture remaining owner inputs,
+3. finish legacy state/status mapping,
+4. document implementation readiness,
+5. only then create the implementation scaffold.
+
+See also: `docs/audit-completion-checklist.md`.

@@ -22,6 +22,7 @@ Start with:
 - `docs/legacy-workflow-map.md`
 - `docs/target-data-model.md`
 - `docs/mvp-application-scope.md`
+- `docs/audit-completion-checklist.md`
 - `docs/project-foundation.md`
 
 ## Current Direction

@@ -148,7 +148,7 @@ Recommended future deployment path:
 5. Define the new product data model.
 6. Decide local database direction for the first prototype.
 7. Decide local n8n setup approach.
-8. Start implementation only after the audit baseline and project foundation are committed.
+8. Complete audit/prep checklist before starting implementation.
 
 See also: `docs/owner-inputs-needed.md`.
 
@@ -157,3 +157,4 @@ Current product design documents:
 - `docs/legacy-workflow-map.md`
 - `docs/target-data-model.md`
 - `docs/mvp-application-scope.md`
+- `docs/audit-completion-checklist.md`
