@@ -20,6 +20,7 @@ Start with:
 - `docs/architecture-audit.md`
 - `docs/current-processes.md`
 - `docs/legacy-workflow-map.md`
+- `docs/legacy-status-and-state-map.md`
 - `docs/target-data-model.md`
 - `docs/mvp-application-scope.md`
 - `docs/audit-completion-checklist.md`
