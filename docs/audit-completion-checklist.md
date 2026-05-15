@@ -150,6 +150,6 @@ Only after this should implementation begin.
 ## Recommended Next Work In This Phase
 
 1. Review `docs/legacy-status-and-state-map.md`.
-2. Create `docs/legacy-linkedin-comparison.md` after owner notes are available.
+2. Review `docs/legacy-linkedin-comparison.md`.
 3. Create `docs/implementation-readiness-plan.md`.
 4. Update `docs/owner-inputs-needed.md` with any remaining concrete asks.

@@ -156,6 +156,7 @@ Current product design documents:
 
 - `docs/legacy-workflow-map.md`
 - `docs/legacy-status-and-state-map.md`
+- `docs/legacy-linkedin-comparison.md`
 - `docs/target-data-model.md`
 - `docs/mvp-application-scope.md`
 - `docs/audit-completion-checklist.md`
