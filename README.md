@@ -21,6 +21,7 @@ Start with:
 - `docs/current-processes.md`
 - `docs/legacy-workflow-map.md`
 - `docs/target-data-model.md`
+- `docs/mvp-application-scope.md`
 - `docs/project-foundation.md`
 
 ## Current Direction

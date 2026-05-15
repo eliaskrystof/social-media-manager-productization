@@ -156,3 +156,4 @@ Current product design documents:
 
 - `docs/legacy-workflow-map.md`
 - `docs/target-data-model.md`
+- `docs/mvp-application-scope.md`
