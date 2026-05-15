@@ -538,7 +538,7 @@ Need owner input:
 4. Which UI view matters most first: content list, detail editor, or onboarding?
 5. Should scheduling be per platform always, or can one schedule apply to all selected platforms by default?
 6. Should approval be required before scheduling in MVP?
-7. What should the working product name be in the UI?
+7. Should the UI use the working codename `Orchard`, or stay generic during the first internal milestone?
 
 ## Recommended Next Step
 

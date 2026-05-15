@@ -15,7 +15,7 @@ This document lists what is needed from the project owner to continue product wo
 
 ## Product Decisions
 
-- Confirm the product name or working codename.
+- Working codename is confirmed as `Orchard`.
 - Confirm whether first MVP should focus only on social media orchestration. Current assumption: yes.
 - Confirm that newsletter stays out of MVP unless explicitly reintroduced. Current assumption: yes.
 - Confirmed: first codebase shape should be a regular application in `apps/web` inside a light monorepo.
@@ -106,6 +106,5 @@ The most useful next inputs are:
 2. Review `docs/mvp-application-scope.md`.
 3. Review `docs/implementation-readiness-plan.md`.
 4. Review `docs/architecture-decisions.md`.
-5. Confirm or choose a working product name/codename.
-6. Confirm first local media implementation: filesystem paths vs local object-storage-like service.
-7. Confirm migration tooling preference.
+5. Confirm first local media implementation: filesystem paths vs local object-storage-like service.
+6. Confirm migration tooling preference.

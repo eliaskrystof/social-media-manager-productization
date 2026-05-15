@@ -22,6 +22,7 @@ Already done:
 
 - Git repository is initialized.
 - GitHub remote is connected and pushed.
+- Working codename is `Orchard`.
 - Legacy workflows, Apps Script code, and schema references are preserved.
 - Known hardcoded secrets in legacy files were redacted before tracking.
 - Current architecture and process documentation exists.
@@ -307,7 +308,6 @@ The first live publisher integration should be implemented and tested separately
 
 Before implementation, the owner should confirm or defer:
 
-- working product name/codename,
 - whether first app should use seeded local user or real auth immediately,
 - whether Supabase Auth is a desired product dependency or later option,
 - whether media should start as metadata-only, local file references, or object storage,

@@ -2,6 +2,8 @@
 
 This repository is the working base for turning an existing internal social media automation system into a product.
 
+Working codename: `Orchard`.
+
 The new product should be treated as a fresh implementation. The existing n8n workflows, Apps Script files, Google Sheets behavior, and Supabase schemas are preserved here as reference material and process knowledge from a working implementation.
 
 ## Current Repository Contents

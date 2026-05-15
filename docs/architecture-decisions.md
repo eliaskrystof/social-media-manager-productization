@@ -37,6 +37,26 @@ Consequences:
 - New databases and n8n instances should be separate from legacy production.
 - Useful legacy behavior can be selectively reimplemented.
 
+## ADR-001A: Use Orchard As Working Codename
+
+Status: Accepted
+
+Decision:
+
+Use `Orchard` as the working codename for the product during planning and early implementation.
+
+Rationale:
+
+- The metaphor fits the product direction: users plant ideas, grow platform variants, approve mature content, and harvest outcomes across channels.
+- It supports a broader orchestration story better than a plain scheduler name.
+- It can guide early language and internal naming without forcing a final public brand decision.
+
+Consequences:
+
+- Documentation may refer to the project as `Orchard`.
+- The codename is not necessarily the final product name.
+- Public naming, domain checks, and brand validation remain deferred.
+
 ## ADR-002: Preserve Legacy Knowledge In Git
 
 Status: Accepted
@@ -412,8 +432,7 @@ These should not block the first milestone:
 
 Before implementation starts, confirm:
 
-1. Product name or working codename.
-2. Whether Supabase Auth should remain deferred after the seeded-user milestone.
-3. Whether local media should be plain filesystem first or a local object-storage-like service.
-4. Migration tooling.
-5. Whether project-specific Docker Compose should be added in this repo during implementation.
+1. Whether Supabase Auth should remain deferred after the seeded-user milestone.
+2. Whether local media should be plain filesystem first or a local object-storage-like service.
+3. Migration tooling.
+4. Whether project-specific Docker Compose should be added in this repo during implementation.

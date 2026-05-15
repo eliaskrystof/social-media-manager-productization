@@ -2,6 +2,8 @@
 
 Date: 2026-05-14
 
+Working codename: `Orchard`.
+
 ## Product Starting Point
 
 The project should be treated as a separate product project, not as a direct continuation of the legacy automation.
@@ -26,6 +28,12 @@ They should not be used as:
 - the final security model.
 
 In short: separate project, selective reuse.
+
+## Working Codename
+
+The working codename is `Orchard`.
+
+The metaphor is that users plant content ideas, grow platform-specific variants, approve what is ready, and harvest content outcomes across channels. This is a working/internal name, not necessarily the final public brand.
 
 ## Git
 
