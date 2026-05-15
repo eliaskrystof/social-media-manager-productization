@@ -70,16 +70,13 @@ Owner input needed:
 
 ### 2. Google Sheet Structure Capture
 
-Status: waiting for owner input.
+Status: baseline captured from owner-provided tab exports.
 
 Needed:
 
-- anonymized Google Sheet export or screenshots,
-- tab names,
-- column headers,
-- sample rows,
-- settings sheet structure,
-- log examples.
+- review `docs/legacy-google-sheets-map.md`,
+- add any hidden tabs/dropdowns/validations if they matter,
+- add more sample rows only if needed.
 
 Purpose:
 

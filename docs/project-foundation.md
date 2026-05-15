@@ -154,6 +154,7 @@ See also: `docs/owner-inputs-needed.md`.
 
 Current product design documents:
 
+- `docs/legacy-google-sheets-map.md`
 - `docs/legacy-workflow-map.md`
 - `docs/legacy-status-and-state-map.md`
 - `docs/legacy-linkedin-comparison.md`

@@ -19,6 +19,7 @@ Start with:
 
 - `docs/architecture-audit.md`
 - `docs/current-processes.md`
+- `docs/legacy-google-sheets-map.md`
 - `docs/legacy-workflow-map.md`
 - `docs/legacy-status-and-state-map.md`
 - `docs/legacy-linkedin-comparison.md`
