@@ -244,15 +244,20 @@ Consequences:
 
 ## ADR-011: First Codebase Shape
 
-Status: Proposed
+Status: Accepted
 
 Decision:
 
-Use a small monorepo-style structure once implementation begins:
+Use a small monorepo-style structure once implementation begins, with `apps/web` as a regular full application.
 
 ```text
 apps/
   web/
+    app/
+    components/
+    lib/
+    services/
+    styles/
 packages/
   database/
   shared/
@@ -266,19 +271,18 @@ Rationale:
 
 - The app will likely need shared domain types, DB migrations/helpers, and a n8n client boundary.
 - A light monorepo keeps these concerns separated without forcing a heavy architecture.
+- `apps/web` still remains the main product application, not a secondary package.
 
 Consequences:
 
 - Initial setup is slightly more structured than a single flat Next.js app.
 - The project can grow without a painful early split.
-
-Owner confirmation needed:
-
-- accept monorepo-style structure, or start with a single `apps/web` only and add packages later.
+- App-level code such as routes, components, services, and UI-specific helpers lives inside `apps/web`.
+- Shared code should only move into `packages/*` when it is genuinely shared or benefits from a clear boundary.
 
 ## ADR-012: First Auth Approach
 
-Status: Proposed
+Status: Accepted
 
 Decision:
 
@@ -295,38 +299,37 @@ Consequences:
 - The schema should include users, workspaces, and roles from day one.
 - The first UI can assume a current user.
 - Production auth is deferred.
-
-Owner confirmation needed:
-
-- confirm seeded user first, or require real auth in the first milestone.
+- Seed data should create a local admin user, workspace, and sample brand.
+- The temporary current-user lookup must be isolated so it can later be replaced by real auth without changing product logic.
 
 ## ADR-013: First Media Handling
 
-Status: Proposed
+Status: Accepted
 
 Decision:
 
-Start with provider-agnostic media records and explicit media ordering. The first implementation can use local file references or metadata-only records before committing to Supabase Storage or another object store.
+Start the first milestone with local media handling, provider-agnostic media records, and explicit media ordering.
+
+The legacy implementation often used local files intentionally. Some publishing flows may work better with local files than public media URLs, but that needs to be verified per platform workflow. The product model should not assume that local files are the final best practice; it should allow later movement to object storage such as Supabase Storage or S3-compatible storage.
 
 Rationale:
 
 - Media ordering is important, especially for LinkedIn and carousel-like publishing.
 - Storage provider choice should stay movable.
 - The first product workflow can be validated before final storage infrastructure is chosen.
+- Local media is simpler for the first milestone and aligns with parts of the legacy implementation.
 
 Consequences:
 
 - `media_assets` should store provider, path/key, media type, metadata, and status.
 - `content_media` should store relation, platform scope, role, and order.
-- Actual upload/storage can be phased in.
-
-Owner confirmation needed:
-
-- choose metadata-only, local file storage, or object storage for the first milestone.
+- Actual object storage can be phased in later.
+- Publishing workflow review should verify where local file access is required and where public URLs are preferred.
+- Best-practice production storage remains a later decision.
 
 ## ADR-014: Approval And Scheduling Rule
 
-Status: Proposed
+Status: Accepted
 
 Decision:
 
@@ -343,14 +346,11 @@ Consequences:
 - Content and variants can have planned dates before approval.
 - `publication_jobs` should represent executable scheduled work.
 - A later setting can relax this rule per workspace/brand if needed.
-
-Owner confirmation needed:
-
-- confirm strict approval-before-job rule, or allow scheduling without approval for internal users.
+- No real publishing should happen before approval.
 
 ## ADR-015: Scheduling Granularity
 
-Status: Proposed
+Status: Accepted
 
 Decision:
 
@@ -367,33 +367,31 @@ Consequences:
 - `platform_variants` can carry planned/scheduled time.
 - `publication_jobs` should be per variant/platform.
 - A content item can be partially scheduled or partially published.
+- The product should support different dates, times, formats, and follow-up items per platform.
+- Future lifecycle features can add repeated stories, reposts, reminders, and long-form variants as separate scheduled jobs or related content items.
 
-Owner confirmation needed:
+## ADR-016: Live Publisher Implementation Order
 
-- confirm per-platform scheduling as the MVP behavior.
-
-## ADR-016: Platform Publishing Order
-
-Status: Proposed
+Status: Accepted
 
 Decision:
 
-When live publishing starts, validate LinkedIn first, then Facebook, then Instagram.
+When live publishing integration starts, validate the technical publisher integrations in this order: Facebook first, then Instagram, then LinkedIn.
+
+This does not define runtime publishing order for content. Individual content items and platform variants should publish according to their own per-platform schedule. For example, one master content item may produce an Instagram post on Monday, a LinkedIn long-form video post on Wednesday, and repeated stories at separate times.
 
 Rationale:
 
-- The solo LinkedIn branch has the strongest recent testing notes.
-- LinkedIn can validate text/media ordering and result tracking without Meta-specific complexity.
-- Meta integrations can follow once the publication job model is stable.
+- Facebook is a practical first Meta integration target.
+- Instagram can follow once the Meta app, media handling, and token flow are already partially validated through Facebook.
+- LinkedIn remains important, especially because the solo branch has stronger posting lessons, but it can be integrated after the Meta publishing path is clearer.
 
 Consequences:
 
-- LinkedIn contract should be documented first.
-- Meta-specific media/video edge cases can be added after the first live publishing loop works.
-
-Owner confirmation needed:
-
-- confirm LinkedIn-first live publishing order.
+- Facebook contract should be documented first.
+- Instagram-specific media/video edge cases can be added after the first Meta publishing loop works.
+- LinkedIn contract should reuse lessons from the solo branch when that publisher is implemented.
+- Runtime scheduling remains per platform and per job.
 
 ## Deferred Decisions
 
@@ -414,10 +412,8 @@ These should not block the first milestone:
 
 Before implementation starts, confirm:
 
-1. Monorepo-style structure.
-2. Seeded local user first.
-3. Media handling for milestone one.
-4. Approval-before-publication-job rule.
-5. Per-platform scheduling.
-6. LinkedIn-first live publishing order.
-
+1. Product name or working codename.
+2. Whether Supabase Auth should remain deferred after the seeded-user milestone.
+3. Whether local media should be plain filesystem first or a local object-storage-like service.
+4. Migration tooling.
+5. Whether project-specific Docker Compose should be added in this repo during implementation.

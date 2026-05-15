@@ -18,6 +18,12 @@ This document lists what is needed from the project owner to continue product wo
 - Confirm the product name or working codename.
 - Confirm whether first MVP should focus only on social media orchestration. Current assumption: yes.
 - Confirm that newsletter stays out of MVP unless explicitly reintroduced. Current assumption: yes.
+- Confirmed: first codebase shape should be a regular application in `apps/web` inside a light monorepo.
+- Confirmed: first milestone can use a seeded local user/admin as long as the future auth boundary remains clean.
+- Confirmed: posts must be approved before real publishing.
+- Confirmed: scheduling should be per platform.
+- Confirmed: local media is acceptable for the first milestone, with provider-agnostic design for later best-practice storage.
+- Clarified: Facebook, then Instagram, then LinkedIn is the technical implementation/testing order for live publishers, not runtime content publishing order.
 - Confirm initial supported channels:
   - Instagram
   - Facebook
@@ -29,8 +35,8 @@ This document lists what is needed from the project owner to continue product wo
 
 ## Infrastructure Direction
 
-- Decide whether Supabase Auth is preferred for MVP or should remain optional.
-- Decide whether media should begin as metadata-only, local file references, local object storage, or Supabase Storage later.
+- Decide whether Supabase Auth should remain optional after the seeded-user milestone.
+- Decide whether first local media implementation should use plain filesystem paths or a local object-storage-like service.
 - Decide whether n8n remains a long-term orchestration component or only a transitional execution engine.
 - Decide expected future deployment target for n8n:
   - VPS,
@@ -101,5 +107,5 @@ The most useful next inputs are:
 3. Review `docs/implementation-readiness-plan.md`.
 4. Review `docs/architecture-decisions.md`.
 5. Confirm or choose a working product name/codename.
-6. Confirm seeded local user vs real auth for the first implementation milestone.
-7. Confirm media handling for the first milestone.
+6. Confirm first local media implementation: filesystem paths vs local object-storage-like service.
+7. Confirm migration tooling preference.

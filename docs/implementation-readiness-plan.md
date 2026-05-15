@@ -141,6 +141,7 @@ Recommended rule:
 Open decision:
 
 - whether the existing local Docker setup should stay outside this repo, or whether a project-specific Docker Compose file should be added later.
+- whether first local media handling should use plain filesystem paths or a local object-storage-like service.
 
 Recommendation:
 
@@ -300,6 +301,8 @@ Expected deliverables:
 
 This proves the product workflow before adding integration complexity.
 
+The first live publisher integration should be implemented and tested separately from runtime scheduling behavior. The currently accepted technical order is Facebook, Instagram, LinkedIn, while actual content publication remains per platform and per scheduled job.
+
 ## Remaining Owner Inputs
 
 Before implementation, the owner should confirm or defer:
@@ -326,4 +329,3 @@ The project is ready to implement when:
 - local infra direction is accepted,
 - first milestone is accepted,
 - no known secret is tracked in Git.
-
