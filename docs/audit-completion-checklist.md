@@ -51,104 +51,134 @@ Out of scope for this phase:
 - Implementation readiness plan drafted.
 - Architecture decisions drafted.
 - Migration tooling selected: Drizzle.
+- Working codename selected: `Orchard`.
+- First app structure accepted: regular Next.js app in `apps/web` inside a light monorepo.
+- First auth approach accepted: seeded local user/admin first, real auth later.
+- First media approach accepted: local filesystem through provider-agnostic storage boundary.
+- Approval-before-real-publishing rule accepted.
+- Per-platform scheduling accepted.
+- Live publisher technical order accepted: Facebook, Instagram, LinkedIn.
+- Project-specific Docker Compose direction accepted.
 
 ## Still Needed For Audit Completion
 
 ### 1. Legacy Workflow Detail Pass
 
-Status: partially complete.
+Status: complete enough for implementation start; detailed publisher contracts deferred.
 
-Needed:
+Completed:
+
+- document status field values and transitions more explicitly,
+- compare main LinkedIn workflow with solo LinkedIn branch,
+- capture current workflow map and known publishing branch behavior at audit level.
+
+Deferred to implementation/publisher contract phase:
 
 - verify exact payload expectations in the main social n8n webhooks,
-- document status field values and transitions more explicitly,
-- document platform publisher branches:
-  - Facebook image/video/feed,
-  - Instagram single/carousel/video,
-  - LinkedIn image/video/text,
-- compare main LinkedIn workflow with solo LinkedIn branch.
-
-Owner input needed:
-
-- notes on why solo LinkedIn works better,
-- known publishing failure cases.
+- document final Facebook image/video/feed publisher contract,
+- document final Instagram single/carousel/video publisher contract,
+- document final LinkedIn image/video/text publisher contract,
+- collect more known publishing failure cases when testing live publisher integrations.
 
 ### 2. Google Sheet Structure Capture
 
-Status: baseline captured from owner-provided tab exports.
+Status: complete enough for implementation start.
 
-Needed:
+Completed:
 
-- review `docs/legacy-google-sheets-map.md`,
-- add any hidden tabs/dropdowns/validations if they matter,
-- add more sample rows only if needed.
+- baseline captured from owner-provided tab exports,
+- Sheet responsibilities mapped to product concepts,
+- log limitations documented.
 
-Purpose:
+Deferred:
 
-- verify legacy field mapping,
-- avoid missing hidden Sheet behavior.
+- add hidden tabs/dropdowns/validations only if they become relevant,
+- add more sample rows only if needed during import/migration planning.
 
 ### 3. Brand Onboarding Finalization
 
-Status: drafted, not finalized.
+Status: drafted for MVP; detailed field validation deferred.
 
-Needed:
+Completed:
 
-- mandatory vs optional onboarding fields,
-- platform-specific onboarding fields,
-- approval/publishing frequency rules,
-- brand voice sample format.
+- onboarding scope drafted in MVP scope,
+- brand profile captured in target data model,
+- brand voice/sample post concept included.
+
+Deferred to implementation design:
+
+- exact mandatory vs optional fields,
+- exact platform-specific onboarding forms,
+- final approval/publishing frequency settings,
+- final brand voice sample format and limits.
 
 ### 4. Target Data Model Review
 
-Status: proposed.
+Status: accepted as first implementation draft.
 
-Needed:
+Completed:
 
-- review whether entities are too broad/narrow,
-- decide seeded user vs auth later at planning level,
-- decide local media storage direction at planning level,
-- decide approval requirement before scheduling.
+- core entities proposed,
+- seeded user first accepted,
+- local filesystem media first accepted,
+- approval-before-real-publishing accepted,
+- per-platform scheduling accepted,
+- Drizzle migrations selected.
 
-No implementation should start until these are accepted or consciously deferred.
+Deferred:
+
+- final production auth model,
+- final production storage provider,
+- exact lifecycle/repurposing model,
+- whether variants need full version history in MVP.
 
 ### 5. Infrastructure Preparation Plan
 
-Status: high-level only.
+Status: accepted at planning level.
 
-Needed:
+Completed:
 
-- document existing local Docker n8n/Postgres setup at a high level,
-- decide whether this repo will eventually include compose files or only app-specific config,
-- define environment variable names,
-- define what stays outside Git.
+- local-first direction documented,
+- existing personal/local Docker setup stays outside repo,
+- project-specific Docker Compose will be added later under `infra/docker/`,
+- secrets and local `.env` files stay outside Git.
+
+Deferred to implementation:
+
+- exact environment variable names,
+- exact compose ports, volumes, and service names,
+- server deployment compose/example.
 
 ### 6. Implementation Readiness Plan
 
-Status: drafted.
+Status: complete enough for implementation start.
 
-Needed before coding:
+Completed:
 
-- review `docs/implementation-readiness-plan.md`,
-- confirm or defer open decisions,
-- review `docs/architecture-decisions.md`.
+- readiness plan drafted,
+- architecture decisions recorded,
+- major prep decisions closed or deferred.
+
+Deferred:
+
+- final implementation-start plan document,
+- first scaffold commit plan.
 
 ## Audit Completion Definition
 
 The audit/prep phase is complete when:
 
-- legacy workflow map is good enough to understand current behavior,
-- target data model is reviewed,
-- MVP scope is reviewed,
-- owner inputs for Sheets/LinkedIn are captured or explicitly deferred,
-- implementation plan exists,
-- no major unknown blocks the first scaffold.
+- legacy workflow map is good enough to understand current behavior: done,
+- target data model is reviewed as first draft: done,
+- MVP scope is reviewed at planning level: done,
+- owner inputs for Sheets/LinkedIn are captured or explicitly deferred: done,
+- implementation readiness plan exists: done,
+- no major unknown blocks the first scaffold: done, with production auth deferred.
 
 Only after this should implementation begin.
 
 ## Recommended Next Work In This Phase
 
-1. Review `docs/legacy-status-and-state-map.md`.
-2. Review `docs/legacy-linkedin-comparison.md`.
-3. Review `docs/architecture-decisions.md`.
-4. Update `docs/owner-inputs-needed.md` with any remaining concrete asks.
+1. Create `docs/implementation-start-plan.md`.
+2. Confirm whether Supabase Auth remains deferred after the seeded-user milestone.
+3. Start implementation scaffold only after the implementation-start plan is accepted.

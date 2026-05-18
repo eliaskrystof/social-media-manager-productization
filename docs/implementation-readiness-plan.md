@@ -227,9 +227,9 @@ Goal: reintroduce live publishing platform by platform.
 
 Recommended order:
 
-1. LinkedIn, using solo branch lessons for media ordering and endpoint parameters.
-2. Facebook.
-3. Instagram.
+1. Facebook.
+2. Instagram.
+3. LinkedIn, using solo branch lessons for media ordering and endpoint parameters.
 4. Blog later.
 5. Newsletter only if reintroduced with a new product design.
 
@@ -305,13 +305,7 @@ The first live publisher integration should be implemented and tested separately
 
 Before implementation, the owner should confirm or defer:
 
-- whether first app should use seeded local user or real auth immediately,
-- whether Supabase Auth is a desired product dependency or later option,
-- whether media should start as metadata-only, local file references, or object storage,
-- whether scheduling is per platform or one master schedule with platform overrides,
-- whether approval is required before scheduling in MVP,
 - whether platform variants can publish independently,
-- which LinkedIn content types should be tested first,
 - whether Supabase Auth should remain deferred after the seeded-user milestone.
 
 ## Readiness Exit Criteria

@@ -280,9 +280,9 @@ Rationale:
 
 Consequences:
 
-- LinkedIn should be the first live publishing integration to validate.
 - Media ordering must be explicit in the product model.
 - LinkedIn mentions/networking are deferred until `li_id` sourcing is solved.
+- LinkedIn publishing lessons should be reused when the unified LinkedIn publisher is implemented.
 
 ## ADR-010: Start Stub-First Before Live Publishing
 

@@ -532,13 +532,11 @@ MVP is successful when:
 
 Need owner input:
 
-1. Should first implementation include auth, or can MVP start with a seeded local user?
-2. Local media storage is filesystem-first; confirm only the exact local directory convention when implementation starts.
-3. Do you want real local n8n generation in the first app iteration, or stub first?
-4. Which UI view matters most first: content list, detail editor, or onboarding?
-5. Should scheduling be per platform always, or can one schedule apply to all selected platforms by default?
-6. Should approval be required before scheduling in MVP?
-7. Should the UI use the working codename `Orchard`, or stay generic during the first internal milestone?
+1. Should Supabase Auth remain deferred after the seeded-user milestone?
+2. Do you want real local n8n generation in the first app iteration, or stub first?
+3. Which UI view matters most first: content list, detail editor, or onboarding?
+4. Should each platform variant have only one active scheduled job?
+5. Should the UI use the working codename `Orchard`, or stay generic during the first internal milestone?
 
 ## Recommended Next Step
 

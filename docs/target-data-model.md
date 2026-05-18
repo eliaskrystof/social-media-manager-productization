@@ -881,13 +881,11 @@ Postgres portability:
 
 Need owner input:
 
-1. MVP auth: simple local auth, Supabase Auth, or postpone auth until app skeleton is ready?
-2. Media storage for local MVP: plain local filesystem through a provider-agnostic storage boundary. Confirm exact directory convention when implementation starts.
-3. Should approvals be required before scheduling in MVP?
-4. Should scheduling create jobs immediately, or only after approval?
-5. Should each platform variant have only one active scheduled job?
-6. Should content start from a required master input, or can a brief-only idea generate all variants?
-7. Should platform variants support multiple versions in MVP?
+1. Should Supabase Auth remain deferred after the seeded-user milestone?
+2. Should each platform variant have only one active scheduled job?
+3. Should content start from a required master input, or can a brief-only idea generate all variants?
+4. Should platform variants support multiple versions in MVP?
+5. Confirm exact local media directory convention when implementation starts.
 
 ## Recommended Next Step
 
