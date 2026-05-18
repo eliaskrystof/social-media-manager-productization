@@ -874,7 +874,8 @@ Postgres portability:
 - use `jsonb`,
 - avoid Supabase-only APIs in migrations,
 - keep auth mapping explicit,
-- keep storage provider fields generic.
+- keep storage provider fields generic,
+- use Drizzle for new Orchard schema and migrations while committing generated SQL migration files to Git.
 
 ## Open Decisions
 

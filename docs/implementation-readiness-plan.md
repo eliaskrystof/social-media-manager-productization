@@ -37,7 +37,7 @@ Still needed before implementation:
 - architecture decisions need to be captured explicitly,
 - local environment boundaries need to be written down,
 - first implementation milestone needs to be defined,
-- database migration strategy needs to be selected,
+- database migration strategy needs to be implemented,
 - n8n integration strategy needs to be split into stub/local/production phases,
 - remaining owner inputs need to be accepted or consciously deferred.
 
@@ -141,7 +141,7 @@ Recommended rule:
 
 Open decision:
 
-- migration tooling.
+- whether Supabase Auth should remain deferred after the seeded-user milestone.
 
 Recommendation:
 
@@ -156,23 +156,18 @@ Goal: create the first clean product schema from the target model.
 
 Recommended order:
 
-1. choose migration tool,
+1. set up Drizzle in the database package,
 2. create initial schema migration,
 3. create seed data for one local user/workspace/brand,
 4. add basic indexes and constraints,
 5. add schema documentation,
 6. generate or write typed access helpers later.
 
-Migration tool decision options:
+Migration tool decision:
 
-- plain SQL migrations,
-- Prisma migrations,
-- Drizzle migrations,
-- Supabase migrations if Supabase becomes the chosen runtime.
-
-Recommendation:
-
-- start with plain SQL or Drizzle-style migrations if portability is the priority,
+- use Drizzle for the new Orchard product schema and migrations,
+- commit generated SQL migration files to Git,
+- keep the schema Postgres-native and portable,
 - avoid depending on Supabase-only features until Supabase is confirmed as a product dependency.
 
 Important:
@@ -317,7 +312,7 @@ Before implementation, the owner should confirm or defer:
 - whether approval is required before scheduling in MVP,
 - whether platform variants can publish independently,
 - which LinkedIn content types should be tested first,
-- migration tooling.
+- whether Supabase Auth should remain deferred after the seeded-user milestone.
 
 ## Readiness Exit Criteria
 

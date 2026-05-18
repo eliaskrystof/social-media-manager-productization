@@ -119,10 +119,6 @@ Consequences:
 - Migrations should work against standard Postgres.
 - Supabase-specific features can be added behind clear boundaries if chosen later.
 
-Open follow-up:
-
-- choose migration tooling before the first schema implementation.
-
 ## ADR-004A: Project-Specific Docker Compose
 
 Status: Accepted
@@ -145,6 +141,31 @@ Consequences:
 - Future compose files should use explicit service names, ports, volumes, and env files.
 - Secrets must stay in local `.env` files or a secret manager, not in compose files committed to Git.
 - If n8n needs filesystem media access, the compose setup should define shared volumes deliberately.
+
+## ADR-004B: Use Drizzle For New Database Schema And Migrations
+
+Status: Accepted
+
+Decision:
+
+Use Drizzle for the new Orchard database schema and migrations.
+
+Drizzle should be used for the product schema, migration generation/application, and typed database access from the TypeScript application. Plain SQL remains acceptable for cases where explicit handcrafted SQL is clearer or required.
+
+Rationale:
+
+- Orchard will be a Next.js/TypeScript application, so typed database access has immediate product value.
+- Drizzle keeps the application closer to SQL and Postgres than a heavier ORM.
+- The project should remain portable across local Postgres, remote Postgres, and potentially Supabase-hosted Postgres.
+- Plain SQL is maximally clean, but would require more manual type and query management during early product development.
+- Prisma is convenient, but adds more abstraction than needed for this project direction.
+
+Consequences:
+
+- Database package should own Drizzle schema and migration files.
+- Generated SQL migrations should be committed to Git.
+- Migration commands should be documented before the first DB implementation.
+- Supabase-specific migration tooling remains deferred unless Supabase becomes a core runtime dependency.
 
 ## ADR-005: Keep n8n As Orchestration, Not Product State Owner
 
@@ -459,4 +480,3 @@ These should not block the first milestone:
 Before implementation starts, confirm:
 
 1. Whether Supabase Auth should remain deferred after the seeded-user milestone.
-2. Migration tooling.

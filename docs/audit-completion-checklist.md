@@ -50,6 +50,7 @@ Out of scope for this phase:
 - LinkedIn solo branch comparison documented.
 - Implementation readiness plan drafted.
 - Architecture decisions drafted.
+- Migration tooling selected: Drizzle.
 
 ## Still Needed For Audit Completion
 

@@ -26,6 +26,7 @@ This document lists what is needed from the project owner to continue product wo
 - Confirmed: scheduling should be per platform.
 - Confirmed: first media implementation should use plain local filesystem storage, with provider-agnostic DB design for later best-practice storage.
 - Clarified: Facebook, then Instagram, then LinkedIn is the technical implementation/testing order for live publishers, not runtime content publishing order.
+- Confirmed: new Orchard database schema and migrations should use Drizzle.
 - Confirm initial supported channels:
   - Instagram
   - Facebook
@@ -107,4 +108,4 @@ The most useful next inputs are:
 2. Review `docs/mvp-application-scope.md`.
 3. Review `docs/implementation-readiness-plan.md`.
 4. Review `docs/architecture-decisions.md`.
-5. Confirm migration tooling preference.
+5. Confirm whether Supabase Auth should remain deferred after the seeded-user milestone.
