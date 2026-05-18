@@ -113,6 +113,8 @@ Future production phase:
 
 The product should not rely on direct browser-to-n8n calls as the long-term API model.
 
+The owner's existing local Docker setup for n8n/Postgres should remain outside this repository. Orchard should later add its own project-specific Docker Compose definitions under `infra/docker/` when implementation reaches the infrastructure phase. Those definitions should be portable, secret-free, and safe to run alongside other local services.
+
 ## Infrastructure Portability
 
 The project should be local-first but server-movable.

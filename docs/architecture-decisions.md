@@ -123,6 +123,29 @@ Open follow-up:
 
 - choose migration tooling before the first schema implementation.
 
+## ADR-004A: Project-Specific Docker Compose
+
+Status: Accepted
+
+Decision:
+
+The owner's existing local Docker setup for n8n/Postgres remains outside this repository.
+
+During the implementation infra phase, Orchard should add its own project-specific Docker Compose definitions under `infra/docker/`. These should be portable, secret-free, and safe to run alongside other local n8n/Postgres services.
+
+Rationale:
+
+- The existing local n8n instance is also used for other testing and should not become project-owned infrastructure.
+- A project-specific compose setup makes Orchard easier to reproduce locally and later move to a server.
+- Keeping the two concerns separate avoids leaking personal/local infrastructure assumptions into the product repo.
+
+Consequences:
+
+- No Docker Compose files are needed during the audit phase.
+- Future compose files should use explicit service names, ports, volumes, and env files.
+- Secrets must stay in local `.env` files or a secret manager, not in compose files committed to Git.
+- If n8n needs filesystem media access, the compose setup should define shared volumes deliberately.
+
 ## ADR-005: Keep n8n As Orchestration, Not Product State Owner
 
 Status: Accepted
@@ -437,4 +460,3 @@ Before implementation starts, confirm:
 
 1. Whether Supabase Auth should remain deferred after the seeded-user milestone.
 2. Migration tooling.
-3. Whether project-specific Docker Compose should be added in this repo during implementation.

@@ -141,12 +141,13 @@ Recommended rule:
 
 Open decision:
 
-- whether the existing local Docker setup should stay outside this repo, or whether a project-specific Docker Compose file should be added later.
+- migration tooling.
 
 Recommendation:
 
-- keep existing Docker setup as-is during audit,
-- add project-specific compose only when implementation actually needs repeatable setup.
+- keep the owner's existing local Docker setup outside this repo,
+- add Orchard-specific compose files later under `infra/docker/` during the implementation infra phase,
+- keep future compose definitions portable, secret-free, and safe to run alongside other local services,
 - use plain local filesystem media storage for the first milestone, behind a provider-agnostic media storage boundary.
 
 ### Phase 3: Database Foundation
@@ -316,7 +317,7 @@ Before implementation, the owner should confirm or defer:
 - whether approval is required before scheduling in MVP,
 - whether platform variants can publish independently,
 - which LinkedIn content types should be tested first,
-- whether the local Docker setup should be committed later as project infra.
+- migration tooling.
 
 ## Readiness Exit Criteria
 

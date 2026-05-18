@@ -12,6 +12,8 @@ This document lists what is needed from the project owner to continue product wo
 - Docker is confirmed as the preferred local infrastructure direction.
 - Local n8n and local Postgres are expected to run through Docker.
 - First database direction is local Postgres first, with future portability to Supabase or remote Postgres.
+- Confirmed: the existing personal/local n8n Docker setup stays outside this repo.
+- Confirmed: Orchard should later include project-specific Docker Compose files under `infra/docker/` during implementation.
 
 ## Product Decisions
 
