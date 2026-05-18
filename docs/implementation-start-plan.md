@@ -10,7 +10,7 @@ It should be read before creating the first application scaffold. The goal is to
 
 ## Implementation Gate
 
-Implementation can start after this plan is accepted.
+Implementation can start. This plan has been reviewed and accepted.
 
 Accepted foundations:
 
@@ -204,15 +204,14 @@ Before considering the first implementation milestone done:
 
 These can be answered immediately before or during the first scaffold:
 
-1. Should Supabase Auth remain deferred after the seeded-user milestone?
-2. Should the first UI visibly use the `Orchard` codename or stay generic?
-3. Should the first visible view be onboarding, content list, or content detail?
-4. Should platform variants allow only one active scheduled job in the first schema?
-5. Should real local n8n generation wait until after the stub-first skeleton?
+1. Should the first UI visibly use the `Orchard` codename or stay generic?
+2. Should the first visible view be onboarding, content list, or content detail?
+3. Should platform variants allow only one active scheduled job in the first schema?
+4. Should real local n8n generation wait until after the stub-first skeleton?
 
 Recommended default answers:
 
-- defer Supabase Auth,
+- Supabase Auth is deferred after the seeded-user milestone,
 - use `Orchard` in internal UI,
 - start with content list plus detail skeleton,
 - allow one active scheduled publication job per variant initially,
@@ -230,4 +229,3 @@ Review:
 - seeded user approach,
 - first UI routes,
 - whether n8n should be wired next or kept stubbed while the editor/onboarding improves.
-

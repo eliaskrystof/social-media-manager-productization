@@ -881,11 +881,10 @@ Postgres portability:
 
 Need owner input:
 
-1. Should Supabase Auth remain deferred after the seeded-user milestone?
-2. Should each platform variant have only one active scheduled job?
-3. Should content start from a required master input, or can a brief-only idea generate all variants?
-4. Should platform variants support multiple versions in MVP?
-5. Confirm exact local media directory convention when implementation starts.
+1. Should each platform variant have only one active scheduled job?
+2. Should content start from a required master input, or can a brief-only idea generate all variants?
+3. Should platform variants support multiple versions in MVP?
+4. Confirm exact local media directory convention when implementation starts.
 
 ## Recommended Next Step
 

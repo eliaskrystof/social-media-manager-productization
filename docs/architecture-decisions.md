@@ -352,6 +352,8 @@ Decision:
 
 Start the first local milestone with a seeded/admin user and workspace, then add real auth after the core workflow is validated.
 
+Supabase Auth is deferred after the seeded-user milestone. It remains a future option, not a dependency for the first scaffold.
+
 Rationale:
 
 - Auth is important, but it is not the highest-risk unknown in the first workflow prototype.
@@ -363,6 +365,7 @@ Consequences:
 - The schema should include users, workspaces, and roles from day one.
 - The first UI can assume a current user.
 - Production auth is deferred.
+- Supabase Auth is deferred.
 - Seed data should create a local admin user, workspace, and sample brand.
 - The temporary current-user lookup must be isolated so it can later be replaced by real auth without changing product logic.
 
@@ -479,4 +482,4 @@ These should not block the first milestone:
 
 Before implementation starts, confirm:
 
-1. Whether Supabase Auth should remain deferred after the seeded-user milestone.
+- No open architecture decisions block the first scaffold.

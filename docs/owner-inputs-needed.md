@@ -27,6 +27,7 @@ This document lists what is needed from the project owner to continue product wo
 - Confirmed: first media implementation should use plain local filesystem storage, with provider-agnostic DB design for later best-practice storage.
 - Clarified: Facebook, then Instagram, then LinkedIn is the technical implementation/testing order for live publishers, not runtime content publishing order.
 - Confirmed: new Orchard database schema and migrations should use Drizzle.
+- Confirmed: Supabase Auth is deferred after the seeded-user milestone.
 - Confirm initial supported channels:
   - Instagram
   - Facebook
@@ -38,7 +39,6 @@ This document lists what is needed from the project owner to continue product wo
 
 ## Infrastructure Direction
 
-- Decide whether Supabase Auth should remain optional after the seeded-user milestone.
 - Decide whether n8n remains a long-term orchestration component or only a transitional execution engine.
 - Decide expected future deployment target for n8n:
   - VPS,
@@ -108,4 +108,4 @@ The most useful next inputs are:
 2. Review `docs/mvp-application-scope.md`.
 3. Review `docs/implementation-readiness-plan.md`.
 4. Review `docs/architecture-decisions.md`.
-5. Confirm whether Supabase Auth should remain deferred after the seeded-user milestone.
+5. No required owner input remains before the first scaffold.

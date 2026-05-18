@@ -532,11 +532,10 @@ MVP is successful when:
 
 Need owner input:
 
-1. Should Supabase Auth remain deferred after the seeded-user milestone?
-2. Do you want real local n8n generation in the first app iteration, or stub first?
-3. Which UI view matters most first: content list, detail editor, or onboarding?
-4. Should each platform variant have only one active scheduled job?
-5. Should the UI use the working codename `Orchard`, or stay generic during the first internal milestone?
+1. Do you want real local n8n generation in the first app iteration, or stub first?
+2. Which UI view matters most first: content list, detail editor, or onboarding?
+3. Should each platform variant have only one active scheduled job?
+4. Should the UI use the working codename `Orchard`, or stay generic during the first internal milestone?
 
 ## Recommended Next Step
 

@@ -60,6 +60,8 @@ Out of scope for this phase:
 - Live publisher technical order accepted: Facebook, Instagram, LinkedIn.
 - Project-specific Docker Compose direction accepted.
 - Implementation start plan created.
+- Implementation start plan accepted.
+- Supabase Auth deferred after the seeded-user milestone.
 
 ## Still Needed For Audit Completion
 
@@ -176,10 +178,10 @@ Only after this should implementation begin.
 
 ## Phase Closure
 
-The audit/prep phase is ready to close after `docs/implementation-start-plan.md` is reviewed.
+The audit/prep phase is closed.
 
 Next phase:
 
-1. Confirm whether Supabase Auth remains deferred after the seeded-user milestone.
-2. Accept the implementation start plan.
-3. Start the first implementation scaffold.
+1. Start the first implementation scaffold.
+2. Keep implementation limited to `docs/implementation-start-plan.md`.
+3. Pause after the first scaffold milestone for review.
