@@ -59,6 +59,7 @@ Out of scope for this phase:
 - Per-platform scheduling accepted.
 - Live publisher technical order accepted: Facebook, Instagram, LinkedIn.
 - Project-specific Docker Compose direction accepted.
+- Implementation start plan created.
 
 ## Still Needed For Audit Completion
 
@@ -151,18 +152,14 @@ Deferred to implementation:
 
 ### 6. Implementation Readiness Plan
 
-Status: complete enough for implementation start.
+Status: complete.
 
 Completed:
 
 - readiness plan drafted,
 - architecture decisions recorded,
 - major prep decisions closed or deferred.
-
-Deferred:
-
-- final implementation-start plan document,
-- first scaffold commit plan.
+- implementation start plan created.
 
 ## Audit Completion Definition
 
@@ -177,8 +174,12 @@ The audit/prep phase is complete when:
 
 Only after this should implementation begin.
 
-## Recommended Next Work In This Phase
+## Phase Closure
 
-1. Create `docs/implementation-start-plan.md`.
-2. Confirm whether Supabase Auth remains deferred after the seeded-user milestone.
-3. Start implementation scaffold only after the implementation-start plan is accepted.
+The audit/prep phase is ready to close after `docs/implementation-start-plan.md` is reviewed.
+
+Next phase:
+
+1. Confirm whether Supabase Auth remains deferred after the seeded-user milestone.
+2. Accept the implementation start plan.
+3. Start the first implementation scaffold.
