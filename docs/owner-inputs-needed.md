@@ -22,7 +22,7 @@ This document lists what is needed from the project owner to continue product wo
 - Confirmed: first milestone can use a seeded local user/admin as long as the future auth boundary remains clean.
 - Confirmed: posts must be approved before real publishing.
 - Confirmed: scheduling should be per platform.
-- Confirmed: local media is acceptable for the first milestone, with provider-agnostic design for later best-practice storage.
+- Confirmed: first media implementation should use plain local filesystem storage, with provider-agnostic DB design for later best-practice storage.
 - Clarified: Facebook, then Instagram, then LinkedIn is the technical implementation/testing order for live publishers, not runtime content publishing order.
 - Confirm initial supported channels:
   - Instagram
@@ -36,7 +36,6 @@ This document lists what is needed from the project owner to continue product wo
 ## Infrastructure Direction
 
 - Decide whether Supabase Auth should remain optional after the seeded-user milestone.
-- Decide whether first local media implementation should use plain filesystem paths or a local object-storage-like service.
 - Decide whether n8n remains a long-term orchestration component or only a transitional execution engine.
 - Decide expected future deployment target for n8n:
   - VPS,
@@ -106,5 +105,4 @@ The most useful next inputs are:
 2. Review `docs/mvp-application-scope.md`.
 3. Review `docs/implementation-readiness-plan.md`.
 4. Review `docs/architecture-decisions.md`.
-5. Confirm first local media implementation: filesystem paths vs local object-storage-like service.
-6. Confirm migration tooling preference.
+5. Confirm migration tooling preference.

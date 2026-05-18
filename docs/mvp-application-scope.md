@@ -136,7 +136,7 @@ MVP media should support:
 - assign media to a platform variant,
 - mark role/order, for example primary or carousel item.
 
-For first implementation, local storage is acceptable. The schema should remain storage-provider agnostic.
+For first implementation, use plain local filesystem storage. The schema and service boundary should remain storage-provider agnostic so the product can later move to Supabase Storage, S3-compatible storage, or another provider.
 
 ### Approvals
 
@@ -533,7 +533,7 @@ MVP is successful when:
 Need owner input:
 
 1. Should first implementation include auth, or can MVP start with a seeded local user?
-2. Should local media storage be filesystem volume first?
+2. Local media storage is filesystem-first; confirm only the exact local directory convention when implementation starts.
 3. Do you want real local n8n generation in the first app iteration, or stub first?
 4. Which UI view matters most first: content list, detail editor, or onboarding?
 5. Should scheduling be per platform always, or can one schedule apply to all selected platforms by default?

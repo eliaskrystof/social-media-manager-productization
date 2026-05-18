@@ -328,9 +328,9 @@ Status: Accepted
 
 Decision:
 
-Start the first milestone with local media handling, provider-agnostic media records, and explicit media ordering.
+Start the first milestone with plain local filesystem media handling, provider-agnostic media records, and explicit media ordering.
 
-The legacy implementation often used local files intentionally. Some publishing flows may work better with local files than public media URLs, but that needs to be verified per platform workflow. The product model should not assume that local files are the final best practice; it should allow later movement to object storage such as Supabase Storage or S3-compatible storage.
+The first storage provider should be `local_fs`. The legacy implementation often used local files intentionally. Some publishing flows may work better with local files than public media URLs, but that needs to be verified per platform workflow. The product model should not assume that local files are the final best practice; it should allow later movement to object storage such as Supabase Storage or S3-compatible storage.
 
 Rationale:
 
@@ -343,6 +343,9 @@ Consequences:
 
 - `media_assets` should store provider, path/key, media type, metadata, and status.
 - `content_media` should store relation, platform scope, role, and order.
+- The first implementation should use a local media directory outside committed source files, for example `.local-media/`.
+- The application should access files through a media storage service boundary, for example `LocalFilesystemStorage`.
+- n8n payloads should receive structured media objects, not only hardcoded absolute paths.
 - Actual object storage can be phased in later.
 - Publishing workflow review should verify where local file access is required and where public URLs are preferred.
 - Best-practice production storage remains a later decision.
@@ -433,6 +436,5 @@ These should not block the first milestone:
 Before implementation starts, confirm:
 
 1. Whether Supabase Auth should remain deferred after the seeded-user milestone.
-2. Whether local media should be plain filesystem first or a local object-storage-like service.
-3. Migration tooling.
-4. Whether project-specific Docker Compose should be added in this repo during implementation.
+2. Migration tooling.
+3. Whether project-specific Docker Compose should be added in this repo during implementation.

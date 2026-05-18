@@ -142,12 +142,12 @@ Recommended rule:
 Open decision:
 
 - whether the existing local Docker setup should stay outside this repo, or whether a project-specific Docker Compose file should be added later.
-- whether first local media handling should use plain filesystem paths or a local object-storage-like service.
 
 Recommendation:
 
 - keep existing Docker setup as-is during audit,
 - add project-specific compose only when implementation actually needs repeatable setup.
+- use plain local filesystem media storage for the first milestone, behind a provider-agnostic media storage boundary.
 
 ### Phase 3: Database Foundation
 
@@ -298,6 +298,7 @@ Expected deliverables:
 - platform variant editor,
 - schedule/approval state,
 - mock automation run log,
+- local filesystem media handling through a media storage service boundary,
 - no live publishing.
 
 This proves the product workflow before adding integration complexity.

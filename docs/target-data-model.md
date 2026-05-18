@@ -881,7 +881,7 @@ Postgres portability:
 Need owner input:
 
 1. MVP auth: simple local auth, Supabase Auth, or postpone auth until app skeleton is ready?
-2. Media storage for local MVP: local filesystem volume or Supabase Storage test project?
+2. Media storage for local MVP: plain local filesystem through a provider-agnostic storage boundary. Confirm exact directory convention when implementation starts.
 3. Should approvals be required before scheduling in MVP?
 4. Should scheduling create jobs immediately, or only after approval?
 5. Should each platform variant have only one active scheduled job?
