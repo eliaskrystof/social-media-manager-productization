@@ -315,6 +315,70 @@ pre {
   color: var(--accent);
 }
 
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.content-create-panel {
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.content-form {
+  display: grid;
+  gap: 14px;
+}
+
+.content-form label {
+  display: grid;
+  gap: 7px;
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.content-form input,
+.content-form textarea {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfaf7;
+  color: var(--ink);
+  font: inherit;
+  font-weight: 400;
+  line-height: 1.45;
+  padding: 11px 12px;
+}
+
+.content-form input:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.content-form textarea {
+  resize: vertical;
+}
+
+.content-form input:focus,
+.content-form textarea:focus {
+  border-color: var(--accent);
+  outline: 2px solid rgba(47, 125, 87, 0.15);
+  outline-offset: 0;
+}
+
+.empty-state {
+  min-height: 180px;
+}
+
+.form-note {
+  margin: -6px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
 .chips {
   display: flex;
   flex-wrap: wrap;
@@ -435,6 +499,7 @@ pre {
   .content-row,
   .facts,
   .tile-grid,
+  .content-create-panel,
   .detail-layout,
   .variant-detail-grid {
     grid-template-columns: 1fr;

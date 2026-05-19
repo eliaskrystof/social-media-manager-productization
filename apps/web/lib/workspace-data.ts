@@ -13,6 +13,7 @@ export type AppSummary =
       contentCount: number;
       latestActivity: typeof schema.activityLogs.$inferSelect | undefined;
       latestAutomationRun: typeof schema.automationRuns.$inferSelect | undefined;
+      latestContentItem: ContinueContentItem | undefined;
     }
   | {
       ok: false;
@@ -22,6 +23,12 @@ export type AppSummary =
 export type BrandListItem = typeof schema.brands.$inferSelect & {
   profile: typeof schema.brandProfiles.$inferSelect | undefined;
   contentCount: number;
+};
+
+export type ContinueContentItem = {
+  brand: typeof schema.brands.$inferSelect;
+  contentItem: typeof schema.contentItems.$inferSelect;
+  activity: typeof schema.activityLogs.$inferSelect | undefined;
 };
 
 export type BrandDetail =
@@ -78,6 +85,8 @@ export async function getAppSummary(): Promise<AppSummary> {
       return { ok: false, message: "No seeded workspace found." };
     }
 
+    const currentUser = await getCurrentUser();
+
     const [brandCountRow] = await db
       .select({ value: sql<number>`count(*)::int` })
       .from(schema.brands)
@@ -105,13 +114,14 @@ export async function getAppSummary(): Promise<AppSummary> {
     return {
       ok: true,
       message: "The local workspace is ready.",
-      user: await getCurrentUser(),
+      user: currentUser,
       workspace,
       brands: await getBrands(),
       brandCount: brandCountRow?.value ?? 0,
       contentCount: contentCountRow?.value ?? 0,
       latestActivity,
-      latestAutomationRun
+      latestAutomationRun,
+      latestContentItem: await getLatestContentItem(workspace.id, currentUser?.id)
     };
   } catch (error) {
     return {
@@ -119,6 +129,52 @@ export async function getAppSummary(): Promise<AppSummary> {
       message: error instanceof Error ? error.message : "Unknown database error."
     };
   }
+}
+
+async function getLatestContentItem(workspaceId: string, userId: string | undefined): Promise<ContinueContentItem | undefined> {
+  if (userId) {
+    const [activity] = await db
+      .select()
+      .from(schema.activityLogs)
+      .where(
+        and(
+          eq(schema.activityLogs.workspaceId, workspaceId),
+          eq(schema.activityLogs.actorUserId, userId),
+          eq(schema.activityLogs.entityType, "content_item")
+        )
+      )
+      .orderBy(desc(schema.activityLogs.createdAt))
+      .limit(1);
+
+    if (activity?.entityId) {
+      const [row] = await db
+        .select({
+          contentItem: schema.contentItems,
+          brand: schema.brands
+        })
+        .from(schema.contentItems)
+        .innerJoin(schema.brands, eq(schema.contentItems.brandId, schema.brands.id))
+        .where(and(eq(schema.contentItems.workspaceId, workspaceId), eq(schema.contentItems.id, activity.entityId)))
+        .limit(1);
+
+      if (row) {
+        return { ...row, activity };
+      }
+    }
+  }
+
+  const [row] = await db
+    .select({
+      contentItem: schema.contentItems,
+      brand: schema.brands
+    })
+    .from(schema.contentItems)
+    .innerJoin(schema.brands, eq(schema.contentItems.brandId, schema.brands.id))
+    .where(eq(schema.contentItems.workspaceId, workspaceId))
+    .orderBy(desc(schema.contentItems.updatedAt))
+    .limit(1);
+
+  return row ? { ...row, activity: undefined } : undefined;
 }
 
 export async function getBrands(): Promise<BrandListItem[]> {

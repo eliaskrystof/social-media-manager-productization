@@ -18,6 +18,9 @@ This changelog records implementation milestones and product-facing changes. Des
 - Added content detail skeleton at `/brands/[brandId]/content/[contentId]`.
 - Added frontend implementation notes in `docs/frontend-implementation-notes.md`.
 - Added product design log in `docs/product-design-log.md`.
+- Added the first brand-scoped content creation flow with automatic draft platform variants and activity logs.
+- Added a dashboard continuation path to the latest content item.
+- Added a disabled media input stub to the brand-scoped draft creation form.
 
 ### Changed
 

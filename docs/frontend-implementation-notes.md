@@ -10,14 +10,17 @@ The architecture/audit documents define the product model and technical decision
 
 ## Current Frontend Principle
 
-The first UI should establish the product's core navigation and mental model before adding write actions.
+The first UI should establish the product's core navigation and mental model, then add write actions only where the product ownership model is already clear.
 
-Current implementation remains read-only. It is intentionally focused on:
+Current implementation is intentionally focused on:
 
 - dashboard orientation,
 - brand workspace context,
 - brand-scoped content lists,
 - content detail skeleton,
+- first brand-scoped content creation flow,
+- dashboard continuation path to the most recently worked content item,
+- prepared media input stub for future draft creation uploads,
 - visible placeholders for future media, approvals, scheduling, automation, and activity logs.
 
 Do not add live publishing, real n8n calls, OAuth, or production auth in this phase.
@@ -44,6 +47,7 @@ Role:
 - workspace status,
 - brand count,
 - content count,
+- continue editing path to the latest content item,
 - latest automation/activity,
 - brand workspace tiles.
 
@@ -78,8 +82,11 @@ Role:
 - brand-scoped content list,
 - content/items focused view,
 - working list for content under one brand.
+- first manual content creation flow.
 
-This route should evolve into a practical operational list with filtering, sorting, status indicators, schedule signals, and links to content detail.
+The current write flow creates one draft content item and draft platform variants for Instagram, Facebook, and LinkedIn. This route should evolve into a practical operational list with filtering, sorting, status indicators, schedule signals, and links to content detail.
+
+The media input on this route is intentionally a disabled stub. It reserves the creation-flow shape for media-first ideas without storing files or media metadata yet.
 
 ### `/brands/[brandId]/content/[contentId]`
 
@@ -93,7 +100,7 @@ Role:
 - publication jobs placeholder,
 - activity/automation visibility.
 
-This is the future editing surface, but it is read-only for now.
+This is the future editing surface. It currently displays created content and platform variants, while editing/generation/approval/scheduling actions remain deferred.
 
 ## Global Content View
 
@@ -124,16 +131,20 @@ Accepted for the local skeleton:
 - global `/content` is deferred,
 - content list is list-oriented rather than dashboard-oriented,
 - content detail exists before write actions are introduced,
-- UI remains read-only until the main navigation flow is validated.
+- first write flow starts with manual brand-owned content creation,
+- creation automatically prepares draft platform variants for Instagram, Facebook, and LinkedIn,
+- activity logging starts with content creation and variant preparation events.
+- dashboard offers a continuation path back into the latest content item,
+- media can be represented in the create flow UI, but real storage remains deferred.
 
 ## Next Frontend Steps
 
 Recommended sequence:
 
-1. Improve the brand-scoped content list into a more useful operational list.
-2. Improve content detail sections enough to host future write actions.
-3. Add the first write flow: create content item under a brand.
-4. Automatically create draft platform variants for Instagram, Facebook, and LinkedIn.
+1. Polish the brand-scoped content creation form and empty/error states.
+2. Define the local media storage flow and connect the prepared media input.
+3. Improve content detail sections enough to host future edit actions.
+4. Add manual editing for master content and platform variant captions.
 5. Add stub variant generation.
 6. Add approval/schedule state actions.
 7. Add global `/content` once brand-scoped content behavior is clear.
@@ -147,6 +158,11 @@ The read-only frontend skeleton is healthy when:
 - brand workspace loads brand profile/content summary,
 - brand content list loads seeded content item,
 - content detail loads platform variants,
+- brand content creation creates a draft content item,
+- draft platform variants are created automatically,
+- creation activity appears in the content detail activity log,
+- dashboard links back to the latest content item,
+- media input is visible but does not store files yet,
 - `npm run typecheck` passes,
 - `npm run lint` passes,
 - `npm run build` passes.

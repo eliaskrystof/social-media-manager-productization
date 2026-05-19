@@ -149,3 +149,95 @@ Revisit When:
 
 - Brand-scoped content flow supports create/edit/generate/approve/schedule.
 - There are enough content items to need cross-brand filtering.
+
+## 2026-05-19: First Write Flow Creates Brand-Owned Draft Content
+
+Decision:
+
+The first write flow should create content from `/brands/[brandId]/content`, not from a global route or the content detail page.
+
+Why:
+
+- Brand ownership is the clearest invariant in the product model.
+- Creating inside a brand workspace can inherit brand defaults such as language.
+- It prepares the later workflow where brand context influences generation, approval, scheduling, and platform rules.
+- A narrow create action is easier to validate before adding editing, uploads, n8n, AI generation, or publishing.
+
+Alternatives Considered:
+
+- Start with a global `/content` create flow.
+- Start directly on the content detail page with a richer editor.
+- Wait until n8n and generation are connected before allowing creation.
+
+Outcome:
+
+- `/brands/[brandId]/content` contains the first creation form.
+- Creating content inserts one draft content item.
+- Instagram, Facebook, and LinkedIn draft variants are created immediately.
+- Activity logs record content creation and variant preparation.
+
+Revisit When:
+
+- Manual editing exists for master content and platform variants.
+- Global `/content` exists and needs a cross-brand create affordance.
+- Brand/platform defaults become configurable enough to alter which variants are created.
+
+## 2026-05-19: Media-First Ideas Need A Creation Slot Before Storage
+
+Decision:
+
+The draft creation UI should show where media will enter the workflow, but real media storage should remain deferred.
+
+Why:
+
+- Many content ideas may begin from images or video rather than text.
+- The product shape should acknowledge media-first creation before AI analysis, publishing, or n8n are active.
+- A disabled media input keeps the UI direction visible without creating hidden filesystem or database behavior.
+
+Alternatives Considered:
+
+- Implement local upload storage immediately.
+- Keep media entirely out of the create flow until storage is ready.
+- Store only filenames or placeholder metadata in the database.
+
+Outcome:
+
+- The brand-scoped create form includes a media input stub.
+- No files or media metadata are stored by this stub.
+- Real upload handling remains a separate implementation step using the existing media tables and local filesystem storage service.
+
+Revisit When:
+
+- The next skeleton step connects local filesystem media storage.
+- Content detail needs to preview attached media.
+- Media-first draft generation becomes part of the n8n or AI flow.
+
+## 2026-05-19: Dashboard Should Resume Work, Not Only Summarize It
+
+Decision:
+
+The dashboard should include a continuation path to the latest content item.
+
+Why:
+
+- Returning to the last active draft is a common daily workflow.
+- It makes the dashboard useful as an operational starting point without turning it into a full content list.
+- The route still respects brand ownership by linking back into `/brands/[brandId]/content/[contentId]`.
+
+Alternatives Considered:
+
+- Keep dashboard purely informational.
+- Add a full recent-content list immediately.
+- Wait for a global `/content` route.
+
+Outcome:
+
+- Dashboard summary links to the latest content item.
+- A compact "Continue editing" panel appears when content exists.
+- The selection is based on latest user content activity, falling back to latest updated content.
+
+Revisit When:
+
+- Multiple recent items should be shown.
+- Global `/content` introduces cross-brand filters.
+- Auth becomes real and "last worked on" can be tracked per authenticated user/session.

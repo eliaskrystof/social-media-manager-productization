@@ -51,7 +51,17 @@ export default async function HomePage() {
           <article className="panel">
             <p className="label">Content items</p>
             <h2>{summary.contentCount}</h2>
-            <p>Brand-scoped content is the primary editing path.</p>
+            <p>
+              {summary.latestContentItem ? (
+                <Link
+                  href={`/brands/${summary.latestContentItem.brand.id}/content/${summary.latestContentItem.contentItem.id}`}
+                >
+                  Continue editing
+                </Link>
+              ) : (
+                "Brand-scoped content is the primary editing path."
+              )}
+            </p>
           </article>
 
           <article className="panel">
@@ -84,6 +94,20 @@ export default async function HomePage() {
               ))}
             </div>
           </section>
+
+          {summary.latestContentItem ? (
+            <article className="panel dashboard-section">
+              <p className="label">Continue editing</p>
+              <h2>{summary.latestContentItem.contentItem.title ?? "Untitled content"}</h2>
+              <p>{summary.latestContentItem.brand.name}</p>
+              <Link
+                className="button secondary"
+                href={`/brands/${summary.latestContentItem.brand.id}/content/${summary.latestContentItem.contentItem.id}`}
+              >
+                Open draft
+              </Link>
+            </article>
+          ) : null}
         </section>
       ) : (
         <section className="panel wide">
