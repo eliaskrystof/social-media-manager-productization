@@ -50,6 +50,9 @@ export async function updatePlatformVariantAction(formData: FormData) {
   const contentId = readFormValue(formData, "contentId");
   const variantId = readFormValue(formData, "variantId");
   const status = readFormValue(formData, "status") || "draft";
+  const postType = readFormValue(formData, "postType") || "post";
+  const purpose = readFormValue(formData, "purpose") || "main";
+  const sortOrder = parseSortOrder(readFormValue(formData, "sortOrder"));
   const headline = readFormValue(formData, "headline");
   const caption = readFormValue(formData, "caption");
   const hashtags = parseTags(readFormValue(formData, "hashtags"));
@@ -62,7 +65,7 @@ export async function updatePlatformVariantAction(formData: FormData) {
     .limit(1);
 
   if (!variant) {
-    throw new Error("Platform variant not found.");
+    throw new Error("Publishing output not found.");
   }
 
   const currentUser = await getCurrentUser();
@@ -72,6 +75,9 @@ export async function updatePlatformVariantAction(formData: FormData) {
       .update(schema.platformVariants)
       .set({
         status,
+        postType,
+        purpose,
+        sortOrder,
         headline: headline || null,
         caption: caption || null,
         hashtags,
@@ -90,9 +96,9 @@ export async function updatePlatformVariantAction(formData: FormData) {
       actorUserId: currentUser?.id,
       entityType: "content_item",
       entityId: contentId,
-      action: "platform_variant_updated",
-      message: `${variant.platform} variant updated.`,
-      metadata: { platform: variant.platform, status }
+      action: "publishing_output_updated",
+      message: `${variant.platform} ${postType} output updated.`,
+      metadata: { platform: variant.platform, postType, purpose, status }
     });
   });
 
@@ -134,6 +140,11 @@ function parseTags(value: string) {
     .filter(Boolean);
 
   return tags.length > 0 ? tags : null;
+}
+
+function parseSortOrder(value: string) {
+  const parsed = Number.parseInt(value, 10);
+  return Number.isFinite(parsed) ? parsed : 0;
 }
 
 function revalidateContentPaths(brandId: string, contentId: string) {

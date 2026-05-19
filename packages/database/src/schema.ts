@@ -1,15 +1,5 @@
 import { relations } from "drizzle-orm";
-import {
-  bigint,
-  integer,
-  jsonb,
-  numeric,
-  pgTable,
-  text,
-  timestamp,
-  unique,
-  uuid
-} from "drizzle-orm/pg-core";
+import { bigint, integer, jsonb, numeric, pgTable, text, timestamp, unique, uuid } from "drizzle-orm/pg-core";
 
 const timestamps = {
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
@@ -110,6 +100,9 @@ export const platformVariants = pgTable(
     id: uuid("id").primaryKey().defaultRandom(),
     contentItemId: uuid("content_item_id").references(() => contentItems.id).notNull(),
     platform: text("platform").notNull(),
+    postType: text("post_type").default("post").notNull(),
+    purpose: text("purpose").default("main").notNull(),
+    sortOrder: integer("sort_order").default(0).notNull(),
     status: text("status").default("draft").notNull(),
     caption: text("caption"),
     headline: text("headline"),
@@ -123,10 +116,7 @@ export const platformVariants = pgTable(
     aiModel: text("ai_model"),
     generationPromptVersion: text("generation_prompt_version"),
     ...timestamps
-  },
-  (table) => ({
-    contentPlatformUnique: unique("platform_variants_content_platform_unique").on(table.contentItemId, table.platform)
-  })
+  }
 );
 
 export const mediaAssets = pgTable("media_assets", {

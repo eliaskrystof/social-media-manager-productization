@@ -15,6 +15,13 @@
       "when": 1779220124165,
       "tag": "0001_flippant_puma",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1779224809936,
+      "tag": "0002_tidy_blonde_phantom",
+      "breakpoints": true
     }
   ]
 }

@@ -303,3 +303,74 @@ Revisit When:
 - Platform variants are renamed or expanded into publishing outputs.
 - Real publisher integrations start writing external post IDs and URLs.
 - Metrics sync needs normalized metric snapshots rather than JSON metadata.
+
+## 2026-05-19: Publishing Outputs Can Repeat Per Platform
+
+Decision:
+
+Treat `platform_variants` as publishing outputs in the product UI, and allow more than one output for the same platform under one master content item.
+
+Why:
+
+- A master idea may need several outputs on the same platform, such as a teaser story, main post, and reminder story.
+- Platform-specific API support differs and will be verified later, but the product model should not prevent repeated or differently formatted outputs.
+- The first skeleton can remain simple by creating one `post/main` output per platform while leaving room for story, reel, long-form, and follow-up outputs.
+
+Alternatives Considered:
+
+- Keep exactly one variant per platform.
+- Create a new `publishing_outputs` table immediately.
+- Model repeated stories as separate content items.
+
+Outcome:
+
+- Removed the unique `(content_item_id, platform)` constraint.
+- Added `post_type`, `purpose`, and `sort_order` to `platform_variants`.
+- The UI now names this area "Publishing outputs".
+- The default create flow still creates three simple outputs: Instagram post/main, Facebook post/main, LinkedIn post/main.
+
+Revisit When:
+
+- A dedicated `publishing_outputs` table would clarify the model more than preserving the existing table name.
+- Platform integrations define exact format limits and API capabilities.
+- Scheduling and approval need per-output workflows beyond the current skeleton.
+
+## 2026-05-19: Content Status Tracks The Working Bundle
+
+Decision:
+
+Content item status should describe the state of the master idea or working bundle, not mirror each publishing output's operational state.
+
+Why:
+
+- One master idea can have several outputs in different states.
+- Output/job state can describe scheduled, publishing, published, or failed work more precisely.
+- A master-level `active` status is clearer than `partially_published`.
+- `on_hold` is useful for waiting on client input, missing media, product decisions, or other temporary blockers without archiving the work.
+
+Alternatives Considered:
+
+- Use `partially_published` on `content_items`.
+- Use campaign-specific statuses such as `campaign_in_progress`.
+- Let master content inherit status directly from child outputs.
+
+Outcome:
+
+- Milestone 2 will use this target content status set in the editor:
+  - `draft`
+  - `in_progress`
+  - `on_hold`
+  - `ready_for_review`
+  - `changes_requested`
+  - `approved`
+  - `active`
+  - `completed`
+  - `archived`
+- Publishing outputs and publication jobs keep more operational statuses such as `scheduled`, `publishing`, `published`, and `failed`.
+- Statuses remain text conventions for now, not hard database enums.
+
+Revisit When:
+
+- Real scheduling/publishing is connected.
+- The global `/content` view needs aggregate status filters.
+- Approval and scheduling actions reveal unclear transitions.

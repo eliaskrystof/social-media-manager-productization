@@ -19,7 +19,7 @@ The model is designed for:
 
 1. Use product concepts, not Google Sheets concepts.
 2. Keep legacy IDs only as references, never as primary product identity.
-3. Split master content from platform variants.
+3. Split master content from publishing outputs.
 4. Split approved content from publication jobs.
 5. Track automation runs and activity logs explicitly.
 6. Keep credentials behind a server boundary.
@@ -40,12 +40,13 @@ Recommended first entities:
 - `brand_voice_samples`
 - `integration_accounts`
 - `content_items`
-- `platform_variants`
+- `platform_variants` (product UI: publishing outputs)
 - `media_assets`
 - `content_media`
 - `approvals`
 - `publication_jobs`
 - `publication_results`
+- `published_posts`
 - `automation_runs`
 - `activity_logs`
 - `legacy_sources`
@@ -78,6 +79,7 @@ erDiagram
   content_items ||--o{ approvals : reviewed_by
   platform_variants ||--o{ publication_jobs : scheduled_as
   publication_jobs ||--o{ publication_results : produces
+  content_items ||--o{ published_posts : has
   content_items ||--o{ automation_runs : triggers
   workspaces ||--o{ activity_logs : records
   legacy_sources ||--o{ content_items : imported_as
@@ -442,7 +444,9 @@ Legacy mapping:
 
 ## `platform_variants`
 
-Platform-specific copy and publishing settings.
+Publishing output copy and settings.
+
+The table name is kept from the first schema slice, but the product concept is "publishing outputs": one master content item can have multiple planned outputs, including repeated outputs on the same platform.
 
 Suggested columns:
 
@@ -450,6 +454,9 @@ Suggested columns:
 - `content_item_id uuid not null references content_items(id)`
 - `platform text not null`
 - `integration_account_id uuid references integration_accounts(id)`
+- `post_type text not null default 'post'`
+- `purpose text not null default 'main'`
+- `sort_order int not null default 0`
 - `status text not null default 'draft'`
 - `caption text`
 - `headline text`
@@ -465,13 +472,10 @@ Suggested columns:
 - `created_at timestamptz not null`
 - `updated_at timestamptz not null`
 
-Constraints:
-
-- unique `(content_item_id, platform)` for MVP.
-
 Notes:
 
-- Later, allow multiple variants per platform by adding `variant_key` or removing uniqueness.
+- Multiple outputs per platform are allowed.
+- Example: one master idea can have an Instagram story teaser, Instagram main post, and Instagram reminder story.
 - `platform_options` can hold IG carousel settings, LinkedIn visibility, FB link/photo mode, etc.
 
 Legacy mapping:
@@ -648,6 +652,37 @@ Notes:
 - Keep raw API response for debugging.
 - Normalize common fields for product UI.
 
+## `published_posts`
+
+Product-level records for external posts that exist on a social platform.
+
+Suggested columns:
+
+- `id uuid primary key`
+- `workspace_id uuid not null references workspaces(id)`
+- `brand_id uuid not null references brands(id)`
+- `content_item_id uuid not null references content_items(id)`
+- `platform_variant_id uuid references platform_variants(id)`
+- `publication_job_id uuid references publication_jobs(id)`
+- `platform text not null`
+- `post_type text not null default 'post'`
+- `status text not null default 'published'`
+- `external_post_id text`
+- `external_url text`
+- `published_at timestamptz`
+- `last_synced_at timestamptz`
+- `metrics jsonb`
+- `raw_response jsonb`
+- `metadata jsonb`
+- `created_at timestamptz not null`
+- `updated_at timestamptz not null`
+
+Notes:
+
+- This is separate from `publication_results`; a result records an execution response, while a published post is a reusable product artifact.
+- External posts can later be used for reposting, sharing, reporting, and metric sync.
+- Some records may be imported or linked manually rather than created by an Orchard publication job.
+
 ## `automation_runs`
 
 Tracks AI/n8n/server automation executions.
@@ -767,6 +802,7 @@ For the first frontend MVP, build only:
 - `approvals`
 - `publication_jobs`
 - `publication_results`
+- `published_posts`
 - `automation_runs`
 - `activity_logs`
 - `legacy_sources`

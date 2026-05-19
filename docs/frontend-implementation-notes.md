@@ -19,7 +19,8 @@ Current implementation is intentionally focused on:
 - brand-scoped content lists,
 - content detail skeleton,
 - first brand-scoped content creation flow,
-- manual editing for master content and platform variant copy,
+- manual editing for master content and publishing output copy,
+- publishing output type/purpose/order planning,
 - published post artifact records for future reposting and metrics,
 - dashboard continuation path to the most recently worked content item,
 - prepared media input stub for future draft creation uploads,
@@ -86,7 +87,7 @@ Role:
 - working list for content under one brand,
 - first manual content creation flow.
 
-The current write flow creates one draft content item and draft platform variants for Instagram, Facebook, and LinkedIn. This route should evolve into a practical operational list with filtering, sorting, status indicators, schedule signals, and links to content detail.
+The current write flow creates one draft content item and default publishing outputs for Instagram, Facebook, and LinkedIn. This route should evolve into a practical operational list with filtering, sorting, status indicators, schedule signals, and links to content detail.
 
 The media input on this route is intentionally a disabled stub. It reserves the creation-flow shape for media-first ideas without storing files or media metadata yet.
 
@@ -96,14 +97,14 @@ Role:
 
 - content detail skeleton,
 - master content / brief,
-- platform variants,
+- publishing outputs,
 - media placeholder,
 - approval placeholder,
 - publication jobs placeholder,
 - published post artifact placeholder,
 - activity/automation visibility,
 - manual master content editing,
-- manual platform variant editing.
+- manual publishing output editing.
 
 This is the active editing surface for manual draft work. Generation, approval, scheduling, uploads, and publishing remain deferred.
 
@@ -139,11 +140,12 @@ Accepted for the local skeleton:
 - content list is list-oriented rather than dashboard-oriented,
 - content detail exists before write actions are introduced,
 - first write flow starts with manual brand-owned content creation,
-- creation automatically prepares draft platform variants for Instagram, Facebook, and LinkedIn,
+- creation automatically prepares default draft publishing outputs for Instagram, Facebook, and LinkedIn,
 - activity logging starts with content creation and variant preparation events,
 - dashboard offers a continuation path back into the latest content item,
 - media can be represented in the create flow UI, but real storage remains deferred,
-- content detail supports manual master content and platform variant edits,
+- content detail supports manual master content and publishing output edits,
+- publishing outputs support type, purpose, and order,
 - published external posts are product artifacts, not only technical publish results.
 
 ## Next Frontend Steps
@@ -153,10 +155,9 @@ Recommended sequence:
 1. Polish the brand-scoped content creation form and empty/error states.
 2. Define the local media storage flow and connect the prepared media input.
 3. Improve content detail edit ergonomics and validation feedback.
-4. Rename/refine platform variants toward publishing outputs with format/type planning.
-5. Add stub variant generation.
-6. Add approval/schedule state actions.
-7. Add global `/content` once brand-scoped content behavior is clear.
+4. Add stub output generation.
+5. Add approval/schedule state actions.
+6. Add global `/content` once brand-scoped content behavior is clear.
 
 ## Current Verification Target
 
@@ -166,14 +167,14 @@ The frontend skeleton is healthy when:
 - brand list loads seeded brand,
 - brand workspace loads brand profile/content summary,
 - brand content list loads seeded content item,
-- content detail loads platform variants,
+- content detail loads publishing outputs,
 - brand content creation creates a draft content item,
-- draft platform variants are created automatically,
+- draft publishing outputs are created automatically,
 - creation activity appears in the content detail activity log,
 - dashboard links back to the latest content item,
 - media input is visible but does not store files yet,
 - content detail can save master content changes,
-- content detail can save platform variant changes,
+- content detail can save publishing output changes,
 - published post artifact table exists and is visible as an empty detail section,
 - `npm run typecheck` passes,
 - `npm run lint` passes,

@@ -23,8 +23,13 @@ This changelog records implementation milestones and product-facing changes. Des
 - Added a disabled media input stub to the brand-scoped draft creation form.
 - Added manual editing for content detail master copy and platform variants.
 - Added `published_posts` records for future live post links, reuse, reposting, and metrics.
+- Added publishing output planning fields for type, purpose, and order.
+- Added Milestone 1 closure documentation.
+- Added Milestone 2 Local Workflow Editor planning documentation.
 
 ### Changed
 
 - Documented local development commands and the Drizzle migration workflow in `README.md`.
 - Established brand-scoped content as the primary ownership path while deferring global `/content`.
+- Renamed the user-facing variant surface toward publishing outputs.
+- Removed the one-output-per-platform database constraint from `platform_variants`.

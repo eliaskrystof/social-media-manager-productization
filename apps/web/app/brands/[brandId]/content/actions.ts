@@ -48,9 +48,12 @@ export async function createContentItemAction(formData: FormData) {
     }
 
     await tx.insert(schema.platformVariants).values(
-      supportedPlatforms.map((platform) => ({
+      supportedPlatforms.map((platform, index) => ({
         contentItemId: contentItem.id,
         platform,
+        postType: "post",
+        purpose: "main",
+        sortOrder: index,
         status: "draft",
         language
       }))
@@ -73,9 +76,11 @@ export async function createContentItemAction(formData: FormData) {
         actorUserId: currentUser?.id,
         entityType: "content_item",
         entityId: contentItem.id,
-        action: "platform_variants_created",
-        message: "Draft platform variants created.",
-        metadata: { platforms: supportedPlatforms }
+        action: "publishing_outputs_created",
+        message: "Default publishing outputs created.",
+        metadata: {
+          outputs: supportedPlatforms.map((platform) => ({ platform, postType: "post", purpose: "main" }))
+        }
       }
     ]);
 

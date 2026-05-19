@@ -13,7 +13,7 @@ export default async function HomePage() {
           <p className="eyebrow">Local milestone 1</p>
           <h1>Orchard</h1>
           <p className="lede">
-            A local-first skeleton for modelling brands, content, platform variants,
+            A local-first skeleton for modelling brands, content, publishing outputs,
             approval, scheduling intent, and simulated automation status.
           </p>
         </div>
@@ -51,17 +51,7 @@ export default async function HomePage() {
           <article className="panel">
             <p className="label">Content items</p>
             <h2>{summary.contentCount}</h2>
-            <p>
-              {summary.latestContentItem ? (
-                <Link
-                  href={`/brands/${summary.latestContentItem.brand.id}/content/${summary.latestContentItem.contentItem.id}`}
-                >
-                  Continue editing
-                </Link>
-              ) : (
-                "Brand-scoped content is the primary editing path."
-              )}
-            </p>
+            <p>Brand-scoped content is the primary editing path.</p>
           </article>
 
           <article className="panel">

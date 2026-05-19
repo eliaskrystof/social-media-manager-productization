@@ -34,7 +34,7 @@ export default async function ContentDetailPage({ params }: ContentDetailPagePro
             Brand workspace
           </Link>
           <button className="button secondary" disabled type="button">
-            Generate variants
+            Generate outputs
           </button>
         </div>
       </section>
@@ -98,8 +98,8 @@ export default async function ContentDetailPage({ params }: ContentDetailPagePro
       <section className="detail-section">
         <div className="section-title">
           <div>
-            <p className="label">Platform variants</p>
-            <h2>Prepared copy</h2>
+            <p className="label">Publishing outputs</p>
+            <h2>Output plan</h2>
           </div>
         </div>
         <div className="variant-detail-grid">
@@ -109,6 +109,9 @@ export default async function ContentDetailPage({ params }: ContentDetailPagePro
                 <div>
                   <p className="label">{variant.status}</p>
                   <h2>{variant.platform}</h2>
+                  <p>
+                    {variant.postType} / {variant.purpose}
+                  </p>
                 </div>
                 <span>{variant.scheduledFor ? formatDateTime(variant.scheduledFor) : "unscheduled"}</span>
               </div>
@@ -126,6 +129,28 @@ export default async function ContentDetailPage({ params }: ContentDetailPagePro
                   </select>
                 </label>
                 <label>
+                  Type
+                  <select name="postType" defaultValue={variant.postType}>
+                    <option value="post">post</option>
+                    <option value="story">story</option>
+                    <option value="reel">reel</option>
+                    <option value="linkedin_long">linkedin_long</option>
+                  </select>
+                </label>
+                <label>
+                  Purpose
+                  <select name="purpose" defaultValue={variant.purpose}>
+                    <option value="main">main</option>
+                    <option value="teaser">teaser</option>
+                    <option value="reminder">reminder</option>
+                    <option value="follow_up">follow_up</option>
+                  </select>
+                </label>
+                <label>
+                  Order
+                  <input min="0" name="sortOrder" type="number" defaultValue={variant.sortOrder} />
+                </label>
+                <label>
                   Headline
                   <input name="headline" defaultValue={variant.headline ?? ""} />
                 </label>
@@ -138,7 +163,7 @@ export default async function ContentDetailPage({ params }: ContentDetailPagePro
                   <input name="hashtags" defaultValue={variant.hashtags?.map((tag) => `#${tag}`).join(", ") ?? ""} />
                 </label>
                 <button className="button secondary" type="submit">
-                  Save variant
+                  Save output
                 </button>
               </form>
               {variant.hashtags && variant.hashtags.length > 0 ? (

@@ -1,4 +1,4 @@
-import { and, desc, eq, sql } from "drizzle-orm";
+import { and, asc, desc, eq, sql } from "drizzle-orm";
 import { db, schema } from "@orchard/database";
 import { getCurrentUser } from "@/lib/current-user";
 
@@ -230,7 +230,8 @@ export async function getBrandContentList(brandId: string): Promise<BrandContent
       const variants = await db
         .select()
         .from(schema.platformVariants)
-        .where(eq(schema.platformVariants.contentItemId, contentItem.id));
+        .where(eq(schema.platformVariants.contentItemId, contentItem.id))
+        .orderBy(asc(schema.platformVariants.sortOrder), asc(schema.platformVariants.platform));
 
       const [latestActivity] = await db
         .select()
@@ -287,7 +288,8 @@ export async function getContentDetail(brandId: string, contentId: string): Prom
   const variants = await db
     .select()
     .from(schema.platformVariants)
-    .where(eq(schema.platformVariants.contentItemId, contentItem.id));
+    .where(eq(schema.platformVariants.contentItemId, contentItem.id))
+    .orderBy(asc(schema.platformVariants.sortOrder), asc(schema.platformVariants.platform));
 
   const mediaRows = await db
     .select({

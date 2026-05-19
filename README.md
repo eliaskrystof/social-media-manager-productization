@@ -34,6 +34,8 @@ Start with:
 - `docs/project-foundation.md`
 - `docs/frontend-implementation-notes.md`
 - `docs/product-design-log.md`
+- `docs/milestone-1-local-skeleton.md`
+- `docs/milestone-2-local-workflow-editor.md`
 - `CHANGELOG.md`
 
 ## Current Direction
