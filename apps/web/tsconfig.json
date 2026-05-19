@@ -1,0 +1,38 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "paths": {
+      "@/*": [
+        "./*"
+      ],
+      "@orchard/database": [
+        "../../packages/database/src/index.ts"
+      ],
+      "@orchard/database/*": [
+        "../../packages/database/src/*"
+      ],
+      "@orchard/n8n-client": [
+        "../../packages/n8n-client/src/index.ts"
+      ],
+      "@orchard/shared": [
+        "../../packages/shared/src/index.ts"
+      ]
+    },
+    "incremental": true
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

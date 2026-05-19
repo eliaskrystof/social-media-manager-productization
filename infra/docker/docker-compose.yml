@@ -1,0 +1,23 @@
+name: orchard-local
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: orchard-postgres
+    restart: unless-stopped
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_DB: orchard
+      POSTGRES_USER: orchard
+      POSTGRES_PASSWORD: orchard
+    volumes:
+      - orchard-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U orchard -d orchard"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  orchard-postgres-data:

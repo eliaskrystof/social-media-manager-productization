@@ -1,0 +1,164 @@
+:root {
+  color-scheme: light;
+  --bg: #f7f6f2;
+  --ink: #20231f;
+  --muted: #64685f;
+  --panel: #ffffff;
+  --line: #dedbd1;
+  --accent: #2f7d57;
+  --accent-soft: #e7f1ea;
+  --warn: #a15c1b;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.shell {
+  width: min(1120px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 40px 0;
+}
+
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 24px;
+  align-items: end;
+  margin-bottom: 24px;
+}
+
+.eyebrow,
+.label {
+  margin: 0 0 8px;
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+h1,
+h2,
+p {
+  margin-top: 0;
+}
+
+h1 {
+  margin-bottom: 12px;
+  font-size: clamp(44px, 8vw, 88px);
+  line-height: 0.95;
+}
+
+h2 {
+  margin-bottom: 10px;
+  font-size: 24px;
+}
+
+.lede {
+  max-width: 720px;
+  color: var(--muted);
+  font-size: 18px;
+  line-height: 1.55;
+}
+
+.status-panel,
+.panel {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  box-shadow: 0 1px 0 rgba(32, 35, 31, 0.04);
+}
+
+.status-panel {
+  display: flex;
+  gap: 12px;
+  padding: 16px;
+}
+
+.status-panel p,
+.panel p {
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.status-dot {
+  width: 12px;
+  height: 12px;
+  flex: 0 0 auto;
+  margin-top: 4px;
+  border-radius: 999px;
+  background: var(--warn);
+}
+
+.status-dot.ok {
+  background: var(--accent);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.panel {
+  padding: 18px;
+}
+
+.wide {
+  grid-column: span 2;
+}
+
+.platforms {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.platform {
+  min-height: 180px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px;
+  background: var(--accent-soft);
+}
+
+.platform strong {
+  display: block;
+  text-transform: capitalize;
+}
+
+.platform span {
+  display: block;
+  margin: 6px 0 10px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+pre {
+  overflow-x: auto;
+  border-radius: 8px;
+  background: #1f2421;
+  color: #f4f1e8;
+  padding: 16px;
+}
+
+@media (max-width: 800px) {
+  .hero,
+  .grid,
+  .platforms {
+    grid-template-columns: 1fr;
+  }
+
+  .wide {
+    grid-column: span 1;
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "name": "orchard",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev -w @orchard/web",
+    "build": "npm run build -w @orchard/web",
+    "lint": "npm run lint --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "db:generate": "drizzle-kit generate --config packages/database/drizzle.config.ts",
+    "db:migrate": "tsx packages/database/src/migrate.ts",
+    "db:migrate:kit": "drizzle-kit migrate --config packages/database/drizzle.config.ts",
+    "db:seed": "tsx packages/database/src/seed.ts"
+  },
+  "dependencies": {
+    "drizzle-orm": "^0.44.2",
+    "next": "^15.3.3",
+    "postgres": "^3.4.7",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.29",
+    "@types/react": "^19.0.14",
+    "@types/react-dom": "^19.0.11",
+    "drizzle-kit": "^0.31.1",
+    "eslint": "^9.28.0",
+    "eslint-config-next": "^15.3.3",
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3"
+  }
+}

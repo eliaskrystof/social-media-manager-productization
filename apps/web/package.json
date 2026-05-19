@@ -1,0 +1,16 @@
+{
+  "name": "@orchard/web",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "lint": "eslint app lib services --max-warnings=0",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@orchard/database": "0.1.0",
+    "@orchard/n8n-client": "0.1.0",
+    "@orchard/shared": "0.1.0"
+  }
+}
