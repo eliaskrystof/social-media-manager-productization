@@ -1,11 +1,10 @@
-import { getLocalOverview } from "@/lib/local-overview";
+import Link from "next/link";
+import { getAppSummary } from "@/lib/workspace-data";
 
 export const dynamic = "force-dynamic";
 
-const platforms = ["instagram", "facebook", "linkedin"] as const;
-
 export default async function HomePage() {
-  const overview = await getLocalOverview();
+  const summary = await getAppSummary();
 
   return (
     <main className="shell">
@@ -19,51 +18,72 @@ export default async function HomePage() {
           </p>
         </div>
         <div className="status-panel">
-          <span className={overview.ok ? "status-dot ok" : "status-dot"} />
+          <span className={summary.ok ? "status-dot ok" : "status-dot"} />
           <div>
-            <strong>{overview.ok ? "Seeded workspace ready" : "Database not ready"}</strong>
-            <p>{overview.message}</p>
+            <strong>{summary.ok ? "Workspace ready" : "Database not ready"}</strong>
+            <p>{summary.message}</p>
           </div>
         </div>
       </section>
 
-      {overview.ok ? (
+      {summary.ok ? (
         <section className="grid">
           <article className="panel">
+            <p className="label">Current user</p>
+            <h2>{summary.user?.displayName ?? "Seeded user"}</h2>
+            <p>{summary.user?.email ?? "No local user found."}</p>
+          </article>
+
+          <article className="panel">
             <p className="label">Workspace</p>
-            <h2>{overview.workspace.name}</h2>
-            <p>{overview.brand.name}</p>
+            <h2>{summary.workspace.name}</h2>
+            <p>{summary.workspace.status}</p>
           </article>
 
           <article className="panel">
-            <p className="label">Brand profile</p>
-            <h2>{overview.profile?.toneOfVoice ?? "Profile draft"}</h2>
-            <p>{overview.profile?.targetAudience ?? "No target audience yet."}</p>
+            <p className="label">Brands</p>
+            <h2>{summary.brandCount}</h2>
+            <p>
+              <Link href="/brands">Open all brands</Link>
+            </p>
           </article>
 
-          <article className="panel wide">
-            <p className="label">Demo content</p>
-            <h2>{overview.content.title}</h2>
-            <p>{overview.content.brief}</p>
-            <div className="platforms">
-              {platforms.map((platform) => {
-                const variant = overview.variants.find((item) => item.platform === platform);
-                return (
-                  <div className="platform" key={platform}>
-                    <strong>{platform}</strong>
-                    <span>{variant?.status ?? "draft"}</span>
-                    <p>{variant?.caption ?? "Variant placeholder"}</p>
-                  </div>
-                );
-              })}
+          <article className="panel">
+            <p className="label">Content items</p>
+            <h2>{summary.contentCount}</h2>
+            <p>Brand-scoped content is the primary editing path.</p>
+          </article>
+
+          <article className="panel">
+            <p className="label">Latest automation</p>
+            <h2>{summary.latestAutomationRun?.status ?? "idle"}</h2>
+            <p>{summary.latestAutomationRun?.runType ?? "No automation run recorded."}</p>
+          </article>
+
+          <article className="panel">
+            <p className="label">Latest activity</p>
+            <h2>{summary.latestActivity?.action ?? "none"}</h2>
+            <p>{summary.latestActivity?.message ?? "No activity recorded."}</p>
+          </article>
+
+          <section className="panel wide dashboard-section">
+            <div className="section-title">
+              <div>
+                <p className="label">Brand workspaces</p>
+                <h2>Active brands</h2>
+              </div>
+              <Link href="/brands">View list</Link>
             </div>
-          </article>
-
-          <article className="panel">
-            <p className="label">Automation</p>
-            <h2>{overview.latestRun?.status ?? "idle"}</h2>
-            <p>{overview.latestRun?.runType ?? "No automation run recorded."}</p>
-          </article>
+            <div className="tile-grid">
+              {summary.brands.map((brand) => (
+                <Link className="brand-tile" href={`/brands/${brand.id}`} key={brand.id}>
+                  <span>{brand.status}</span>
+                  <strong>{brand.name}</strong>
+                  <small>{brand.contentCount} content item(s)</small>
+                </Link>
+              ))}
+            </div>
+          </section>
         </section>
       ) : (
         <section className="panel wide">
