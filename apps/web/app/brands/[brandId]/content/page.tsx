@@ -33,24 +33,43 @@ export default async function BrandContentPage({ params }: BrandContentPageProps
 
       <section className="list">
         {contentList.contentItems.map((contentItem) => (
-          <article className="row-card" key={contentItem.id}>
-            <div>
+          <article className="content-row" key={contentItem.id}>
+            <div className="content-row-main">
               <p className="label">{contentItem.status}</p>
-              <h2>{contentItem.title ?? "Untitled content"}</h2>
+              <h2>
+                <Link href={`/brands/${contentList.brand.id}/content/${contentItem.id}`}>
+                  {contentItem.title ?? "Untitled content"}
+                </Link>
+              </h2>
               <p>{contentItem.brief ?? contentItem.masterContent ?? "No brief yet."}</p>
+              <div className="meta-line">
+                <span>Updated {formatDate(contentItem.updatedAt)}</span>
+                <span>{contentItem.publicationJobCount} publication job(s)</span>
+                <span>{contentItem.latestAutomationRun?.status ?? "automation idle"}</span>
+              </div>
             </div>
-            <div className="platforms compact">
+            <div className="variant-chip-list" aria-label="Platform variants">
               {contentItem.variants.map((variant) => (
-                <div className="platform" key={variant.id}>
+                <div className="variant-chip" key={variant.id}>
                   <strong>{variant.platform}</strong>
                   <span>{variant.status}</span>
-                  <p>{variant.caption ?? "No caption yet."}</p>
                 </div>
               ))}
             </div>
+            <Link className="row-action" href={`/brands/${contentList.brand.id}/content/${contentItem.id}`}>
+              Open
+            </Link>
           </article>
         ))}
       </section>
     </main>
   );
+}
+
+function formatDate(value: Date | string) {
+  return new Intl.DateTimeFormat("en", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric"
+  }).format(new Date(value));
 }

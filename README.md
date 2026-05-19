@@ -32,6 +32,7 @@ Start with:
 - `docs/architecture-decisions.md`
 - `docs/audit-completion-checklist.md`
 - `docs/project-foundation.md`
+- `docs/frontend-implementation-notes.md`
 
 ## Current Direction
 

@@ -213,6 +213,61 @@ pre {
   padding: 18px;
 }
 
+.content-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(260px, 0.9fr) auto;
+  gap: 18px;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  padding: 18px;
+}
+
+.content-row-main h2 {
+  margin-bottom: 8px;
+}
+
+.meta-line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 12px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.variant-chip-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.variant-chip {
+  min-width: 112px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--accent-soft);
+  padding: 10px;
+}
+
+.variant-chip strong,
+.variant-chip span {
+  display: block;
+  text-transform: capitalize;
+}
+
+.variant-chip span {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.row-action {
+  color: var(--accent);
+  font-weight: 700;
+}
+
 .facts {
   display: grid;
   grid-template-columns: repeat(3, minmax(96px, 1fr));
@@ -291,6 +346,53 @@ pre {
   color: var(--muted);
 }
 
+.detail-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.detail-main {
+  min-height: 260px;
+}
+
+.detail-side {
+  display: grid;
+  gap: 16px;
+}
+
+.detail-section {
+  margin-bottom: 24px;
+}
+
+.variant-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.variant-detail {
+  min-height: 260px;
+}
+
+.variant-detail .section-title span {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.log-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  border-top: 1px solid var(--line);
+  padding-top: 8px;
+}
+
+.log-row span {
+  color: var(--muted);
+}
+
 .section-title {
   display: flex;
   align-items: flex-start;
@@ -330,8 +432,11 @@ pre {
   .grid,
   .platforms,
   .row-card,
+  .content-row,
   .facts,
-  .tile-grid {
+  .tile-grid,
+  .detail-layout,
+  .variant-detail-grid {
     grid-template-columns: 1fr;
   }
 
