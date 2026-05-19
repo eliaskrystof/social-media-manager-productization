@@ -56,7 +56,7 @@ export default async function BrandContentPage({ params }: BrandContentPageProps
             Media
             <input disabled name="media" type="file" />
           </label>
-          <p className="form-note">Media input is prepared as a stub for the next storage step.</p>
+          <p className="form-note">Create the draft first, then attach media in the editor.</p>
           <label>
             Language
             <input name="language" placeholder={contentList.brand.defaultLanguage ?? "en"} />

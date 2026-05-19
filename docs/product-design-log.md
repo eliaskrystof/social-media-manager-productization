@@ -374,3 +374,35 @@ Revisit When:
 - Real scheduling/publishing is connected.
 - The global `/content` view needs aggregate status filters.
 - Approval and scheduling actions reveal unclear transitions.
+
+## 2026-05-20: Media Has Three Roles In The Editor
+
+Decision:
+
+Media should be modeled in the editor as a reusable source, an output assignment, and a preview input.
+
+Why:
+
+- The same uploaded media may be reused across several publishing outputs.
+- A master idea may start from media, not text.
+- Output previews need to combine selected media with generated or edited copy.
+- Platform requirements may force output-specific media transformations such as crop, aspect ratio, video range, or thumbnail selection.
+
+Alternatives Considered:
+
+- Treat uploaded media as only attached to the master idea.
+- Duplicate media per output immediately.
+- Build a full transformation editor before assigning media to outputs.
+
+Outcome:
+
+- Milestone 2 starts with master-level media upload and per-output media assignment.
+- HTML preview templates are planned as local editorial previews, not exact platform renderers.
+- Media transformation is documented as a necessary future layer, but not implemented in the first media step.
+- Simulated AI should later be able to generate or refine master content from selected media.
+
+Revisit When:
+
+- Output previews are implemented.
+- The same source media needs different crops or video ranges per output.
+- Real platform publishing exposes exact media requirements.

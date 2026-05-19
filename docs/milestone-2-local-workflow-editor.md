@@ -32,11 +32,32 @@ Core concept:
 
 ### Local Media
 
-- Connect the prepared media input to local filesystem storage under `.local-media`.
+- Connect media upload to local filesystem storage under `.local-media`.
 - Write `media_assets` and `content_media`.
 - Show basic media preview in content detail.
 - Allow media to be associated with the master content first.
-- Defer per-output media assignment until the master-level flow is stable.
+- Allow media to be assigned to a specific publishing output.
+- Keep media transformations as a documented future need.
+- Keep media-as-source generation as a simulated AI placeholder first.
+
+### Post Preview
+
+- Add preview placeholders for publishing outputs.
+- Use simple HTML templates per platform/type before real API rendering exists.
+- Preview should combine selected media, output copy, headline, hashtags, and basic platform/type framing.
+- Templates are not authoritative platform previews. They are local editorial previews.
+
+### Media Transformations
+
+Media may need output-specific transformations before real publishing:
+
+- square or vertical crop for image posts/stories,
+- video time range selection,
+- thumbnail selection,
+- platform-specific dimensions,
+- AI-assisted auto-crop or resize for higher tiers later.
+
+Milestone 2 should document and prepare the model for this, but does not need a full media transformation editor unless it becomes necessary for local workflow validation.
 
 ### Workflow State Actions
 
@@ -71,6 +92,7 @@ Add app-server actions that simulate AI/n8n behavior:
 - edit output,
 - regenerate output,
 - generate from media placeholder.
+- generate master idea from media placeholder.
 
 Simulation should:
 
@@ -142,6 +164,7 @@ Do not add hard Postgres enums yet. Keep text statuses with application-level co
 ## Done Criteria
 
 - Editor can upload and preview local media.
+- Editor can assign uploaded media to a publishing output.
 - Editor can move content through the agreed local statuses.
 - Editor can create approval and schedule stubs.
 - Simulated AI actions write automation runs and update outputs.

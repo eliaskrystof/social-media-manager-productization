@@ -1,7 +1,12 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getContentDetail } from "@/lib/workspace-data";
-import { updateContentItemAction, updatePlatformVariantAction } from "./actions";
+import {
+  assignMediaToOutputAction,
+  updateContentItemAction,
+  updatePlatformVariantAction,
+  uploadContentMediaAction
+} from "./actions";
 
 export const dynamic = "force-dynamic";
 
@@ -72,7 +77,42 @@ export default async function ContentDetailPage({ params }: ContentDetailPagePro
           <article className="panel">
             <p className="label">Media</p>
             <h2>{detail.media.length}</h2>
-            <p>Media attachments will appear here.</p>
+            <form action={uploadContentMediaAction} className="content-form media-upload-form">
+              <input name="brandId" type="hidden" value={detail.brand.id} />
+              <input name="contentId" type="hidden" value={detail.contentItem.id} />
+              <label>
+                File
+                <input accept="image/*,video/*,application/pdf" name="media" required type="file" />
+              </label>
+              <label>
+                Alt text
+                <input name="altText" placeholder="Short media description" />
+              </label>
+              <button className="button secondary" type="submit">
+                Upload media
+              </button>
+            </form>
+            <div className="media-preview-list">
+              {detail.media.length > 0 ? (
+                detail.media.map((media) => (
+                  <div className="media-preview" key={media.id}>
+                    {media.asset.mediaType === "image" && media.asset.publicUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img alt={media.asset.altText ?? media.asset.filename ?? "Uploaded media"} src={media.asset.publicUrl} />
+                    ) : null}
+                    {media.asset.mediaType === "video" && media.asset.publicUrl ? (
+                      <video controls src={media.asset.publicUrl} />
+                    ) : null}
+                    <div>
+                      <strong>{media.asset.filename ?? "Media asset"}</strong>
+                      <span>{media.asset.mediaType}</span>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p>Upload images, videos, or PDFs for this master idea.</p>
+              )}
+            </div>
           </article>
 
           <article className="panel">
@@ -166,6 +206,34 @@ export default async function ContentDetailPage({ params }: ContentDetailPagePro
                   Save output
                 </button>
               </form>
+              <form action={assignMediaToOutputAction} className="content-form variant-form">
+                <input name="brandId" type="hidden" value={detail.brand.id} />
+                <input name="contentId" type="hidden" value={detail.contentItem.id} />
+                <input name="variantId" type="hidden" value={variant.id} />
+                <label>
+                  Media
+                  <select name="mediaAssetId" required defaultValue="">
+                    <option disabled value="">
+                      Select media
+                    </option>
+                    {detail.media.map((media) => (
+                      <option key={media.asset.id} value={media.asset.id}>
+                        {media.asset.filename ?? media.asset.mediaType}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <button className="button secondary" disabled={detail.media.length === 0} type="submit">
+                  Use media
+                </button>
+              </form>
+              <div className="output-media-list">
+                {detail.media
+                  .filter((media) => media.platformVariantId === variant.id)
+                  .map((media) => (
+                    <span key={media.id}>{media.asset.filename ?? media.asset.mediaType}</span>
+                  ))}
+              </div>
               {variant.hashtags && variant.hashtags.length > 0 ? (
                 <div className="chips">
                   {variant.hashtags.map((tag) => (
