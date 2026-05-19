@@ -33,6 +33,8 @@ Start with:
 - `docs/audit-completion-checklist.md`
 - `docs/project-foundation.md`
 - `docs/frontend-implementation-notes.md`
+- `docs/product-design-log.md`
+- `CHANGELOG.md`
 
 ## Current Direction
 
