@@ -35,3 +35,7 @@ This changelog records implementation milestones and product-facing changes. Des
 - Established brand-scoped content as the primary ownership path while deferring global `/content`.
 - Renamed the user-facing variant surface toward publishing outputs.
 - Removed the one-output-per-platform database constraint from `platform_variants`.
+
+### Fixed
+
+- Fixed duplicate media rendering when assigning uploaded media to publishing outputs.

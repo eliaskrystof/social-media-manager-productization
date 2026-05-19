@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, sql } from "drizzle-orm";
+import { and, asc, desc, eq, isNotNull, isNull, sql } from "drizzle-orm";
 import { db, schema } from "@orchard/database";
 import { getCurrentUser } from "@/lib/current-user";
 
@@ -68,6 +68,7 @@ export type ContentDetail =
       contentItem: typeof schema.contentItems.$inferSelect;
       variants: Array<typeof schema.platformVariants.$inferSelect>;
       media: Array<typeof schema.contentMedia.$inferSelect & { asset: typeof schema.mediaAssets.$inferSelect }>;
+      outputMedia: Array<typeof schema.contentMedia.$inferSelect & { asset: typeof schema.mediaAssets.$inferSelect }>;
       approvals: Array<typeof schema.approvals.$inferSelect>;
       publicationJobs: Array<typeof schema.publicationJobs.$inferSelect>;
       publishedPosts: Array<typeof schema.publishedPosts.$inferSelect>;
@@ -298,7 +299,17 @@ export async function getContentDetail(brandId: string, contentId: string): Prom
     })
     .from(schema.contentMedia)
     .innerJoin(schema.mediaAssets, eq(schema.contentMedia.mediaAssetId, schema.mediaAssets.id))
-    .where(eq(schema.contentMedia.contentItemId, contentItem.id))
+    .where(and(eq(schema.contentMedia.contentItemId, contentItem.id), isNull(schema.contentMedia.platformVariantId)))
+    .orderBy(schema.contentMedia.sortOrder);
+
+  const outputMediaRows = await db
+    .select({
+      relation: schema.contentMedia,
+      asset: schema.mediaAssets
+    })
+    .from(schema.contentMedia)
+    .innerJoin(schema.mediaAssets, eq(schema.contentMedia.mediaAssetId, schema.mediaAssets.id))
+    .where(and(eq(schema.contentMedia.contentItemId, contentItem.id), isNotNull(schema.contentMedia.platformVariantId)))
     .orderBy(schema.contentMedia.sortOrder);
 
   const approvals = await db
@@ -339,6 +350,7 @@ export async function getContentDetail(brandId: string, contentId: string): Prom
     contentItem,
     variants,
     media: mediaRows.map((row) => ({ ...row.relation, asset: row.asset })),
+    outputMedia: outputMediaRows.map((row) => ({ ...row.relation, asset: row.asset })),
     approvals,
     publicationJobs,
     publishedPosts,

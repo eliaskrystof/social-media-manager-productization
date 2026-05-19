@@ -208,6 +208,16 @@ export async function assignMediaToOutputAction(formData: FormData) {
   const currentUser = await getCurrentUser();
 
   await db.transaction(async (tx) => {
+    await tx
+      .delete(schema.contentMedia)
+      .where(
+        and(
+          eq(schema.contentMedia.contentItemId, contentId),
+          eq(schema.contentMedia.platformVariantId, variant.id),
+          eq(schema.contentMedia.role, "primary")
+        )
+      );
+
     await tx.insert(schema.contentMedia).values({
       contentItemId: contentId,
       platformVariantId: variant.id,

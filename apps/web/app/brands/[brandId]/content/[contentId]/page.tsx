@@ -217,7 +217,7 @@ export default async function ContentDetailPage({ params }: ContentDetailPagePro
                       Select media
                     </option>
                     {detail.media.map((media) => (
-                      <option key={media.asset.id} value={media.asset.id}>
+                      <option key={media.id} value={media.asset.id}>
                         {media.asset.filename ?? media.asset.mediaType}
                       </option>
                     ))}
@@ -228,7 +228,7 @@ export default async function ContentDetailPage({ params }: ContentDetailPagePro
                 </button>
               </form>
               <div className="output-media-list">
-                {detail.media
+                {detail.outputMedia
                   .filter((media) => media.platformVariantId === variant.id)
                   .map((media) => (
                     <span key={media.id}>{media.asset.filename ?? media.asset.mediaType}</span>
