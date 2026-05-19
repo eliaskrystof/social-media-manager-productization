@@ -241,3 +241,65 @@ Revisit When:
 - Multiple recent items should be shown.
 - Global `/content` introduces cross-brand filters.
 - Auth becomes real and "last worked on" can be tracked per authenticated user/session.
+
+## 2026-05-19: Content Detail Becomes The First Manual Editor
+
+Decision:
+
+Content detail should become the first manual editing surface before AI generation, approval, scheduling, or publishing are introduced.
+
+Why:
+
+- Created drafts need an immediate place to be refined.
+- Manual editing validates the content and platform variant data model without introducing automation complexity.
+- It keeps the workflow understandable: create under a brand, continue on detail, adjust master content and platform-specific copy.
+
+Alternatives Considered:
+
+- Keep detail read-only until generation exists.
+- Put editing on the brand content list.
+- Build a separate rich editor route immediately.
+
+Outcome:
+
+- `/brands/[brandId]/content/[contentId]` can update title, brief, master content, language, variant status, headline, caption, and hashtags.
+- Each edit updates the content timestamp and writes an activity log.
+- Generation remains a disabled placeholder action.
+
+Revisit When:
+
+- Validation feedback needs to be shown inline instead of relying on basic form behavior.
+- Rich text, media previews, or side-by-side platform previews become necessary.
+- AI generation needs to write into the same variant fields.
+
+## 2026-05-19: Published Posts Are Product Artifacts
+
+Decision:
+
+Store published posts as their own product records, separate from publication job results.
+
+Why:
+
+- A publish job is an execution attempt; a published post is an external artifact the product may use later.
+- Master ideas should be able to reference live posts for reposting, sharing, reuse, reporting, and metric sync.
+- Some published posts may be created outside the app later and still need to be linked back to a master idea.
+- Keeping artifacts separate avoids making analytics and reuse depend on technical job history.
+
+Alternatives Considered:
+
+- Use `publication_results` as the only external post record.
+- Store external URLs only in variant metadata.
+- Wait until real publishing is implemented.
+
+Outcome:
+
+- Added `published_posts` as the product-level record for external posts.
+- Each record links to workspace, brand, master content item, and optionally a platform variant/output and publication job.
+- The content detail UI includes an empty published artifacts section.
+- Real publishing, syncing, metrics, reposting, and external import remain deferred.
+
+Revisit When:
+
+- Platform variants are renamed or expanded into publishing outputs.
+- Real publisher integrations start writing external post IDs and URLs.
+- Metrics sync needs normalized metric snapshots rather than JSON metadata.

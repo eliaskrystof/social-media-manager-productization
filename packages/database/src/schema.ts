@@ -206,6 +206,35 @@ export const publicationResults = pgTable("publication_results", {
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull()
 });
 
+export const publishedPosts = pgTable(
+  "published_posts",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    workspaceId: uuid("workspace_id").references(() => workspaces.id).notNull(),
+    brandId: uuid("brand_id").references(() => brands.id).notNull(),
+    contentItemId: uuid("content_item_id").references(() => contentItems.id).notNull(),
+    platformVariantId: uuid("platform_variant_id").references(() => platformVariants.id),
+    publicationJobId: uuid("publication_job_id").references(() => publicationJobs.id),
+    platform: text("platform").notNull(),
+    postType: text("post_type").default("post").notNull(),
+    status: text("status").default("published").notNull(),
+    externalPostId: text("external_post_id"),
+    externalUrl: text("external_url"),
+    publishedAt: timestamp("published_at", { withTimezone: true }),
+    lastSyncedAt: timestamp("last_synced_at", { withTimezone: true }),
+    metrics: jsonb("metrics").$type<Record<string, unknown>>(),
+    rawResponse: jsonb("raw_response").$type<Record<string, unknown>>(),
+    metadata: jsonb("metadata").$type<Record<string, unknown>>(),
+    ...timestamps
+  },
+  (table) => ({
+    platformExternalPostUnique: unique("published_posts_platform_external_post_unique").on(
+      table.platform,
+      table.externalPostId
+    )
+  })
+);
+
 export const automationRuns = pgTable("automation_runs", {
   id: uuid("id").primaryKey().defaultRandom(),
   workspaceId: uuid("workspace_id").references(() => workspaces.id).notNull(),
@@ -269,5 +298,6 @@ export const contentItemsRelations = relations(contentItems, ({ one, many }) => 
   variants: many(platformVariants),
   media: many(contentMedia),
   approvals: many(approvals),
-  automationRuns: many(automationRuns)
+  automationRuns: many(automationRuns),
+  publishedPosts: many(publishedPosts)
 }));

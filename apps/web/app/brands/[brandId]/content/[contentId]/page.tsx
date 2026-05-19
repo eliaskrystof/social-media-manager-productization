@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getContentDetail } from "@/lib/workspace-data";
+import { updateContentItemAction, updatePlatformVariantAction } from "./actions";
 
 export const dynamic = "force-dynamic";
 
@@ -32,6 +33,9 @@ export default async function ContentDetailPage({ params }: ContentDetailPagePro
           <Link className="button secondary" href={`/brands/${detail.brand.id}`}>
             Brand workspace
           </Link>
+          <button className="button secondary" disabled type="button">
+            Generate variants
+          </button>
         </div>
       </section>
 
@@ -39,7 +43,29 @@ export default async function ContentDetailPage({ params }: ContentDetailPagePro
         <article className="panel detail-main">
           <p className="label">Master content</p>
           <h2>{detail.contentItem.status}</h2>
-          <p>{detail.contentItem.masterContent ?? "No master content yet."}</p>
+          <form action={updateContentItemAction} className="content-form">
+            <input name="brandId" type="hidden" value={detail.brand.id} />
+            <input name="contentId" type="hidden" value={detail.contentItem.id} />
+            <label>
+              Title
+              <input name="title" required defaultValue={detail.contentItem.title ?? ""} />
+            </label>
+            <label>
+              Brief
+              <textarea name="brief" rows={3} defaultValue={detail.contentItem.brief ?? ""} />
+            </label>
+            <label>
+              Master content
+              <textarea name="masterContent" rows={8} defaultValue={detail.contentItem.masterContent ?? ""} />
+            </label>
+            <label>
+              Language
+              <input name="language" defaultValue={detail.contentItem.language ?? detail.brand.defaultLanguage ?? ""} />
+            </label>
+            <button className="button" type="submit">
+              Save master
+            </button>
+          </form>
         </article>
 
         <aside className="detail-side">
@@ -59,6 +85,12 @@ export default async function ContentDetailPage({ params }: ContentDetailPagePro
             <p className="label">Publication jobs</p>
             <h2>{detail.publicationJobs.length}</h2>
             <p>Scheduling and publishing jobs will appear here.</p>
+          </article>
+
+          <article className="panel">
+            <p className="label">Published posts</p>
+            <h2>{detail.publishedPosts.length}</h2>
+            <p>Live post links and sync metrics will appear here after publishing is connected.</p>
           </article>
         </aside>
       </section>
@@ -81,6 +113,34 @@ export default async function ContentDetailPage({ params }: ContentDetailPagePro
                 <span>{variant.scheduledFor ? formatDateTime(variant.scheduledFor) : "unscheduled"}</span>
               </div>
               <p>{variant.caption ?? "No caption yet."}</p>
+              <form action={updatePlatformVariantAction} className="content-form variant-form">
+                <input name="brandId" type="hidden" value={detail.brand.id} />
+                <input name="contentId" type="hidden" value={detail.contentItem.id} />
+                <input name="variantId" type="hidden" value={variant.id} />
+                <label>
+                  Status
+                  <select name="status" defaultValue={variant.status}>
+                    <option value="draft">draft</option>
+                    <option value="ready_for_review">ready_for_review</option>
+                    <option value="approved">approved</option>
+                  </select>
+                </label>
+                <label>
+                  Headline
+                  <input name="headline" defaultValue={variant.headline ?? ""} />
+                </label>
+                <label>
+                  Caption
+                  <textarea name="caption" rows={5} defaultValue={variant.caption ?? ""} />
+                </label>
+                <label>
+                  Hashtags
+                  <input name="hashtags" defaultValue={variant.hashtags?.map((tag) => `#${tag}`).join(", ") ?? ""} />
+                </label>
+                <button className="button secondary" type="submit">
+                  Save variant
+                </button>
+              </form>
               {variant.hashtags && variant.hashtags.length > 0 ? (
                 <div className="chips">
                   {variant.hashtags.map((tag) => (
@@ -114,6 +174,24 @@ export default async function ContentDetailPage({ params }: ContentDetailPagePro
           <p className="label">Automation runs</p>
           <h2>{detail.automationRuns[0]?.status ?? "idle"}</h2>
           <p>{detail.automationRuns[0]?.runType ?? "No automation run recorded."}</p>
+        </article>
+
+        <article className="panel wide">
+          <p className="label">Published artifacts</p>
+          <div className="compact-list">
+            {detail.publishedPosts.length > 0 ? (
+              detail.publishedPosts.map((post) => (
+                <div className="log-row" key={post.id}>
+                  <strong>
+                    {post.platform} / {post.postType}
+                  </strong>
+                  {post.externalUrl ? <a href={post.externalUrl}>{post.status}</a> : <span>{post.status}</span>}
+                </div>
+              ))
+            ) : (
+              <p>No published post recorded yet.</p>
+            )}
+          </div>
         </article>
       </section>
     </main>

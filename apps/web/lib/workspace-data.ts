@@ -70,6 +70,7 @@ export type ContentDetail =
       media: Array<typeof schema.contentMedia.$inferSelect & { asset: typeof schema.mediaAssets.$inferSelect }>;
       approvals: Array<typeof schema.approvals.$inferSelect>;
       publicationJobs: Array<typeof schema.publicationJobs.$inferSelect>;
+      publishedPosts: Array<typeof schema.publishedPosts.$inferSelect>;
       automationRuns: Array<typeof schema.automationRuns.$inferSelect>;
       activityLogs: Array<typeof schema.activityLogs.$inferSelect>;
     }
@@ -310,6 +311,12 @@ export async function getContentDetail(brandId: string, contentId: string): Prom
     .where(eq(schema.publicationJobs.contentItemId, contentItem.id))
     .orderBy(desc(schema.publicationJobs.createdAt));
 
+  const publishedPosts = await db
+    .select()
+    .from(schema.publishedPosts)
+    .where(eq(schema.publishedPosts.contentItemId, contentItem.id))
+    .orderBy(desc(schema.publishedPosts.createdAt));
+
   const automationRuns = await db
     .select()
     .from(schema.automationRuns)
@@ -332,6 +339,7 @@ export async function getContentDetail(brandId: string, contentId: string): Prom
     media: mediaRows.map((row) => ({ ...row.relation, asset: row.asset })),
     approvals,
     publicationJobs,
+    publishedPosts,
     automationRuns,
     activityLogs
   };

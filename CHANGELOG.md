@@ -21,6 +21,8 @@ This changelog records implementation milestones and product-facing changes. Des
 - Added the first brand-scoped content creation flow with automatic draft platform variants and activity logs.
 - Added a dashboard continuation path to the latest content item.
 - Added a disabled media input stub to the brand-scoped draft creation form.
+- Added manual editing for content detail master copy and platform variants.
+- Added `published_posts` records for future live post links, reuse, reposting, and metrics.
 
 ### Changed
 

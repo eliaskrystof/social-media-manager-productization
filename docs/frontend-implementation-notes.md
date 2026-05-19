@@ -19,6 +19,8 @@ Current implementation is intentionally focused on:
 - brand-scoped content lists,
 - content detail skeleton,
 - first brand-scoped content creation flow,
+- manual editing for master content and platform variant copy,
+- published post artifact records for future reposting and metrics,
 - dashboard continuation path to the most recently worked content item,
 - prepared media input stub for future draft creation uploads,
 - visible placeholders for future media, approvals, scheduling, automation, and activity logs.
@@ -81,7 +83,7 @@ Role:
 
 - brand-scoped content list,
 - content/items focused view,
-- working list for content under one brand.
+- working list for content under one brand,
 - first manual content creation flow.
 
 The current write flow creates one draft content item and draft platform variants for Instagram, Facebook, and LinkedIn. This route should evolve into a practical operational list with filtering, sorting, status indicators, schedule signals, and links to content detail.
@@ -98,9 +100,14 @@ Role:
 - media placeholder,
 - approval placeholder,
 - publication jobs placeholder,
-- activity/automation visibility.
+- published post artifact placeholder,
+- activity/automation visibility,
+- manual master content editing,
+- manual platform variant editing.
 
-This is the future editing surface. It currently displays created content and platform variants, while editing/generation/approval/scheduling actions remain deferred.
+This is the active editing surface for manual draft work. Generation, approval, scheduling, uploads, and publishing remain deferred.
+
+Published post artifacts are intentionally separated from publication job results. Jobs describe execution attempts; published artifacts describe the external post that the product can later link to, reuse, repost, or sync metrics from.
 
 ## Global Content View
 
@@ -133,9 +140,11 @@ Accepted for the local skeleton:
 - content detail exists before write actions are introduced,
 - first write flow starts with manual brand-owned content creation,
 - creation automatically prepares draft platform variants for Instagram, Facebook, and LinkedIn,
-- activity logging starts with content creation and variant preparation events.
+- activity logging starts with content creation and variant preparation events,
 - dashboard offers a continuation path back into the latest content item,
-- media can be represented in the create flow UI, but real storage remains deferred.
+- media can be represented in the create flow UI, but real storage remains deferred,
+- content detail supports manual master content and platform variant edits,
+- published external posts are product artifacts, not only technical publish results.
 
 ## Next Frontend Steps
 
@@ -143,15 +152,15 @@ Recommended sequence:
 
 1. Polish the brand-scoped content creation form and empty/error states.
 2. Define the local media storage flow and connect the prepared media input.
-3. Improve content detail sections enough to host future edit actions.
-4. Add manual editing for master content and platform variant captions.
+3. Improve content detail edit ergonomics and validation feedback.
+4. Rename/refine platform variants toward publishing outputs with format/type planning.
 5. Add stub variant generation.
 6. Add approval/schedule state actions.
 7. Add global `/content` once brand-scoped content behavior is clear.
 
 ## Current Verification Target
 
-The read-only frontend skeleton is healthy when:
+The frontend skeleton is healthy when:
 
 - dashboard loads from seeded data,
 - brand list loads seeded brand,
@@ -163,6 +172,9 @@ The read-only frontend skeleton is healthy when:
 - creation activity appears in the content detail activity log,
 - dashboard links back to the latest content item,
 - media input is visible but does not store files yet,
+- content detail can save master content changes,
+- content detail can save platform variant changes,
+- published post artifact table exists and is visible as an empty detail section,
 - `npm run typecheck` passes,
 - `npm run lint` passes,
 - `npm run build` passes.

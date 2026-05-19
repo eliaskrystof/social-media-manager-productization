@@ -8,6 +8,13 @@
       "when": 1779111462082,
       "tag": "0000_numerous_gunslinger",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1779220124165,
+      "tag": "0001_flippant_puma",
+      "breakpoints": true
     }
   ]
 }
