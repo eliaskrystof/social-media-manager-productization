@@ -72,6 +72,7 @@ export type ContentDetail =
       approvals: Array<typeof schema.approvals.$inferSelect>;
       publicationJobs: Array<typeof schema.publicationJobs.$inferSelect>;
       publishedPosts: Array<typeof schema.publishedPosts.$inferSelect>;
+      outputRevisions: Array<typeof schema.platformVariantRevisions.$inferSelect>;
       automationRuns: Array<typeof schema.automationRuns.$inferSelect>;
       activityLogs: Array<typeof schema.activityLogs.$inferSelect>;
     }
@@ -322,13 +323,20 @@ export async function getContentDetail(brandId: string, contentId: string): Prom
     .select()
     .from(schema.publicationJobs)
     .where(eq(schema.publicationJobs.contentItemId, contentItem.id))
-    .orderBy(desc(schema.publicationJobs.createdAt));
+    .orderBy(asc(schema.publicationJobs.scheduledFor), desc(schema.publicationJobs.createdAt));
 
   const publishedPosts = await db
     .select()
     .from(schema.publishedPosts)
     .where(eq(schema.publishedPosts.contentItemId, contentItem.id))
     .orderBy(desc(schema.publishedPosts.createdAt));
+
+  const outputRevisions = await db
+    .select()
+    .from(schema.platformVariantRevisions)
+    .where(eq(schema.platformVariantRevisions.contentItemId, contentItem.id))
+    .orderBy(desc(schema.platformVariantRevisions.createdAt))
+    .limit(30);
 
   const automationRuns = await db
     .select()
@@ -354,6 +362,7 @@ export async function getContentDetail(brandId: string, contentId: string): Prom
     approvals,
     publicationJobs,
     publishedPosts,
+    outputRevisions,
     automationRuns,
     activityLogs
   };

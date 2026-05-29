@@ -28,6 +28,9 @@ export default async function BrandDetailPage({ params }: BrandDetailPageProps) 
           <Link className="button" href={`/brands/${detail.brand.id}/content`}>
             View content
           </Link>
+          <Link className="button secondary" href={`/brands/${detail.brand.id}/settings`}>
+            Brand settings
+          </Link>
           <Link className="button secondary" href="/brands">
             All brands
           </Link>

@@ -40,6 +40,8 @@ function inferContentType(pathname: string) {
       return "image/gif";
     case "webp":
       return "image/webp";
+    case "svg":
+      return "image/svg+xml";
     case "mp4":
       return "video/mp4";
     case "webm":

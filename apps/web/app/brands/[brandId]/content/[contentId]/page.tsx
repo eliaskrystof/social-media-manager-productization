@@ -2,11 +2,19 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getContentDetail } from "@/lib/workspace-data";
 import {
-  assignMediaToOutputAction,
+  createPublishingOutputAction,
   updateContentItemAction,
-  updatePlatformVariantAction,
+  updateContentWorkflowAction,
   uploadContentMediaAction
 } from "./actions";
+import {
+  OutputEditor,
+  type OutputEditorMedia,
+  type OutputEditorReviewLog,
+  type OutputEditorRevision,
+  type OutputEditorVariant
+} from "./output-editor";
+import { ActionNotice, FormActionFeedback } from "./form-action-feedback";
 
 export const dynamic = "force-dynamic";
 
@@ -15,18 +23,30 @@ type ContentDetailPageProps = {
     brandId: string;
     contentId: string;
   }>;
+  searchParams: Promise<{
+    actionMessage?: string;
+    actionNotice?: string;
+    actionTitle?: string;
+  }>;
 };
 
-export default async function ContentDetailPage({ params }: ContentDetailPageProps) {
+export default async function ContentDetailPage({ params, searchParams }: ContentDetailPageProps) {
   const { brandId, contentId } = await params;
+  const notice = await searchParams;
   const detail = await getContentDetail(brandId, contentId);
 
   if (!detail.ok) {
     notFound();
   }
 
+  const masterApprovals = detail.approvals.filter((approval) => approval.platformVariantId === null);
+  const latestMasterApproval = masterApprovals[0];
+
   return (
     <main className="shell">
+      {notice.actionNotice === "error" && notice.actionMessage ? (
+        <ActionNotice kind="error" message={notice.actionMessage} title={notice.actionTitle ?? "Action failed"} />
+      ) : null}
       <section className="page-heading">
         <p className="eyebrow">Content item</p>
         <h1>{detail.contentItem.title ?? "Untitled content"}</h1>
@@ -38,9 +58,6 @@ export default async function ContentDetailPage({ params }: ContentDetailPagePro
           <Link className="button secondary" href={`/brands/${detail.brand.id}`}>
             Brand workspace
           </Link>
-          <button className="button secondary" disabled type="button">
-            Generate outputs
-          </button>
         </div>
       </section>
 
@@ -70,6 +87,7 @@ export default async function ContentDetailPage({ params }: ContentDetailPagePro
             <button className="button" type="submit">
               Save master
             </button>
+            <FormActionFeedback pendingMessage="Saving master..." />
           </form>
         </article>
 
@@ -91,6 +109,7 @@ export default async function ContentDetailPage({ params }: ContentDetailPagePro
               <button className="button secondary" type="submit">
                 Upload media
               </button>
+              <FormActionFeedback pendingMessage="Uploading media..." />
             </form>
             <div className="media-preview-list">
               {detail.media.length > 0 ? (
@@ -116,15 +135,67 @@ export default async function ContentDetailPage({ params }: ContentDetailPagePro
           </article>
 
           <article className="panel">
-            <p className="label">Approval</p>
-            <h2>{detail.approvals[0]?.status ?? "not requested"}</h2>
-            <p>{detail.approvals[0]?.comment ?? "Approval workflow is not active yet."}</p>
+            <p className="label">Workflow</p>
+            <h2>{detail.contentItem.status}</h2>
+            <form action={updateContentWorkflowAction} className="content-form workflow-form">
+              <input name="brandId" type="hidden" value={detail.brand.id} />
+              <input name="contentId" type="hidden" value={detail.contentItem.id} />
+              <label>
+                Note
+                <textarea name="comment" rows={3} placeholder="Review note or reason" />
+              </label>
+              <div className="workflow-actions">
+                <button className="button secondary" name="nextStatus" type="submit" value="in_progress">
+                  Start work
+                </button>
+                <button className="button secondary" name="nextStatus" type="submit" value="ready_for_review">
+                  Submit review
+                </button>
+                <button className="button secondary" name="nextStatus" type="submit" value="changes_requested">
+                  Request changes
+                </button>
+                <button className="button secondary" name="nextStatus" type="submit" value="approved">
+                  Approve
+                </button>
+                <button className="button secondary" name="nextStatus" type="submit" value="on_hold">
+                  Hold
+                </button>
+                <button className="button secondary" name="nextStatus" type="submit" value="completed">
+                  Complete
+                </button>
+              </div>
+              <FormActionFeedback pendingMessage="Updating workflow..." />
+            </form>
+          </article>
+
+          <article className="panel">
+            <p className="label">Master review</p>
+            <h2>{latestMasterApproval?.status ?? "not requested"}</h2>
+            <p>{latestMasterApproval?.comment ?? "Master-level approval is separate from output review."}</p>
           </article>
 
           <article className="panel">
             <p className="label">Publication jobs</p>
             <h2>{detail.publicationJobs.length}</h2>
-            <p>Scheduling and publishing jobs will appear here.</p>
+            <div className="compact-list">
+              {detail.publicationJobs.length > 0 ? (
+                detail.publicationJobs.map((job) => {
+                  const variant = detail.variants.find((item) => item.id === job.platformVariantId);
+
+                  return (
+                    <div className="log-row" key={job.id}>
+                      <strong>{formatPublicationJobTitle(job, variant)}</strong>
+                      <span>
+                        {job.scheduledFor ? formatDateTime(job.scheduledFor) : job.status}
+                        {job.scheduledFor ? ` / ${job.status}` : ""}
+                      </span>
+                    </div>
+                  );
+                })
+              ) : (
+                <p>Scheduling and publishing jobs will appear here.</p>
+              )}
+            </div>
           </article>
 
           <article className="panel">
@@ -142,107 +213,122 @@ export default async function ContentDetailPage({ params }: ContentDetailPagePro
             <h2>Output plan</h2>
           </div>
         </div>
-        <div className="variant-detail-grid">
-          {detail.variants.map((variant) => (
-            <article className="panel variant-detail" key={variant.id}>
-              <div className="section-title">
-                <div>
-                  <p className="label">{variant.status}</p>
-                  <h2>{variant.platform}</h2>
-                  <p>
-                    {variant.postType} / {variant.purpose}
-                  </p>
-                </div>
-                <span>{variant.scheduledFor ? formatDateTime(variant.scheduledFor) : "unscheduled"}</span>
-              </div>
-              <p>{variant.caption ?? "No caption yet."}</p>
-              <form action={updatePlatformVariantAction} className="content-form variant-form">
-                <input name="brandId" type="hidden" value={detail.brand.id} />
-                <input name="contentId" type="hidden" value={detail.contentItem.id} />
-                <input name="variantId" type="hidden" value={variant.id} />
-                <label>
-                  Status
-                  <select name="status" defaultValue={variant.status}>
-                    <option value="draft">draft</option>
-                    <option value="ready_for_review">ready_for_review</option>
-                    <option value="approved">approved</option>
-                  </select>
-                </label>
-                <label>
-                  Type
-                  <select name="postType" defaultValue={variant.postType}>
-                    <option value="post">post</option>
-                    <option value="story">story</option>
-                    <option value="reel">reel</option>
-                    <option value="linkedin_long">linkedin_long</option>
-                  </select>
-                </label>
-                <label>
-                  Purpose
-                  <select name="purpose" defaultValue={variant.purpose}>
-                    <option value="main">main</option>
-                    <option value="teaser">teaser</option>
-                    <option value="reminder">reminder</option>
-                    <option value="follow_up">follow_up</option>
-                  </select>
-                </label>
-                <label>
-                  Order
-                  <input min="0" name="sortOrder" type="number" defaultValue={variant.sortOrder} />
-                </label>
-                <label>
-                  Headline
-                  <input name="headline" defaultValue={variant.headline ?? ""} />
-                </label>
-                <label>
-                  Caption
-                  <textarea name="caption" rows={5} defaultValue={variant.caption ?? ""} />
-                </label>
-                <label>
-                  Hashtags
-                  <input name="hashtags" defaultValue={variant.hashtags?.map((tag) => `#${tag}`).join(", ") ?? ""} />
-                </label>
-                <button className="button secondary" type="submit">
-                  Save output
-                </button>
-              </form>
-              <form action={assignMediaToOutputAction} className="content-form variant-form">
-                <input name="brandId" type="hidden" value={detail.brand.id} />
-                <input name="contentId" type="hidden" value={detail.contentItem.id} />
-                <input name="variantId" type="hidden" value={variant.id} />
-                <label>
-                  Media
-                  <select name="mediaAssetId" required defaultValue="">
-                    <option disabled value="">
-                      Select media
-                    </option>
-                    {detail.media.map((media) => (
-                      <option key={media.id} value={media.asset.id}>
-                        {media.asset.filename ?? media.asset.mediaType}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <button className="button secondary" disabled={detail.media.length === 0} type="submit">
-                  Use media
-                </button>
-              </form>
-              <div className="output-media-list">
-                {detail.outputMedia
-                  .filter((media) => media.platformVariantId === variant.id)
-                  .map((media) => (
-                    <span key={media.id}>{media.asset.filename ?? media.asset.mediaType}</span>
-                  ))}
-              </div>
-              {variant.hashtags && variant.hashtags.length > 0 ? (
-                <div className="chips">
-                  {variant.hashtags.map((tag) => (
-                    <span key={tag}>#{tag}</span>
-                  ))}
-                </div>
-              ) : null}
+        <article className="panel create-output-panel">
+          <div>
+            <p className="label">New output</p>
+            <h2>Create output</h2>
+            <p>Start from a manual draft or generate a first version from the master.</p>
+          </div>
+          <form action={createPublishingOutputAction} className="content-form create-output-form">
+            <input name="brandId" type="hidden" value={detail.brand.id} />
+            <input name="contentId" type="hidden" value={detail.contentItem.id} />
+            <fieldset className="mode-field">
+              <legend>Mode</legend>
+              <label>
+                <input name="creationMode" type="radio" value="manual" defaultChecked />
+                Manual
+              </label>
+              <label>
+                <input name="creationMode" type="radio" value="generate" />
+                Generate
+              </label>
+            </fieldset>
+            <label>
+              Output title
+              <input name="title" placeholder="Internal name, e.g. Launch teaser" />
+            </label>
+            <label>
+              Platform
+              <select name="platform" defaultValue="instagram">
+                <option value="instagram">instagram</option>
+                <option value="facebook">facebook</option>
+                <option value="linkedin">linkedin</option>
+              </select>
+            </label>
+            <label>
+              Type
+              <select name="postType" defaultValue="post">
+                <option value="post">post</option>
+                <option value="story">story</option>
+                <option value="reel">reel</option>
+                <option value="linkedin_long">linkedin_long</option>
+              </select>
+            </label>
+            <label>
+              Purpose
+              <input name="purpose" defaultValue="main" />
+            </label>
+            <label className="wide-field">
+              Generate instruction
+              <input name="generationInstruction" placeholder="This will be a story for a new product..." />
+            </label>
+            <label className="wide-field">
+              Headline
+              <input name="headline" placeholder="Optional visible headline" />
+            </label>
+            <label className="wide-field">
+              Caption
+              <textarea name="caption" placeholder="Manual draft or optional generation hint..." rows={4} />
+            </label>
+            <label className="wide-field">
+              Hashtags
+              <input name="hashtags" placeholder="#launch, #update" />
+            </label>
+            <button className="button secondary" type="submit">
+              Create output
+            </button>
+            <FormActionFeedback pendingMessage="Creating output..." />
+          </form>
+        </article>
+        <div className="output-list">
+          {detail.variants.length > 0 ? (
+          detail.variants.map((variant, index) => {
+            const assignedMedia = detail.outputMedia.filter((media) => media.platformVariantId === variant.id);
+            const revisions = detail.outputRevisions
+              .filter((revision) => revision.platformVariantId === variant.id)
+              .slice(0, 4)
+              .map(toOutputEditorRevision);
+            const reviewLogs = detail.approvals
+              .filter((approval) => approval.platformVariantId === variant.id)
+              .slice(0, 5)
+              .map(toOutputEditorReviewLog);
+            const editorVariant: OutputEditorVariant = {
+              id: variant.id,
+              platform: variant.platform,
+              status: variant.status,
+              postType: variant.postType,
+              purpose: variant.purpose,
+              sortOrder: variant.sortOrder,
+              title: variant.title,
+              headline: variant.headline,
+              caption: variant.caption,
+              hashtags: variant.hashtags,
+              scheduledFor: variant.scheduledFor ? variant.scheduledFor.toISOString() : null
+            };
+            const mediaOptions = detail.media.map(toOutputEditorMedia);
+            const assignedEditorMedia = assignedMedia.map(toOutputEditorMedia);
+
+            return (
+              <OutputEditor
+                assignedMedia={assignedEditorMedia}
+                brandId={detail.brand.id}
+                contentId={detail.contentItem.id}
+                initiallyOpen={index === 0 && detail.variants.length === 1}
+                key={variant.id}
+                mediaOptions={mediaOptions}
+                reviewLogs={reviewLogs}
+                revisions={revisions}
+                variant={editorVariant}
+              />
+            );
+          })
+          ) : (
+            <article className="panel empty-state">
+              <p className="label">No outputs yet</p>
+              <h2>Create the first publishing output.</h2>
+              <p>Use the form above to add only the platform and format you need for this master.</p>
             </article>
-          ))}
+          )}
         </div>
       </section>
 
@@ -273,14 +359,16 @@ export default async function ContentDetailPage({ params }: ContentDetailPagePro
           <p className="label">Published artifacts</p>
           <div className="compact-list">
             {detail.publishedPosts.length > 0 ? (
-              detail.publishedPosts.map((post) => (
-                <div className="log-row" key={post.id}>
-                  <strong>
-                    {post.platform} / {post.postType}
-                  </strong>
-                  {post.externalUrl ? <a href={post.externalUrl}>{post.status}</a> : <span>{post.status}</span>}
-                </div>
-              ))
+              detail.publishedPosts.map((post) => {
+                const variant = detail.variants.find((item) => item.id === post.platformVariantId);
+
+                return (
+                  <div className="log-row" key={post.id}>
+                    <strong>{formatPublishedPostTitle(post, variant)}</strong>
+                    {post.externalUrl ? <a href={post.externalUrl}>{post.status}</a> : <span>{post.status}</span>}
+                  </div>
+                );
+              })
             ) : (
               <p>No published post recorded yet.</p>
             )}
@@ -289,6 +377,81 @@ export default async function ContentDetailPage({ params }: ContentDetailPagePro
       </section>
     </main>
   );
+}
+
+function toOutputEditorMedia(media: {
+  id: string;
+  asset: {
+    id: string;
+    filename: string | null;
+    mediaType: string;
+    publicUrl: string | null;
+    altText: string | null;
+  };
+}): OutputEditorMedia {
+  return {
+    id: media.id,
+    assetId: media.asset.id,
+    filename: media.asset.filename,
+    mediaType: media.asset.mediaType,
+    publicUrl: media.asset.publicUrl,
+    altText: media.asset.altText
+  };
+}
+
+function toOutputEditorRevision(revision: {
+  id: string;
+  revisionType: string;
+  reason: string | null;
+  createdAt: Date;
+  snapshot: {
+    caption: string | null;
+    headline: string | null;
+    title: string | null;
+  };
+}): OutputEditorRevision {
+  return {
+    id: revision.id,
+    revisionType: revision.revisionType,
+    reason: revision.reason,
+    createdAt: revision.createdAt.toISOString(),
+    caption: revision.snapshot.caption,
+    headline: revision.snapshot.headline,
+    title: revision.snapshot.title
+  };
+}
+
+function toOutputEditorReviewLog(approval: {
+  id: string;
+  comment: string | null;
+  createdAt: Date;
+  reviewedAt: Date | null;
+  status: string;
+}): OutputEditorReviewLog {
+  return {
+    id: approval.id,
+    comment: approval.comment,
+    createdAt: approval.createdAt.toISOString(),
+    reviewedAt: approval.reviewedAt ? approval.reviewedAt.toISOString() : null,
+    status: approval.status
+  };
+}
+
+function formatPublishedPostTitle(
+  post: { metadata: Record<string, unknown> | null; platform: string; postType: string },
+  variant?: { headline: string | null; title: string | null }
+) {
+  const metadataTitle = post.metadata && typeof post.metadata.title === "string" ? post.metadata.title : null;
+  const metadataHeadline = post.metadata && typeof post.metadata.headline === "string" ? post.metadata.headline : null;
+
+  return metadataTitle || variant?.title || metadataHeadline || variant?.headline || `${post.platform} / ${post.postType}`;
+}
+
+function formatPublicationJobTitle(
+  job: { platform: string },
+  variant?: { headline: string | null; postType: string; title: string | null }
+) {
+  return variant?.title || variant?.headline || `${job.platform} / ${variant?.postType ?? "post"}`;
 }
 
 function formatDateTime(value: Date | string) {

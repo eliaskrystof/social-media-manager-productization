@@ -4,7 +4,6 @@ import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { db, schema } from "@orchard/database";
-import { supportedPlatforms } from "@orchard/shared";
 import { getCurrentUser } from "@/lib/current-user";
 
 export async function createContentItemAction(formData: FormData) {
@@ -47,42 +46,16 @@ export async function createContentItemAction(formData: FormData) {
       throw new Error("Content item could not be created.");
     }
 
-    await tx.insert(schema.platformVariants).values(
-      supportedPlatforms.map((platform, index) => ({
-        contentItemId: contentItem.id,
-        platform,
-        postType: "post",
-        purpose: "main",
-        sortOrder: index,
-        status: "draft",
-        language
-      }))
-    );
-
-    await tx.insert(schema.activityLogs).values([
-      {
-        workspaceId: brand.workspaceId,
-        brandId: brand.id,
-        actorUserId: currentUser?.id,
-        entityType: "content_item",
-        entityId: contentItem.id,
-        action: "content_created",
-        message: `Draft content created for ${brand.name}.`,
-        metadata: { title, source: "manual" }
-      },
-      {
-        workspaceId: brand.workspaceId,
-        brandId: brand.id,
-        actorUserId: currentUser?.id,
-        entityType: "content_item",
-        entityId: contentItem.id,
-        action: "publishing_outputs_created",
-        message: "Default publishing outputs created.",
-        metadata: {
-          outputs: supportedPlatforms.map((platform) => ({ platform, postType: "post", purpose: "main" }))
-        }
-      }
-    ]);
+    await tx.insert(schema.activityLogs).values({
+      workspaceId: brand.workspaceId,
+      brandId: brand.id,
+      actorUserId: currentUser?.id,
+      entityType: "content_item",
+      entityId: contentItem.id,
+      action: "content_created",
+      message: `Draft content created for ${brand.name}.`,
+      metadata: { title, source: "manual", publishingOutputs: 0 }
+    });
 
     return contentItem.id;
   });

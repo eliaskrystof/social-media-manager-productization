@@ -36,7 +36,7 @@ export default async function BrandContentPage({ params }: BrandContentPageProps
         <div>
           <p className="label">New content</p>
           <h2>Create draft</h2>
-          <p>Creates one brand-owned content item and default publishing outputs for Instagram, Facebook, and LinkedIn.</p>
+          <p>Creates one brand-owned master item. Add publishing outputs in the editor only when you need them.</p>
         </div>
         <form action={createContentItemAction} className="content-form">
           <input name="brandId" type="hidden" value={contentList.brand.id} />
@@ -86,15 +86,22 @@ export default async function BrandContentPage({ params }: BrandContentPageProps
                 </div>
               </div>
             <div className="variant-chip-list" aria-label="Publishing outputs">
-              {contentItem.variants.map((variant) => (
-                <div className="variant-chip" key={variant.id}>
-                  <strong>{variant.platform}</strong>
-                  <span>
-                    {variant.postType} / {variant.purpose}
-                  </span>
-                  <span>{variant.status}</span>
+              {contentItem.variants.length > 0 ? (
+                contentItem.variants.map((variant) => (
+                  <div className="variant-chip" key={variant.id}>
+                    <strong>{variant.platform}</strong>
+                    <span>
+                      {variant.postType} / {variant.purpose}
+                    </span>
+                    <span>{variant.status}</span>
+                  </div>
+                ))
+              ) : (
+                <div className="variant-chip empty">
+                  <strong>No outputs</strong>
+                  <span>Create them in detail</span>
                 </div>
-              ))}
+              )}
             </div>
               <Link className="row-action" href={`/brands/${contentList.brand.id}/content/${contentItem.id}`}>
                 Open
@@ -105,7 +112,7 @@ export default async function BrandContentPage({ params }: BrandContentPageProps
           <article className="panel empty-state">
             <p className="label">No content yet</p>
             <h2>Start with the draft above.</h2>
-            <p>The first item will appear here with draft publishing outputs already attached.</p>
+            <p>The first item will appear here as a master draft. Publishing outputs are added inside detail.</p>
           </article>
         )}
       </section>

@@ -22,6 +22,20 @@
       "when": 1779224809936,
       "tag": "0002_tidy_blonde_phantom",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1779803887376,
+      "tag": "0003_nifty_bloodstorm",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1780046877641,
+      "tag": "0004_perfect_maximus",
+      "breakpoints": true
     }
   ]
 }

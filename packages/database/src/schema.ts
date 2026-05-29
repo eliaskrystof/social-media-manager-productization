@@ -104,6 +104,7 @@ export const platformVariants = pgTable(
     purpose: text("purpose").default("main").notNull(),
     sortOrder: integer("sort_order").default(0).notNull(),
     status: text("status").default("draft").notNull(),
+    title: text("title"),
     caption: text("caption"),
     headline: text("headline"),
     credits: text("credits"),
@@ -118,6 +119,36 @@ export const platformVariants = pgTable(
     ...timestamps
   }
 );
+
+export type PlatformVariantRevisionSnapshot = {
+  status: string;
+  title: string | null;
+  postType: string;
+  purpose: string;
+  sortOrder: number;
+  caption: string | null;
+  headline: string | null;
+  credits: string | null;
+  hashtags: string[] | null;
+  ctaLabel: string | null;
+  ctaUrl: string | null;
+  language: string | null;
+  scheduledFor: string | null;
+  platformOptions: Record<string, unknown> | null;
+  aiModel: string | null;
+  generationPromptVersion: string | null;
+};
+
+export const platformVariantRevisions = pgTable("platform_variant_revisions", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  contentItemId: uuid("content_item_id").references(() => contentItems.id).notNull(),
+  platformVariantId: uuid("platform_variant_id").references(() => platformVariants.id).notNull(),
+  actorUserId: uuid("actor_user_id").references(() => users.id),
+  revisionType: text("revision_type").notNull(),
+  reason: text("reason"),
+  snapshot: jsonb("snapshot").$type<PlatformVariantRevisionSnapshot>().notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull()
+});
 
 export const mediaAssets = pgTable("media_assets", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -286,6 +317,7 @@ export const contentItemsRelations = relations(contentItems, ({ one, many }) => 
     references: [brands.id]
   }),
   variants: many(platformVariants),
+  revisions: many(platformVariantRevisions),
   media: many(contentMedia),
   approvals: many(approvals),
   automationRuns: many(automationRuns),

@@ -406,3 +406,105 @@ Revisit When:
 - Output previews are implemented.
 - The same source media needs different crops or video ranges per output.
 - Real platform publishing exposes exact media requirements.
+
+## 2026-05-29: Simple And Complex Content Modes
+
+Decision:
+
+Keep the current master-content plus publishing-output model, but plan for two user-facing creation modes:
+
+- `simple`: a fast path for one straightforward post/output.
+- `complex`: the richer workflow for one idea that may produce multiple outputs across platforms, multiple outputs for the same platform, reposts, or longer content plans.
+
+Why:
+
+- The current model is flexible, but the full content detail workflow can feel heavy when the user only wants to create and schedule one simple post.
+- A simple mode can hide complexity without requiring a fundamentally different database model.
+- Internally, simple content can still be represented as one `content_item` with one publishing output, which leaves room to promote it into a complex workflow later.
+- Complex content remains valuable for cross-platform campaigns, repeated stories, reposting, and reuse of one master idea.
+
+Alternatives Considered:
+
+- Split simple and complex content into separate database tables.
+- Keep only the current complex editor and rely on UI polish to make it feel lighter.
+- Model every simple post as a standalone published artifact without a master content item.
+
+Outcome:
+
+- Treat this as a future UX/information architecture direction.
+- Avoid a hard data-model split unless real usage shows the shared model creates confusion or technical limits.
+- Future UI can present a quick-create/simple editor while still writing the same underlying content/output records.
+
+Revisit When:
+
+- The current content detail flow supports generate, manual edit, approval, schedule, and dummy publish reliably.
+- Users begin creating enough single-output posts that the full editor feels like repeated overhead.
+- The product needs a clear quick-create entry point from dashboard, brand workspace, or global content calendar.
+
+## 2026-05-29: Content And Output References For Reuse
+
+Decision:
+
+Plan for future content and output references so a new content item or publishing output can intentionally build on earlier work.
+
+Why:
+
+- Users may want to reuse a successful published post as a new story, repost, follow-up, or recurring content pattern.
+- References should give both the user and AI access to persistent context such as original copy, media, platform, publish artifact, schedule history, and eventually engagement metrics.
+- This supports workflows like "take this successful post, adapt it for stories, and schedule three variants."
+
+Alternatives Considered:
+
+- Copy old content manually into a new draft.
+- Depend only on published post URLs as loose references.
+- Delay all reuse behavior until real metrics sync exists.
+
+Outcome:
+
+- Keep this as a future capability rather than an immediate implementation task.
+- Likely model references as links between content items and/or specific publishing outputs, with metadata describing the relationship such as `derived_from`, `repost_of`, `follow_up_to`, or `reference`.
+- Published artifacts and metrics can later make references more useful for AI-assisted reposting and recurring schedules.
+
+Revisit When:
+
+- Published artifacts have real platform IDs/URLs and synced metrics.
+- Scheduler supports more than one-off schedule intents.
+- AI generation needs prior content examples beyond the brand profile and current master content.
+
+## 2026-05-29: Scheduling As The Primary Completion Path
+
+Decision:
+
+Prefer scheduling over immediate publishing in the content detail workflow. Direct publish should remain available, but visually and operationally secondary.
+
+Why:
+
+- Most publishing work is expected to be planned rather than published immediately.
+- Scheduling gives the product a clearer operational center: users can prepare, approve, and place posts into a visible plan.
+- Publication jobs are the natural bridge between approved outputs and future publisher workers or n8n automation.
+- A calendar/timeline view can later become a main planning surface across brands and platforms.
+
+Alternatives Considered:
+
+- Keep direct publish beside review as an equally prominent action.
+- Delay scheduling UI until a full calendar exists.
+- Treat scheduled posts only as hidden database rows until real publisher integrations exist.
+
+Outcome:
+
+- The output editor should present schedule as the primary next action after approval.
+- Direct/dummy publish remains a secondary escape hatch for local testing and manual completion.
+- `publication_jobs` should stay per output and carry the executable schedule state.
+
+Revisit When:
+
+- The dashboard gains a calendar or timeline view.
+- Global content filters need scheduled posts by brand, platform, status, and date.
+- Recurring schedules, batch scheduling, or repost scheduling are designed.
+
+Next Step:
+
+- Design the first visual scheduling surface before adding real publisher workers.
+- Start small inside content detail with a clearer scheduled outputs/jobs timeline.
+- Then introduce a dashboard or global calendar view that can filter scheduled outputs by brand, platform, status, and date range.
+- Keep direct publish secondary; the expected completion path should be approve -> schedule -> publication job execution.
