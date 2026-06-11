@@ -36,6 +36,9 @@ Start with:
 - `docs/product-design-log.md`
 - `docs/milestone-1-local-skeleton.md`
 - `docs/milestone-2-local-workflow-editor.md`
+- `docs/development-roadmap.md`
+- `docs/codex-thread-goals.md`
+- `docs/local-credential-handling.md`
 - `CHANGELOG.md`
 
 ## Current Direction
@@ -57,6 +60,8 @@ It uses:
 - Drizzle schema and migrations in `packages/database`,
 - local Postgres through `DATABASE_URL`,
 - local filesystem media root through `LOCAL_MEDIA_ROOT`,
+- local signed sessions through `LOCAL_SESSION_SECRET`,
+- optional encrypted local platform test credentials through `LOCAL_CREDENTIAL_ENCRYPTION_KEY`,
 - a stub n8n boundary in `packages/n8n-client`.
 
 Create a local environment file:
@@ -66,6 +71,8 @@ cp .env.example .env
 ```
 
 Then set `DATABASE_URL` to your local Postgres database. The project Docker Compose uses port `5433` so it can run next to another local Postgres/n8n setup.
+
+For real local accounts and platform connection testing, also set `LOCAL_SESSION_SECRET` and `LOCAL_CREDENTIAL_ENCRYPTION_KEY` to private local values. Credential handling is documented in `docs/local-credential-handling.md`.
 
 Start the Orchard-only Postgres service:
 

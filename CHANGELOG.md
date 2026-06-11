@@ -8,6 +8,20 @@ This changelog records implementation milestones and product-facing changes. Des
 
 ### Added
 
+- Added a development roadmap that defines post-skeleton milestones and a stricter functional MVP target.
+- Added Codex thread goals for starting milestone-specific implementation threads with clean context.
+- Added local account signup, login, logout, signed HTTP-only sessions, and first-run onboarding for user-owned workspaces.
+- Added brand creation from onboarding and the brands page, plus editable brand name, website, language, and profile settings.
+- Added manual Facebook, Instagram, and LinkedIn integration account records with connector states, validation logging, and settings visibility.
+- Added encrypted server-side storage for optional local platform test credentials, documented in `docs/local-credential-handling.md`.
+- Added publishing job destination routing through `integration_account_id` on outputs and publication jobs while keeping live publishing disabled.
+- Added a global scheduler control plane with brand, platform, status, date-range, and source-idea filters.
+- Added local due-job processing from the scheduler, creating `publication_results` and `published_posts` records through a stub publisher.
+- Added scheduler retry and cancel controls for failed/skipped local publication jobs.
+- Added published-output log visibility grouped by source idea and platform.
+- Added a brief-first idea canvas that can prepare a simple publishing output or a complex publishing plan from selected targets and formats.
+- Added editable platform scheduling defaults and batch scheduling for approved outputs, with optional shared-time scheduling while preserving per-platform `publication_jobs`.
+- Added a content-detail planning timeline that summarizes scheduled, ready, and waiting publishing outputs.
 - Added local media upload and preview for content detail.
 - Added publishing output media assignment from uploaded media.
 - Added local content workflow actions for review, approval, and completion states.
@@ -59,6 +73,7 @@ This changelog records implementation milestones and product-facing changes. Des
 
 ### Changed
 
+- Changed M4 documentation status to implemented locally but pending product acceptance hardening, with a review checklist for auth, onboarding, brand settings, credentials, connectors, and routing.
 - Documented local development commands and the Drizzle migration workflow in `README.md`.
 - Established brand-scoped content as the primary ownership path while deferring global `/content`.
 - Renamed the user-facing variant surface toward publishing outputs.

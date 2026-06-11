@@ -421,7 +421,7 @@ Why:
 - The current model is flexible, but the full content detail workflow can feel heavy when the user only wants to create and schedule one simple post.
 - A simple mode can hide complexity without requiring a fundamentally different database model.
 - Internally, simple content can still be represented as one `content_item` with one publishing output, which leaves room to promote it into a complex workflow later.
-- Complex content remains valuable for cross-platform campaigns, repeated stories, reposting, and reuse of one master idea.
+- Complex content remains valuable for multi-output plans, repeated stories, reposting, and reuse of one master idea.
 
 Alternatives Considered:
 
@@ -508,3 +508,202 @@ Next Step:
 - Start small inside content detail with a clearer scheduled outputs/jobs timeline.
 - Then introduce a dashboard or global calendar view that can filter scheduled outputs by brand, platform, status, and date range.
 - Keep direct publish secondary; the expected completion path should be approve -> schedule -> publication job execution.
+
+## 2026-06-03: Start Scheduling Visibility In Content Detail
+
+Decision:
+
+Add the first scheduling surface as a compact planning timeline on the content detail page.
+
+Why:
+
+- Scheduling already writes output and publication job state, but the existing detail sidebar only counted jobs.
+- Content detail is still the main working surface, so showing scheduled, ready, and waiting outputs there helps validate the workflow before a global calendar is introduced.
+- The timeline can stay read-only while scheduling actions continue to live inside each publishing output.
+
+Alternatives Considered:
+
+- Build a global calendar route immediately.
+- Expand the dashboard with scheduled output cards.
+- Keep the publication job sidebar list until live publishing exists.
+
+Outcome:
+
+- Content detail now shows a planning timeline above publishing outputs.
+- Outputs are grouped visually as scheduled, ready, waiting, done, or cancelled from existing output/job state.
+- Global calendar and cross-brand filters remain deferred.
+
+Revisit When:
+
+- Several brands have scheduled outputs at the same time.
+- Publication workers or n8n execution make job state more operational.
+- Users need calendar/date-range filtering across content items.
+
+## 2026-06-04: Brief-First Idea Canvas
+
+Decision:
+
+Reframe content detail around an idea brief that can prepare a publishing plan.
+
+Why:
+
+- The legacy Google Sheets flow effectively used one row as the working idea and one free-form prompt/user input as the generation brief.
+- The legacy platform dialog selected broad channel groups such as Facebook/Instagram, LinkedIn, or all, while platform-specific columns held the generated results.
+- The product should preserve that broader-strokes workflow without copying the spreadsheet-shaped model.
+- Content should not be treated as a campaign by default. The normal unit is a publishing idea, which may be a single cross-platform post or a larger multi-output plan.
+- Simple and complex content should both start from a brief. Simple means one user-facing output shape, while complex means multiple planned outputs or schedule moments.
+- Simple output may still create per-platform variant records because Facebook, Instagram, and LinkedIn need separate copy, review, schedule, and future publishing state.
+
+Alternatives Considered:
+
+- Keep master content as the main copy editor and make users add outputs one by one.
+- Build a separate campaign table before proving the workflow.
+- Start with a global calendar instead of improving the creation/editing canvas.
+
+Outcome:
+
+- Content detail now leads with an idea brief canvas.
+- The brief form can save the brief or prepare publishing outputs from selected targets and formats.
+- `simple` and `complex` are captured as workflow modes in content metadata while platform-specific execution records remain `platform_variants`.
+- Simple mode is constrained to one post format across selected platforms; shorts, articles, follow-ups, and multiple formats belong to complex mode.
+- Simple cross-platform posts should remain easy to schedule across selected platforms, with shared-time scheduling as an optional batch feature rather than the primary workflow.
+- Manual single-output creation remains available as a secondary path.
+
+Revisit When:
+
+- The brief-to-output plan action should infer output presets from natural language instead of relying on checkboxes.
+- AI planning becomes a paid or advanced tier.
+- The shared `content_items` plus `platform_variants` model no longer captures idea planning clearly enough.
+
+## 2026-06-05: Scheduling Defaults And Batch Planning
+
+Decision:
+
+Scheduling should be date-first and comfortable: each approved output can be scheduled separately, and a batch scheduling helper can schedule all approved outputs using platform defaults or one optional shared time. The app still stores one `platform_variants` record and one active `publication_jobs` record per selected platform/output.
+
+Why:
+
+- Publishing times probably vary by platform in normal use, so platform-specific defaults should be the primary convenience.
+- Publication and future connector execution still need platform-specific records for copy, review history, account routing, retries, results, and logs.
+- Shared-time scheduling is still useful when several outputs should intentionally publish together, but it should be a feature inside batch planning rather than the center of the editor.
+
+Alternatives Considered:
+
+- Add a separate publishing-moments table immediately.
+- Hide platform variants entirely in simple mode.
+- Keep only per-output approval and scheduling until the global scheduler exists.
+
+Outcome:
+
+- Brand settings expose editable default times for Instagram, Facebook, LinkedIn, and fallback scheduling.
+- Individual output scheduling accepts a date and optional time; an empty time resolves to the platform default.
+- Content detail offers a batch schedule helper for approved outputs using platform defaults or one explicit shared time.
+- Batch scheduling writes or updates one scheduled `publication_jobs` row per platform variant, plus grouped activity and automation logs.
+
+Revisit When:
+
+- Complex plans need grouped schedule moments across selected subsets of outputs.
+- The scheduler control plane needs a durable grouping key beyond matching content item, mode, and timestamp.
+- Live publishing introduces account routing or retry rules that benefit from a first-class publishing-moment entity.
+
+## 2026-06-05: Scheduler Becomes The Local Operations Queue
+
+Decision:
+
+Add a top-level scheduler control plane before live publishing, using existing `publication_jobs`, `publication_results`, and `published_posts` records rather than introducing a new queue table.
+
+Why:
+
+- The product needs an operational surface that can inspect all scheduled posts across brands and ideas before real platform connectors are added.
+- Local due-job processing proves state transitions, logs, failure handling, retries, and published artifacts without risking accidental external publishing.
+- Keeping the route global makes the previously deferred cross-brand view concrete while preserving brand-scoped editing as the authoring path.
+- Using the current job/result/post tables keeps future live publishers focused on adapter behavior instead of product-state redesign.
+
+Alternatives Considered:
+
+- Build a drag-and-drop calendar first.
+- Add a dedicated publishing-moment table immediately.
+- Keep dummy publishing only inside content detail until OAuth and real connectors exist.
+
+Outcome:
+
+- `/scheduler` now shows publication jobs across brands and ideas.
+- Filters cover brand, platform, status, date range, and source idea.
+- Due jobs can be processed in bulk or one at a time by a local stub worker.
+- Successful stub jobs create publication results and published-post records.
+- Failed jobs store useful failure detail and can be retried or cancelled from the scheduler.
+- Published outputs are grouped by source idea and platform.
+
+Revisit When:
+
+- Real platform account routing is implemented.
+- Recurring schedules or grouped publishing moments need durable first-class grouping.
+- Drag-and-drop calendar planning becomes more valuable than queue inspection.
+
+## 2026-06-07: Local Accounts And Manual Connector Records
+
+Decision:
+
+Replace the implicit seeded-user lookup with local account signup/login and signed HTTP-only sessions. Add manual Facebook, Instagram, and LinkedIn connection records on brand settings, with optional encrypted local test credentials stored server-side only.
+
+Why:
+
+- Milestone 4 needs a non-seeded user to own workspace, brand, content, and publishing connection state.
+- Production OAuth is still deferred, but live publishing cannot start until the app can identify the destination page/profile/account for each job.
+- Manual connector records let the product validate routing, settings visibility, and scheduler readiness before platform adapter work begins.
+- Credentials need a clear server-only boundary now, before real tokens are introduced.
+
+Alternatives Considered:
+
+- Keep using the seeded admin until OAuth is ready.
+- Add Supabase Auth immediately.
+- Store only environment variable names and skip encrypted local credential rows.
+
+Outcome:
+
+- `/login` supports local signup/login/logout.
+- First-run onboarding creates a user-owned workspace and brand profile.
+- Brand settings can create, update, and validate platform connection records with `connected`, `needs_attention`, `expired`, and `disabled` states.
+- Optional local test credentials are encrypted before insertion into `integration_credentials` and never selected into page props.
+- Scheduling resolves `integration_account_id` onto outputs and publication jobs when a connected account exists.
+- Real platform publishing remains blocked until Milestone 5.
+
+Revisit When:
+
+- Production OAuth replaces manual connector entry.
+- Team membership and invitation flows become part of the product.
+- A real secret manager or hosted auth provider is selected.
+
+## 2026-06-11: M4 Acceptance Hardening Direction
+
+Decision:
+
+Treat the initial M4 implementation as locally implemented but not product-accepted until a short hardening checklist is complete.
+
+Why:
+
+- The seeded user and seeded brand are no longer needed for the real app path.
+- The first signed-up user should own a workspace, while future collaboration should use workspace invitations and `workspace_members`.
+- A global product admin role is not needed yet; future debug/diagnostic tools should be env-gated and separate from workspace roles.
+- Signup should stay shallow because most users will arrive with a brand in mind, while fuller brand onboarding can happen later through an assisted profile-completion flow.
+- Manual connector setup is acceptable for local MVP and publishing validation, but it should match the real platform destination shape before live publishing begins.
+
+Outcome:
+
+- Keep the current account model as user plus workspace role.
+- Keep brand as the primary connection boundary; multiple same-platform accounts per brand remain schema-supported but are not optimized in the UI yet.
+- Target manual connector inputs:
+  - Facebook page ID plus page access token.
+  - Instagram user ID plus token.
+  - LinkedIn personal URN plus token.
+- Defer LinkedIn organization publishing because managed-organization permissions are materially stricter.
+- Treat OAuth as a future credential acquisition path, not a different destination model.
+- Add token expiration warnings and local/manual credential removal or disable controls before live publishing.
+- Add optional forbidden symbols to brand profile guidance.
+- Allow scheduling without a connected destination during planning, but require valid connected destinations for live publishing.
+
+Revisit When:
+
+- Manual-token publishing tests begin in Milestone 5.
+- OAuth app ownership and provider review strategy are selected.
+- Workspace invitation and team management move into scope.
