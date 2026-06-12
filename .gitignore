@@ -4,6 +4,7 @@ Thumbs.db
 Desktop.ini
 .vscode/
 .idea/
+AGENTS.md
 
 # Environment and secrets
 .env

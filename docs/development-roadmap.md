@@ -250,11 +250,13 @@ Implemented local behavior:
 - Instagram live publishing maps approved outputs with one public image URL to Graph API media container plus publish calls.
 - LinkedIn live publishing maps approved outputs to text posts through the LinkedIn Posts API and fails clearly when media is assigned.
 - Successful publisher results continue to create `publication_results` and `published_posts`; failures remain inspectable and retryable through the scheduler.
+- Content items automatically move to `completed` once every planned publishing output is published.
 
 Deferred:
 
 - Advanced media transformations.
 - Bulk publishing optimizations.
+- Production scheduler automation, where a worker or cron process picks up due jobs automatically and the scheduler action remains an operator fallback.
 - Full production deployment hardening.
 - OAuth credential acquisition and real platform acceptance testing with owner-provided test accounts.
 

@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { db, schema } from "@orchard/database";
 import { getCurrentUser } from "@/lib/current-user";
+import { completeContentItemIfAllOutputsPublished } from "@/lib/content-completion";
 import { resolveIntegrationAccountForJob } from "@/lib/connection-routing";
 import { assertBrandAccess } from "@/lib/workspace-context";
 import {
@@ -1634,6 +1635,12 @@ export async function dummyPublishOutputAction(formData: FormData) {
         title: variant.title
       }
     });
+  });
+
+  await completeContentItemIfAllOutputsPublished({
+    actorUserId: currentUser?.id,
+    completedAt: publishedAt,
+    contentId
   });
 
   revalidateContentPaths(brandId, contentId);

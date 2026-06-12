@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { db, schema } from "@orchard/database";
 import { getCurrentUser } from "@/lib/current-user";
 import { resolveIntegrationAccountForJob } from "@/lib/connection-routing";
+import { completeContentItemIfAllOutputsPublished } from "@/lib/content-completion";
 import { requireWorkspaceContext } from "@/lib/workspace-context";
 import { publishPlatformOutput, type PublisherFailure } from "@/services/publisher";
 
@@ -374,6 +375,12 @@ async function processPublicationJob(jobId: string, attemptedAt: Date): Promise<
         publicationJobId: row.job.id
       }
     });
+  });
+
+  await completeContentItemIfAllOutputsPublished({
+    actorUserId: currentUser?.id,
+    completedAt: attemptedAt,
+    contentId: row.contentItem.id
   });
 
   revalidateSchedulerPaths(row.brand.id, row.contentItem.id);

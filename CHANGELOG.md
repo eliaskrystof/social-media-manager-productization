@@ -21,6 +21,7 @@ This changelog records implementation milestones and product-facing changes. Des
 - Added server-only credential decryption for publisher adapters while keeping stored credential values out of frontend props and logs.
 - Added Facebook Graph API feed/photo posting, Instagram Graph API image publishing, and LinkedIn Posts API text publishing adapters behind `PUBLISHER_MODE=live` plus `LIVE_PUBLISHING_ENABLED=true`.
 - Added publisher-mode visibility in the scheduler control plane and live-readiness dry-run validation for destinations, credentials, and Instagram public image handoff.
+- Added automatic content completion when every planned publishing output has been published.
 - Added a global scheduler control plane with brand, platform, status, date-range, and source-idea filters.
 - Added local due-job processing from the scheduler, creating `publication_results` and `published_posts` records through a stub publisher.
 - Added scheduler retry and cancel controls for failed/skipped local publication jobs.

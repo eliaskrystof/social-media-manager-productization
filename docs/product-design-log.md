@@ -727,9 +727,11 @@ Outcome:
 - Local mode preserves the previous local artifact behavior.
 - Dry-run mode records mapped platform payload readiness without storing credentials or calling APIs.
 - Live mode includes Facebook page feed posts, Instagram public-image publishing, and LinkedIn text posts, but remains blocked unless live publishing is explicitly enabled.
+- Published outputs now close the parent content workflow automatically when no planned output remains unpublished.
 
 Revisit When:
 
 - Real platform smoke tests have been run with owner-provided test destinations.
 - Media transformation or object storage makes Instagram and LinkedIn media publishing broader than public-image handoff.
+- A production worker or cron scheduler replaces manual due-job processing as the default path, keeping the scheduler button as a fallback and recovery control.
 - OAuth replaces manual local token entry.
