@@ -5,12 +5,15 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { db, schema } from "@orchard/database";
 import { getCurrentUser } from "@/lib/current-user";
+import { resolveIntegrationAccountForJob } from "@/lib/connection-routing";
+import { assertBrandAccess } from "@/lib/workspace-context";
 import {
   createAiRunInput,
   editPublishingOutput,
   generatePublishingOutput,
   regeneratePublishingOutput,
-  type PublishingOutputAiInput
+  type PublishingOutputAiInput,
+  type PublishingOutputAiResult
 } from "@/services/ai-output-generator";
 import { getMediaTypeFromMime, storeLocalMediaFile } from "@/services/local-filesystem-storage";
 
@@ -41,6 +44,51 @@ const outputStatuses = [
 ] as const;
 
 const schedulableJobStatuses = ["draft", "scheduled", "queued"] as const;
+
+const outputPlanPresets = [
+  {
+    key: "facebook_post",
+    platform: "facebook",
+    postType: "post",
+    purpose: "main",
+    title: "Facebook post"
+  },
+  {
+    key: "facebook_short",
+    platform: "facebook",
+    postType: "reel",
+    purpose: "teaser",
+    title: "Facebook short teaser"
+  },
+  {
+    key: "instagram_post",
+    platform: "instagram",
+    postType: "post",
+    purpose: "main",
+    title: "Instagram post"
+  },
+  {
+    key: "instagram_short",
+    platform: "instagram",
+    postType: "reel",
+    purpose: "teaser",
+    title: "Instagram short teaser"
+  },
+  {
+    key: "linkedin_post",
+    platform: "linkedin",
+    postType: "post",
+    purpose: "main",
+    title: "LinkedIn post"
+  },
+  {
+    key: "linkedin_article",
+    platform: "linkedin",
+    postType: "linkedin_long",
+    purpose: "deep_dive",
+    title: "LinkedIn product article"
+  }
+] as const;
 
 export async function updateContentItemAction(formData: FormData) {
   const brandId = readFormValue(formData, "brandId");
@@ -276,6 +324,236 @@ export async function createPublishingOutputAction(formData: FormData) {
         purpose,
         platformVariantId: variant.id,
         title: generated?.title ?? baseVariant.title
+      }
+    });
+  });
+
+  revalidateContentPaths(brandId, contentId);
+  redirect(`/brands/${brandId}/content/${contentId}`);
+}
+
+export async function createOutputPlanFromBriefAction(formData: FormData) {
+  const brandId = readFormValue(formData, "brandId");
+  const contentId = readFormValue(formData, "contentId");
+  const planAction = readFormValue(formData, "planAction") || "save";
+  const workflowMode = readFormValue(formData, "workflowMode") || "complex";
+  const ideaGoal = readFormValue(formData, "ideaGoal") || readFormValue(formData, "campaignGoal") || "launch";
+  const title = readFormValue(formData, "title") || "Untitled idea";
+  const brief = readFormValue(formData, "brief");
+  const masterContent = readFormValue(formData, "masterContent");
+  const language = readFormValue(formData, "language");
+  const generationInstruction = readFormValue(formData, "generationInstruction");
+  const draftMode = readFormValue(formData, "draftMode") || "plan";
+  const selectedOutputKeys = new Set(readFormValues(formData, "plannedOutput"));
+
+  const detail = await getEditableContent(brandId, contentId);
+  const currentUser = await getCurrentUser();
+  const now = new Date();
+  const shouldCreateOutputs = planAction === "prepare";
+  const selectedPresets = shouldCreateOutputs ? outputPlanPresets.filter((preset) => selectedOutputKeys.has(preset.key)) : [];
+
+  if (shouldCreateOutputs && selectedPresets.length === 0) {
+    redirectWithActionError(brandId, contentId, "Output plan blocked", "Select at least one output to prepare.");
+  }
+
+  const [existingVariant] = shouldCreateOutputs
+    ? await db
+        .select({ id: schema.platformVariants.id })
+        .from(schema.platformVariants)
+        .where(eq(schema.platformVariants.contentItemId, contentId))
+        .limit(1)
+    : [];
+
+  if (existingVariant) {
+    redirectWithActionError(
+      brandId,
+      contentId,
+      "Output plan already exists",
+      "This idea already has publishing outputs. Save brief changes here, then edit, add, approve, or schedule outputs manually."
+    );
+  }
+
+  if (shouldCreateOutputs && workflowMode === "simple" && selectedPresets.some((preset) => preset.postType !== "post" || preset.purpose !== "main")) {
+    redirectWithActionError(
+      brandId,
+      contentId,
+      "Simple output blocked",
+      "Simple mode can prepare one post format across selected platforms. Use Complex for shorts, articles, or multiple formats."
+    );
+  }
+
+  const [sortRow] = await db
+    .select({ value: sqlMaxSortOrder() })
+    .from(schema.platformVariants)
+    .where(eq(schema.platformVariants.contentItemId, contentId));
+
+  const plannedVariants = selectedPresets.map((preset, index) => {
+    const planCaption = createPlannedOutputCaption({
+      brief,
+      generationInstruction,
+      ideaGoal,
+      masterContent,
+      preset
+    });
+
+    return createUnsavedVariant({
+      caption: draftMode === "plan" ? planCaption : null,
+      contentItemId: contentId,
+      hashtags: null,
+      headline: null,
+      language: language || detail.contentItem.language,
+      platform: preset.platform,
+      postType: preset.postType,
+      purpose: preset.purpose,
+      sortOrder: (sortRow?.value ?? -1) + index + 1,
+      status: draftMode === "plan" ? "draft" : "generating",
+      title: preset.title
+    });
+  });
+
+  const generatedOutputs: Array<{
+    generated: PublishingOutputAiResult;
+    input: PublishingOutputAiInput;
+    variant: typeof schema.platformVariants.$inferSelect;
+  }> = [];
+
+  if (shouldCreateOutputs && draftMode === "generate") {
+    for (const variant of plannedVariants) {
+      const aiInput = createPublishingOutputAiInput(
+        { ...detail, contentItem: { ...detail.contentItem, title, brief: brief || null, masterContent: masterContent || null, language: language || null } },
+        variant,
+        {
+          generationInstruction: createPlanGenerationInstruction({ generationInstruction, ideaGoal, workflowMode }),
+          manualHints: {
+            caption: variant.caption,
+            hashtags: null,
+            headline: null,
+            purpose: variant.purpose,
+            title: variant.title
+          },
+          operation: "generate"
+        }
+      );
+
+      try {
+        const generated = await generatePublishingOutput(aiInput);
+        generatedOutputs.push({ generated, input: aiInput, variant });
+      } catch (error) {
+        await recordAiFailure({
+          brandId,
+          contentId,
+          detail,
+          error,
+          input: createAiRunInput(aiInput),
+          runType: "brief_output_plan_generate"
+        });
+        redirectWithActionError(brandId, contentId, "Output plan generation failed", getActionErrorMessage(error));
+      }
+    }
+  }
+
+  await db.transaction(async (tx) => {
+    await tx
+      .update(schema.contentItems)
+      .set({
+        title,
+        brief: brief || null,
+        masterContent: masterContent || null,
+        language: language || null,
+        metadata: {
+          ...(detail.contentItem.metadata ?? {}),
+          ideaGoal,
+          lastBriefPlanAt: now.toISOString(),
+          workflowMode
+        },
+        status: shouldCreateOutputs ? "in_progress" : detail.contentItem.status,
+        updatedAt: now
+      })
+      .where(and(eq(schema.contentItems.id, contentId), eq(schema.contentItems.brandId, brandId)));
+
+    for (const [index, variant] of plannedVariants.entries()) {
+      const generatedEntry = generatedOutputs.find((entry) => entry.variant === variant);
+      const generated = generatedEntry?.generated;
+      const [insertedVariant] = await tx
+        .insert(schema.platformVariants)
+        .values({
+          contentItemId: contentId,
+          platform: variant.platform,
+          postType: variant.postType,
+          purpose: variant.purpose,
+          sortOrder: variant.sortOrder,
+          status: generated ? "ready_for_review" : "draft",
+          title: generated?.title ?? variant.title,
+          headline: generated?.headline ?? variant.headline,
+          caption: generated?.caption ?? variant.caption,
+          hashtags: generated?.hashtags ?? variant.hashtags,
+          language: language || detail.contentItem.language,
+          aiModel: generated?.model ?? null,
+          generationPromptVersion: generated?.provider ?? null,
+          platformOptions: {
+            ideaGoal,
+            outputShape: workflowMode === "simple" ? "single_output" : "multi_output_plan",
+            planSource: "brief",
+            workflowMode
+          }
+        })
+        .returning({ id: schema.platformVariants.id });
+
+      if (!insertedVariant) {
+        throw new Error("Publishing output could not be created.");
+      }
+
+      if (generated && generatedEntry) {
+        await tx.insert(schema.automationRuns).values({
+          workspaceId: detail.brand.workspaceId,
+          brandId,
+          contentItemId: contentId,
+          platformVariantId: insertedVariant.id,
+          runType: "brief_output_plan_generate",
+          provider: generated.provider,
+          status: "succeeded",
+          input: createAiRunInput(generatedEntry.input),
+          output: generated,
+          startedAt: now,
+          finishedAt: new Date()
+        });
+      }
+
+      await tx.insert(schema.activityLogs).values({
+        workspaceId: detail.brand.workspaceId,
+        brandId,
+        actorUserId: currentUser?.id,
+        entityType: "content_item",
+        entityId: contentId,
+        action: "brief_output_planned",
+        message: `${generated?.title ?? variant.title ?? `Output ${index + 1}`} prepared from brief.`,
+        metadata: {
+          draftMode,
+          ideaGoal,
+          outputShape: workflowMode === "simple" ? "single_output" : "multi_output_plan",
+          platform: variant.platform,
+          platformVariantId: insertedVariant.id,
+          postType: variant.postType,
+          purpose: variant.purpose,
+          workflowMode
+        }
+      });
+    }
+
+    await tx.insert(schema.activityLogs).values({
+      workspaceId: detail.brand.workspaceId,
+      brandId,
+      actorUserId: currentUser?.id,
+      entityType: "content_item",
+      entityId: contentId,
+      action: shouldCreateOutputs ? "brief_output_plan_created" : "brief_saved",
+      message: shouldCreateOutputs ? `${plannedVariants.length} publishing variant(s) prepared from the brief.` : "Idea brief saved.",
+      metadata: {
+        draftMode,
+        ideaGoal,
+        outputCount: plannedVariants.length,
+        outputShape: workflowMode === "simple" ? "single_output" : "multi_output_plan",
+        workflowMode
       }
     });
   });
@@ -859,7 +1137,6 @@ export async function scheduleOutputAction(formData: FormData) {
   const brandId = readFormValue(formData, "brandId");
   const contentId = readFormValue(formData, "contentId");
   const variantId = readFormValue(formData, "variantId");
-  const scheduledFor = parseDateTime(readFormValue(formData, "scheduledFor"));
 
   const detail = await getEditableContent(brandId, contentId);
   const [variant] = await db
@@ -876,6 +1153,12 @@ export async function scheduleOutputAction(formData: FormData) {
     redirectWithActionError(brandId, contentId, "Schedule blocked", "Approve this output before scheduling it.");
   }
 
+  const scheduledFor = resolveScheduleDateTime({
+    formData,
+    platform: variant.platform,
+    profile: detail.profile
+  });
+  const integrationAccount = await resolveIntegrationAccountForJob(brandId, variant);
   const currentUser = await getCurrentUser();
 
   await db.transaction(async (tx) => {
@@ -893,6 +1176,7 @@ export async function scheduleOutputAction(formData: FormData) {
       .update(schema.platformVariants)
       .set({
         status: "scheduled",
+        integrationAccountId: integrationAccount?.id ?? null,
         scheduledFor,
         updatedAt: new Date()
       })
@@ -914,6 +1198,7 @@ export async function scheduleOutputAction(formData: FormData) {
         .update(schema.publicationJobs)
         .set({
           status: "scheduled",
+          integrationAccountId: integrationAccount?.id ?? null,
           scheduledFor,
           updatedAt: new Date()
         })
@@ -922,6 +1207,7 @@ export async function scheduleOutputAction(formData: FormData) {
       await tx.insert(schema.publicationJobs).values({
         contentItemId: contentId,
         platformVariantId: variant.id,
+        integrationAccountId: integrationAccount?.id ?? null,
         platform: variant.platform,
         status: "scheduled",
         scheduledFor,
@@ -947,9 +1233,172 @@ export async function scheduleOutputAction(formData: FormData) {
       metadata: {
         platform: variant.platform,
         postType: variant.postType,
+        integrationAccountId: integrationAccount?.id ?? null,
         platformVariantId: variant.id,
         scheduledFor: scheduledFor.toISOString(),
         title: variant.title
+      }
+    });
+  });
+
+  revalidateContentPaths(brandId, contentId);
+  redirect(`/brands/${brandId}/content/${contentId}`);
+}
+
+export async function scheduleApprovedOutputsAction(formData: FormData) {
+  const brandId = readFormValue(formData, "brandId");
+  const contentId = readFormValue(formData, "contentId");
+  const scheduleDate = readFormValue(formData, "scheduleDate");
+  const scheduleMode = readFormValue(formData, "scheduleMode") || "platform_defaults";
+  const sharedTime = readFormValue(formData, "sharedTime");
+
+  if (!scheduleDate) {
+    redirectWithActionError(brandId, contentId, "Batch schedule blocked", "Choose a date for the approved outputs.");
+  }
+
+  const detail = await getEditableContent(brandId, contentId);
+  const variants = await db
+    .select()
+    .from(schema.platformVariants)
+    .where(eq(schema.platformVariants.contentItemId, contentId));
+  const approvedVariants = variants
+    .filter((variant) => variant.status === "approved" || variant.status === "scheduled")
+    .sort((left, right) => left.sortOrder - right.sortOrder || left.platform.localeCompare(right.platform));
+
+  if (approvedVariants.length === 0) {
+    redirectWithActionError(brandId, contentId, "Batch schedule blocked", "Approve at least one output before batch scheduling.");
+  }
+
+  const currentUser = await getCurrentUser();
+  const now = new Date();
+  const scheduledOutputs: Array<{
+    integrationAccountId: string | null;
+    platform: string;
+    platformVariantId: string;
+    publicationJobId: string;
+    scheduledFor: string;
+  }> = [];
+
+  await db.transaction(async (tx) => {
+    for (const variant of approvedVariants) {
+      const scheduledFor = parseDateTime(
+        `${scheduleDate}T${getBatchScheduleTime({
+          mode: scheduleMode,
+          platform: variant.platform,
+          profile: detail.profile,
+          sharedTime
+        })}`
+      );
+      const integrationAccount = await resolveIntegrationAccountForJob(brandId, variant);
+
+      await tx.insert(schema.platformVariantRevisions).values(
+        createRevisionValues({
+          actorUserId: currentUser?.id,
+          contentItemId: contentId,
+          reason: "Before batch schedule update.",
+          revisionType: "batch_schedule",
+          variant
+        })
+      );
+
+      await tx
+        .update(schema.platformVariants)
+        .set({
+          status: "scheduled",
+          integrationAccountId: integrationAccount?.id ?? null,
+          scheduledFor,
+          updatedAt: now
+        })
+        .where(eq(schema.platformVariants.id, variant.id));
+
+      const [existingJob] = await tx
+        .select()
+        .from(schema.publicationJobs)
+        .where(
+          and(
+            eq(schema.publicationJobs.platformVariantId, variant.id),
+            inArray(schema.publicationJobs.status, [...schedulableJobStatuses])
+          )
+        )
+        .limit(1);
+
+      const [job] = existingJob
+        ? await tx
+            .update(schema.publicationJobs)
+            .set({
+              status: "scheduled",
+              integrationAccountId: integrationAccount?.id ?? null,
+              scheduledFor,
+              updatedAt: now
+            })
+            .where(eq(schema.publicationJobs.id, existingJob.id))
+            .returning({ id: schema.publicationJobs.id })
+        : await tx
+            .insert(schema.publicationJobs)
+            .values({
+              contentItemId: contentId,
+              platformVariantId: variant.id,
+              integrationAccountId: integrationAccount?.id ?? null,
+              platform: variant.platform,
+              status: "scheduled",
+              scheduledFor,
+              createdByUserId: currentUser?.id
+            })
+            .returning({ id: schema.publicationJobs.id });
+
+      if (!job && !existingJob) {
+        throw new Error("Publication job could not be created.");
+      }
+
+      scheduledOutputs.push({
+        platform: variant.platform,
+        integrationAccountId: integrationAccount?.id ?? null,
+        platformVariantId: variant.id,
+        publicationJobId: job?.id ?? existingJob!.id,
+        scheduledFor: scheduledFor.toISOString()
+      });
+    }
+
+    await tx.insert(schema.automationRuns).values({
+      workspaceId: detail.brand.workspaceId,
+      brandId,
+      contentItemId: contentId,
+      runType: "approved_outputs_batch_scheduled",
+      provider: "app_server_local",
+      status: "succeeded",
+      input: {
+        scheduleDate,
+        scheduleMode,
+        sharedTime: sharedTime || null
+      },
+      output: {
+        scheduledOutputs
+      },
+      startedAt: now,
+      finishedAt: now
+    });
+
+    await tx
+      .update(schema.contentItems)
+      .set({
+        status: "active",
+        updatedAt: now
+      })
+      .where(eq(schema.contentItems.id, contentId));
+
+    await tx.insert(schema.activityLogs).values({
+      workspaceId: detail.brand.workspaceId,
+      brandId,
+      actorUserId: currentUser?.id,
+      entityType: "content_item",
+      entityId: contentId,
+      action: "approved_outputs_batch_scheduled",
+      message: `${scheduledOutputs.length} approved output(s) scheduled in one planning action.`,
+      metadata: {
+        scheduleDate,
+        scheduleMode,
+        scheduledOutputs,
+        sharedTime: sharedTime || null
       }
     });
   });
@@ -1058,6 +1507,7 @@ export async function dummyPublishOutputAction(formData: FormData) {
 
   const currentUser = await getCurrentUser();
   const publishedAt = new Date();
+  const integrationAccount = await resolveIntegrationAccountForJob(brandId, variant);
 
   await db.transaction(async (tx) => {
     await tx.insert(schema.platformVariantRevisions).values(
@@ -1086,6 +1536,7 @@ export async function dummyPublishOutputAction(formData: FormData) {
           .update(schema.publicationJobs)
           .set({
             status: "published",
+            integrationAccountId: integrationAccount?.id ?? null,
             startedAt: existingJob.startedAt ?? publishedAt,
             finishedAt: publishedAt,
             updatedAt: publishedAt
@@ -1097,6 +1548,7 @@ export async function dummyPublishOutputAction(formData: FormData) {
           .values({
             contentItemId: contentId,
             platformVariantId: variant.id,
+            integrationAccountId: integrationAccount?.id ?? null,
             platform: variant.platform,
             status: "published",
             queuedAt: publishedAt,
@@ -1153,6 +1605,7 @@ export async function dummyPublishOutputAction(formData: FormData) {
     await tx
       .update(schema.platformVariants)
       .set({
+        integrationAccountId: integrationAccount?.id ?? null,
         status: "published",
         updatedAt: publishedAt
       })
@@ -1339,13 +1792,17 @@ async function getEditableContent(brandId: string, contentId: string) {
     throw new Error("Brand and content item are required.");
   }
 
+  const { brand } = await assertBrandAccess(brandId);
+
+  if (!brand) {
+    throw new Error("Brand not found.");
+  }
+
   const [row] = await db
     .select({
-      contentItem: schema.contentItems,
-      brand: schema.brands
+      contentItem: schema.contentItems
     })
     .from(schema.contentItems)
-    .innerJoin(schema.brands, eq(schema.contentItems.brandId, schema.brands.id))
     .where(and(eq(schema.contentItems.id, contentId), eq(schema.contentItems.brandId, brandId)))
     .limit(1);
 
@@ -1355,12 +1812,16 @@ async function getEditableContent(brandId: string, contentId: string) {
 
   const [profile] = await db.select().from(schema.brandProfiles).where(eq(schema.brandProfiles.brandId, brandId)).limit(1);
 
-  return { ...row, profile };
+  return { ...row, brand, profile };
 }
 
 function readFormValue(formData: FormData, key: string) {
   const value = formData.get(key);
   return typeof value === "string" ? value.trim() : "";
+}
+
+function readFormValues(formData: FormData, key: string) {
+  return formData.getAll(key).flatMap((value) => (typeof value === "string" && value.trim() ? [value.trim()] : []));
 }
 
 function parseTags(value: string) {
@@ -1460,6 +1921,7 @@ function createUnsavedVariant({
     generationPromptVersion: null,
     hashtags,
     headline,
+    integrationAccountId: null,
     language,
     platform,
     platformOptions: null,
@@ -1493,6 +1955,44 @@ function createDefaultOutputTitle({
   return `${platformLabel} ${typeLabel}${purposeLabel}${sourceLabel}`;
 }
 
+function createPlannedOutputCaption({
+  brief,
+  generationInstruction,
+  ideaGoal,
+  masterContent,
+  preset
+}: {
+  brief: string;
+  generationInstruction: string;
+  ideaGoal: string;
+  masterContent: string;
+  preset: (typeof outputPlanPresets)[number];
+}) {
+  const source = [brief, masterContent, generationInstruction].filter(Boolean).join("\n\n");
+  const goal = ideaGoal.replaceAll("_", " ");
+  const format = `${preset.platform} ${preset.postType.replaceAll("_", " ")} / ${preset.purpose.replaceAll("_", " ")}`;
+
+  return [`Brief direction: ${source || "No brief text yet."}`, `Goal: ${goal}.`, `Output format: ${format}.`].join("\n\n");
+}
+
+function createPlanGenerationInstruction({
+  generationInstruction,
+  ideaGoal,
+  workflowMode
+}: {
+  generationInstruction: string;
+  ideaGoal: string;
+  workflowMode: string;
+}) {
+  const parts = [
+    `Idea goal: ${ideaGoal.replaceAll("_", " ")}.`,
+    `Workflow mode: ${workflowMode}.`,
+    generationInstruction || "Create a publishing-ready first draft from the brief."
+  ];
+
+  return parts.join("\n");
+}
+
 function titleCase(value: string) {
   return value.charAt(0).toUpperCase() + value.slice(1);
 }
@@ -1524,6 +2024,79 @@ function parseDateTime(value: string) {
   }
 
   return parsed;
+}
+
+function resolveScheduleDateTime({
+  formData,
+  platform,
+  profile
+}: {
+  formData: FormData;
+  platform: string;
+  profile: typeof schema.brandProfiles.$inferSelect | undefined;
+}) {
+  const scheduledFor = readFormValue(formData, "scheduledFor");
+
+  if (scheduledFor) {
+    return parseDateTime(scheduledFor);
+  }
+
+  const scheduleDate = readFormValue(formData, "scheduleDate");
+
+  if (!scheduleDate) {
+    throw new Error("Schedule date is required.");
+  }
+
+  return parseDateTime(`${scheduleDate}T${readFormValue(formData, "scheduleTime") || getDefaultScheduleTime(profile, platform)}`);
+}
+
+function getBatchScheduleTime({
+  mode,
+  platform,
+  profile,
+  sharedTime
+}: {
+  mode: string;
+  platform: string;
+  profile: typeof schema.brandProfiles.$inferSelect | undefined;
+  sharedTime: string;
+}) {
+  if (mode === "shared_time") {
+    return normalizeScheduleTime(sharedTime) || getDefaultScheduleTime(profile, "fallback");
+  }
+
+  return getDefaultScheduleTime(profile, platform);
+}
+
+function getDefaultScheduleTime(profile: typeof schema.brandProfiles.$inferSelect | undefined, platform: string) {
+  const scheduleDefaults = getRecord(getRecord(profile?.publishingFrequency).scheduleDefaults);
+  const fallback = getStringValue(scheduleDefaults, "fallback") || "10:00";
+
+  return getStringValue(scheduleDefaults, platform) || getBuiltInScheduleDefault(platform) || fallback;
+}
+
+function getBuiltInScheduleDefault(platform: string) {
+  const defaults: Record<string, string> = {
+    facebook: "12:00",
+    fallback: "10:00",
+    instagram: "18:30",
+    linkedin: "09:00"
+  };
+
+  return defaults[platform] ?? defaults.fallback;
+}
+
+function normalizeScheduleTime(value: string) {
+  return /^\d{2}:\d{2}$/.test(value) ? value : "";
+}
+
+function getRecord(value: unknown): Record<string, unknown> {
+  return value && typeof value === "object" && !Array.isArray(value) ? (value as Record<string, unknown>) : {};
+}
+
+function getStringValue(record: Record<string, unknown>, key: string) {
+  const value = record[key];
+  return typeof value === "string" && normalizeScheduleTime(value) ? value : "";
 }
 
 function assertContentStatus(value: string) {

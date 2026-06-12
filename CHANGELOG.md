@@ -15,6 +15,8 @@ This changelog records implementation milestones and product-facing changes. Des
 - Added manual Facebook, Instagram, and LinkedIn integration account records with connector states, validation logging, and settings visibility.
 - Added encrypted server-side storage for optional local platform test credentials, documented in `docs/local-credential-handling.md`.
 - Added publishing job destination routing through `integration_account_id` on outputs and publication jobs while keeping live publishing disabled.
+- Added M4 hardening for signup activity logs, forbidden symbols guidance, platform-specific connection cards, token expiration warnings, credential removal, and connection disable controls.
+- Accepted M4 after closeout smoke coverage for auth/session routing, brand settings, credential safety, one live destination per platform per brand, and scheduler/content destination fallback.
 - Added a global scheduler control plane with brand, platform, status, date-range, and source-idea filters.
 - Added local due-job processing from the scheduler, creating `publication_results` and `published_posts` records through a stub publisher.
 - Added scheduler retry and cancel controls for failed/skipped local publication jobs.
@@ -73,7 +75,7 @@ This changelog records implementation milestones and product-facing changes. Des
 
 ### Changed
 
-- Changed M4 documentation status to implemented locally but pending product acceptance hardening, with a review checklist for auth, onboarding, brand settings, credentials, connectors, and routing.
+- Changed M4 documentation status from pending hardening to accepted after auth, onboarding, brand settings, credentials, connectors, and routing closeout checks.
 - Documented local development commands and the Drizzle migration workflow in `README.md`.
 - Established brand-scoped content as the primary ownership path while deferring global `/content`.
 - Renamed the user-facing variant surface toward publishing outputs.

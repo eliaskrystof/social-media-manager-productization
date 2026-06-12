@@ -107,7 +107,7 @@ Start Goal M3 from docs/codex-thread-goals.md. Build the scheduler control plane
 
 ## Goal M4: Real Users, Onboarding, And Platform Connections
 
-Status: implemented locally; pending product acceptance hardening.
+Status: accepted locally after product acceptance hardening.
 
 Thread goal:
 
@@ -150,12 +150,15 @@ Implemented local behavior:
 
 Product acceptance hardening:
 
+Implementation status: accepted after closeout smoke, credential-safety review, seeded-boundary review, typecheck, and lint.
+
 - Treat seeded user and brand data as obsolete for the real app path.
 - Keep signup onboarding shallow; add fuller assisted brand onboarding/completion later.
 - Add signup activity logging for workspace and brand creation.
 - Document local auth limitations and deferred workspace invitations.
 - Add optional forbidden symbols guidance.
 - Make manual connection setup platform-specific for Facebook page ID, Instagram user ID, and LinkedIn personal URN.
+- Treat each brand as having one live destination per platform for M4; use separate brands for separate publishing identities and defer per-output account selection.
 - Auto-set credential type by platform.
 - Add token expiration warnings and remove/disable credential actions.
 - Require `LOCAL_CREDENTIAL_ENCRYPTION_KEY` before storing real manual tokens.

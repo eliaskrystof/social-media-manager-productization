@@ -1,5 +1,6 @@
 import { desc, eq } from "drizzle-orm";
 import { db, schema } from "@orchard/database";
+import { getCurrentWorkspaceContext } from "@/lib/workspace-context";
 
 type Overview =
   | {
@@ -19,14 +20,16 @@ type Overview =
 
 export async function getLocalOverview(): Promise<Overview> {
   try {
-    const [workspace] = await db.select().from(schema.workspaces).limit(1);
-    if (!workspace) {
-      return { ok: false, message: "No seeded workspace found." };
+    const context = await getCurrentWorkspaceContext();
+
+    if (!context) {
+      return { ok: false, message: "Log in or finish onboarding to create a local workspace." };
     }
 
+    const { workspace } = context;
     const [brand] = await db.select().from(schema.brands).where(eq(schema.brands.workspaceId, workspace.id)).limit(1);
     if (!brand) {
-      return { ok: false, message: "No seeded brand found." };
+      return { ok: false, message: "No brand found for the current workspace." };
     }
 
     const [profile] = await db.select().from(schema.brandProfiles).where(eq(schema.brandProfiles.brandId, brand.id)).limit(1);
@@ -37,7 +40,7 @@ export async function getLocalOverview(): Promise<Overview> {
       .limit(1);
 
     if (!content) {
-      return { ok: false, message: "No seeded content item found." };
+      return { ok: false, message: "No content item found for the current workspace." };
     }
 
     const variants = await db
@@ -54,7 +57,7 @@ export async function getLocalOverview(): Promise<Overview> {
 
     return {
       ok: true,
-      message: "The app can read seeded workspace and content data.",
+      message: "The app can read the current workspace and content data.",
       workspace,
       brand,
       profile,

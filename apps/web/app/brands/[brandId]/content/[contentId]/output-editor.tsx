@@ -63,6 +63,7 @@ type OutputEditorProps = {
   mediaOptions: OutputEditorMedia[];
   reviewLogs: OutputEditorReviewLog[];
   revisions: OutputEditorRevision[];
+  scheduleDefaultTime: string;
   variant: OutputEditorVariant;
 };
 
@@ -74,6 +75,7 @@ export function OutputEditor({
   mediaOptions,
   reviewLogs,
   revisions,
+  scheduleDefaultTime,
   variant
 }: OutputEditorProps) {
   const [isOpen, setIsOpen] = useState(initiallyOpen);
@@ -271,20 +273,26 @@ export function OutputEditor({
                   <input name="contentId" type="hidden" value={contentId} />
                   <input name="variantId" type="hidden" value={variant.id} />
                   <label>
-                    Schedule intent
+                    Date
                     <input
-                      name="scheduledFor"
+                      name="scheduleDate"
                       required
-                      type="datetime-local"
-                      defaultValue={variant.scheduledFor ? formatDateTimeInput(variant.scheduledFor) : ""}
+                      type="date"
+                      defaultValue={variant.scheduledFor ? formatDateInput(variant.scheduledFor) : ""}
                     />
+                  </label>
+                  <label>
+                    Time
+                    <input name="scheduleTime" type="time" defaultValue={variant.scheduledFor ? formatTimeInput(variant.scheduledFor) : ""} />
                   </label>
                   <button className="button" disabled={!canSchedule} type="submit">
                     Schedule output
                   </button>
                   <FormActionFeedback pendingMessage="Scheduling output..." />
                 </form>
-                {!canSchedule ? <p className="form-note">Approve this output before scheduling.</p> : null}
+                <p className="form-note">
+                  {canSchedule ? `Leave time empty to use ${scheduleDefaultTime}.` : "Approve this output before scheduling."}
+                </p>
                 {variant.scheduledFor ? (
                   <form action={cancelOutputScheduleAction} className="content-form variant-form">
                     <input name="brandId" type="hidden" value={brandId} />
@@ -498,9 +506,16 @@ function formatDateTime(value: Date | string) {
   }).format(new Date(value));
 }
 
-function formatDateTimeInput(value: Date | string) {
+function formatDateInput(value: Date | string) {
   const date = new Date(value);
   const offsetDate = new Date(date.getTime() - date.getTimezoneOffset() * 60_000);
 
-  return offsetDate.toISOString().slice(0, 16);
+  return offsetDate.toISOString().slice(0, 10);
+}
+
+function formatTimeInput(value: Date | string) {
+  const date = new Date(value);
+  const offsetDate = new Date(date.getTime() - date.getTimezoneOffset() * 60_000);
+
+  return offsetDate.toISOString().slice(11, 16);
 }

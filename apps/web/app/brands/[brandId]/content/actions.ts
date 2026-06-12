@@ -1,10 +1,10 @@
 "use server";
 
-import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { db, schema } from "@orchard/database";
 import { getCurrentUser } from "@/lib/current-user";
+import { assertBrandAccess } from "@/lib/workspace-context";
 
 export async function createContentItemAction(formData: FormData) {
   const brandId = readFormValue(formData, "brandId");
@@ -17,7 +17,8 @@ export async function createContentItemAction(formData: FormData) {
     throw new Error("Brand is required.");
   }
 
-  const [brand] = await db.select().from(schema.brands).where(eq(schema.brands.id, brandId)).limit(1);
+  const { brand } = await assertBrandAccess(brandId);
+
   if (!brand) {
     throw new Error("Brand not found.");
   }

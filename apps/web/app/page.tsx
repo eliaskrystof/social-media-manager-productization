@@ -1,10 +1,22 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
+import { getCurrentUser } from "@/lib/current-user";
 import { getAppSummary } from "@/lib/workspace-data";
 
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
+  const user = await getCurrentUser();
+
+  if (!user) {
+    redirect("/login");
+  }
+
   const summary = await getAppSummary();
+
+  if (!summary.ok) {
+    redirect("/onboarding");
+  }
 
   return (
     <main className="shell">
@@ -30,7 +42,7 @@ export default async function HomePage() {
         <section className="grid">
           <article className="panel">
             <p className="label">Current user</p>
-            <h2>{summary.user?.displayName ?? "Seeded user"}</h2>
+            <h2>{summary.user?.displayName ?? "Local user"}</h2>
             <p>{summary.user?.email ?? "No local user found."}</p>
           </article>
 

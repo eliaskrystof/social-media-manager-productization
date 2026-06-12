@@ -691,7 +691,7 @@ Why:
 Outcome:
 
 - Keep the current account model as user plus workspace role.
-- Keep brand as the primary connection boundary; multiple same-platform accounts per brand remain schema-supported but are not optimized in the UI yet.
+- Keep brand as the primary connection boundary; for M4, each brand has one live destination per platform. Multiple same-platform records may exist historically in the schema, but the app should route through the current connected record and users should create separate brands when they need separate publishing identities.
 - Target manual connector inputs:
   - Facebook page ID plus page access token.
   - Instagram user ID plus token.

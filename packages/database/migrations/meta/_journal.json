@@ -36,6 +36,13 @@
       "when": 1780046877641,
       "tag": "0004_perfect_maximus",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1780859206639,
+      "tag": "0005_vengeful_celestials",
+      "breakpoints": true
     }
   ]
 }

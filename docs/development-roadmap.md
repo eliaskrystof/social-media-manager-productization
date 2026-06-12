@@ -132,7 +132,7 @@ Deferred:
 
 ## Milestone 4: Real Users, Onboarding, And Platform Connections
 
-Status: implemented locally; pending product acceptance hardening.
+Status: accepted locally after product acceptance hardening.
 
 Goal:
 
@@ -173,6 +173,8 @@ Implemented local behavior:
 
 Product acceptance hardening:
 
+Implementation status: accepted after closeout smoke, credential-safety review, seeded-boundary review, typecheck, and lint.
+
 - Treat seeded user and brand data as obsolete for the real app path; local users should create/access their own workspace.
 - Keep the first signed-up user as workspace `owner`; defer global admin accounts and use future env-gated dev tools for diagnostics.
 - Keep signup onboarding shallow with workspace and first brand creation, then add a fuller assisted brand onboarding/completion path later.
@@ -192,7 +194,7 @@ Product acceptance hardening:
 - Store credential provenance metadata, starting with `source = manual`.
 - In local/manual mode, require `LOCAL_CREDENTIAL_ENCRYPTION_KEY` before storing real tokens.
 - Allow scheduling without a connected destination, but show clear missing-destination warnings.
-- Keep brand as the primary connection boundary; defer explicit per-output account selection unless one brand needs multiple accounts on the same platform.
+- Keep brand as the primary connection boundary; M4 supports one live destination per platform per brand and defers explicit per-output account selection unless a later workflow proves one brand needs multiple same-platform destinations.
 - Document that live publishing must block missing, disabled, expired, or needs-attention destinations.
 
 Deferred:

@@ -1,6 +1,7 @@
 import { and, asc, desc, eq, isNotNull, isNull, sql } from "drizzle-orm";
 import { db, schema } from "@orchard/database";
 import { getCurrentUser } from "@/lib/current-user";
+import { assertBrandAccess, getCurrentWorkspaceContext, requireWorkspaceContext } from "@/lib/workspace-context";
 
 export type AppSummary =
   | {
@@ -35,6 +36,7 @@ export type BrandDetail =
   | {
       ok: true;
       brand: typeof schema.brands.$inferSelect;
+      integrationAccounts: Array<typeof schema.integrationAccounts.$inferSelect>;
       profile: typeof schema.brandProfiles.$inferSelect | undefined;
       contentItems: Array<typeof schema.contentItems.$inferSelect>;
     }
@@ -65,6 +67,8 @@ export type ContentDetail =
   | {
       ok: true;
       brand: typeof schema.brands.$inferSelect;
+      integrationAccounts: Array<typeof schema.integrationAccounts.$inferSelect>;
+      profile: typeof schema.brandProfiles.$inferSelect | undefined;
       contentItem: typeof schema.contentItems.$inferSelect;
       variants: Array<typeof schema.platformVariants.$inferSelect>;
       media: Array<typeof schema.contentMedia.$inferSelect & { asset: typeof schema.mediaAssets.$inferSelect }>;
@@ -83,12 +87,13 @@ export type ContentDetail =
 
 export async function getAppSummary(): Promise<AppSummary> {
   try {
-    const [workspace] = await db.select().from(schema.workspaces).limit(1);
-    if (!workspace) {
-      return { ok: false, message: "No seeded workspace found." };
+    const context = await getCurrentWorkspaceContext();
+
+    if (!context) {
+      return { ok: false, message: "Log in or finish onboarding to create a local workspace." };
     }
 
-    const currentUser = await getCurrentUser();
+    const { user: currentUser, workspace } = context;
 
     const [brandCountRow] = await db
       .select({ value: sql<number>`count(*)::int` })
@@ -181,7 +186,12 @@ async function getLatestContentItem(workspaceId: string, userId: string | undefi
 }
 
 export async function getBrands(): Promise<BrandListItem[]> {
-  const brands = await db.select().from(schema.brands).orderBy(schema.brands.name);
+  const { workspace } = await requireWorkspaceContext();
+  const brands = await db
+    .select()
+    .from(schema.brands)
+    .where(eq(schema.brands.workspaceId, workspace.id))
+    .orderBy(schema.brands.name);
 
   return Promise.all(
     brands.map(async (brand) => {
@@ -201,12 +211,18 @@ export async function getBrands(): Promise<BrandListItem[]> {
 }
 
 export async function getBrandDetail(brandId: string): Promise<BrandDetail> {
-  const [brand] = await db.select().from(schema.brands).where(eq(schema.brands.id, brandId)).limit(1);
+  const { brand } = await assertBrandAccess(brandId);
+
   if (!brand) {
     return { ok: false, message: "Brand not found." };
   }
 
   const [profile] = await db.select().from(schema.brandProfiles).where(eq(schema.brandProfiles.brandId, brand.id)).limit(1);
+  const integrationAccounts = await db
+    .select()
+    .from(schema.integrationAccounts)
+    .where(eq(schema.integrationAccounts.brandId, brand.id))
+    .orderBy(asc(schema.integrationAccounts.platform), asc(schema.integrationAccounts.externalAccountName));
   const contentItems = await db
     .select()
     .from(schema.contentItems)
@@ -216,6 +232,7 @@ export async function getBrandDetail(brandId: string): Promise<BrandDetail> {
   return {
     ok: true,
     brand,
+    integrationAccounts,
     profile,
     contentItems
   };
@@ -272,7 +289,8 @@ export async function getBrandContentList(brandId: string): Promise<BrandContent
 }
 
 export async function getContentDetail(brandId: string, contentId: string): Promise<ContentDetail> {
-  const [brand] = await db.select().from(schema.brands).where(eq(schema.brands.id, brandId)).limit(1);
+  const { brand } = await assertBrandAccess(brandId);
+
   if (!brand) {
     return { ok: false, message: "Brand not found." };
   }
@@ -292,6 +310,13 @@ export async function getContentDetail(brandId: string, contentId: string): Prom
     .from(schema.platformVariants)
     .where(eq(schema.platformVariants.contentItemId, contentItem.id))
     .orderBy(asc(schema.platformVariants.sortOrder), asc(schema.platformVariants.platform));
+
+  const [profile] = await db.select().from(schema.brandProfiles).where(eq(schema.brandProfiles.brandId, brand.id)).limit(1);
+  const integrationAccounts = await db
+    .select()
+    .from(schema.integrationAccounts)
+    .where(eq(schema.integrationAccounts.brandId, brand.id))
+    .orderBy(asc(schema.integrationAccounts.platform), asc(schema.integrationAccounts.externalAccountName));
 
   const mediaRows = await db
     .select({
@@ -355,6 +380,8 @@ export async function getContentDetail(brandId: string, contentId: string): Prom
   return {
     ok: true,
     brand,
+    integrationAccounts,
+    profile,
     contentItem,
     variants,
     media: mediaRows.map((row) => ({ ...row.relation, asset: row.asset })),

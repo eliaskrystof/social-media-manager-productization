@@ -63,9 +63,9 @@ When a credential is submitted:
 
 Set `LOCAL_CREDENTIAL_ENCRYPTION_KEY` locally before storing real test tokens. If it is missing, the local development fallback derives a key from `LOCAL_SESSION_SECRET` or `DATABASE_URL`, which is acceptable only for local prototype data.
 
-Before live publishing tests with real provider tokens, manual credential storage should refuse to save credentials unless `LOCAL_CREDENTIAL_ENCRYPTION_KEY` is set explicitly.
+Manual credential storage refuses to save credentials unless `LOCAL_CREDENTIAL_ENCRYPTION_KEY` is set explicitly.
 
-Saved credentials must never be displayed after storage. The UI should support:
+Saved credentials must never be displayed after storage. The UI supports:
 
 - replacing a credential,
 - disabling a connection,

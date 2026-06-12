@@ -16,6 +16,15 @@ export const users = pgTable("users", {
   ...timestamps
 });
 
+export const userLoginCredentials = pgTable("user_login_credentials", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: uuid("user_id").references(() => users.id).notNull().unique(),
+  passwordHash: text("password_hash").notNull(),
+  passwordSalt: text("password_salt").notNull(),
+  passwordIterations: integer("password_iterations").notNull(),
+  ...timestamps
+});
+
 export const workspaces = pgTable("workspaces", {
   id: uuid("id").primaryKey().defaultRandom(),
   name: text("name").notNull(),
@@ -73,6 +82,44 @@ export const brandProfiles = pgTable("brand_profiles", {
   ...timestamps
 });
 
+export const integrationAccounts = pgTable(
+  "integration_accounts",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    brandId: uuid("brand_id").references(() => brands.id).notNull(),
+    platform: text("platform").notNull(),
+    accountType: text("account_type"),
+    externalAccountId: text("external_account_id"),
+    externalAccountName: text("external_account_name"),
+    status: text("status").default("connected").notNull(),
+    scopes: text("scopes").array(),
+    connectedAt: timestamp("connected_at", { withTimezone: true }),
+    lastValidatedAt: timestamp("last_validated_at", { withTimezone: true }),
+    expiresAt: timestamp("expires_at", { withTimezone: true }),
+    secretRef: text("secret_ref"),
+    metadata: jsonb("metadata").$type<Record<string, unknown>>(),
+    ...timestamps
+  },
+  (table) => ({
+    brandPlatformExternalUnique: unique("integration_accounts_brand_platform_external_unique").on(
+      table.brandId,
+      table.platform,
+      table.externalAccountId
+    )
+  })
+);
+
+export const integrationCredentials = pgTable("integration_credentials", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  integrationAccountId: uuid("integration_account_id")
+    .references(() => integrationAccounts.id)
+    .notNull(),
+  credentialType: text("credential_type").notNull(),
+  encryptedValue: text("encrypted_value").notNull(),
+  expiresAt: timestamp("expires_at", { withTimezone: true }),
+  ...timestamps
+});
+
 export const contentItems = pgTable("content_items", {
   id: uuid("id").primaryKey().defaultRandom(),
   workspaceId: uuid("workspace_id").references(() => workspaces.id).notNull(),
@@ -100,6 +147,7 @@ export const platformVariants = pgTable(
     id: uuid("id").primaryKey().defaultRandom(),
     contentItemId: uuid("content_item_id").references(() => contentItems.id).notNull(),
     platform: text("platform").notNull(),
+    integrationAccountId: uuid("integration_account_id").references(() => integrationAccounts.id),
     postType: text("post_type").default("post").notNull(),
     purpose: text("purpose").default("main").notNull(),
     sortOrder: integer("sort_order").default(0).notNull(),
@@ -200,6 +248,7 @@ export const publicationJobs = pgTable("publication_jobs", {
   id: uuid("id").primaryKey().defaultRandom(),
   contentItemId: uuid("content_item_id").references(() => contentItems.id).notNull(),
   platformVariantId: uuid("platform_variant_id").references(() => platformVariants.id).notNull(),
+  integrationAccountId: uuid("integration_account_id").references(() => integrationAccounts.id),
   platform: text("platform").notNull(),
   status: text("status").default("draft").notNull(),
   scheduledFor: timestamp("scheduled_for", { withTimezone: true }),
@@ -304,6 +353,7 @@ export const brandsRelations = relations(brands, ({ one, many }) => ({
     references: [workspaces.id]
   }),
   profile: one(brandProfiles),
+  integrationAccounts: many(integrationAccounts),
   contentItems: many(contentItems)
 }));
 
