@@ -1,6 +1,6 @@
 import "server-only";
 
-import { createCipheriv, createHash, randomBytes } from "node:crypto";
+import { createCipheriv, createDecipheriv, createHash, randomBytes } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -14,6 +14,22 @@ export function encryptLocalCredential(value: string) {
   const authTag = cipher.getAuthTag();
 
   return `v1:${iv.toString("base64url")}:${authTag.toString("base64url")}:${encrypted.toString("base64url")}`;
+}
+
+export function decryptLocalCredential(encryptedValue: string) {
+  const [version, ivValue, authTagValue, encryptedContent] = encryptedValue.split(":");
+
+  if (version !== "v1" || !ivValue || !authTagValue || !encryptedContent) {
+    throw new Error("Unsupported credential envelope.");
+  }
+
+  const decipher = createDecipheriv("aes-256-gcm", getCredentialKey(), Buffer.from(ivValue, "base64url"));
+  decipher.setAuthTag(Buffer.from(authTagValue, "base64url"));
+
+  return Buffer.concat([
+    decipher.update(Buffer.from(encryptedContent, "base64url")),
+    decipher.final()
+  ]).toString("utf8");
 }
 
 export function hasExplicitCredentialEncryptionKey() {

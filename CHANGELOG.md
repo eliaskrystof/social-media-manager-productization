@@ -17,6 +17,10 @@ This changelog records implementation milestones and product-facing changes. Des
 - Added publishing job destination routing through `integration_account_id` on outputs and publication jobs while keeping live publishing disabled.
 - Added M4 hardening for signup activity logs, forbidden symbols guidance, platform-specific connection cards, token expiration warnings, credential removal, and connection disable controls.
 - Accepted M4 after closeout smoke coverage for auth/session routing, brand settings, credential safety, one live destination per platform per brand, and scheduler/content destination fallback.
+- Added the M5 publisher service with local, dry-run, and explicitly gated live modes for Facebook, Instagram, and LinkedIn publication jobs.
+- Added server-only credential decryption for publisher adapters while keeping stored credential values out of frontend props and logs.
+- Added Facebook Graph API feed/photo posting, Instagram Graph API image publishing, and LinkedIn Posts API text publishing adapters behind `PUBLISHER_MODE=live` plus `LIVE_PUBLISHING_ENABLED=true`.
+- Added publisher-mode visibility in the scheduler control plane and live-readiness dry-run validation for destinations, credentials, and Instagram public image handoff.
 - Added a global scheduler control plane with brand, platform, status, date-range, and source-idea filters.
 - Added local due-job processing from the scheduler, creating `publication_results` and `published_posts` records through a stub publisher.
 - Added scheduler retry and cancel controls for failed/skipped local publication jobs.

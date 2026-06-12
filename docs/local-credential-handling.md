@@ -73,6 +73,14 @@ Saved credentials must never be displayed after storage. The UI supports:
 
 Credential metadata should record provenance, starting with `source = manual`. Future OAuth credentials should use the same account model with different provenance metadata.
 
+Milestone 5 publisher adapters may decrypt stored credentials only inside server-only publishing code. Decrypted values must not be written to `publication_results`, `automation_runs`, activity logs, frontend props, screenshots, or smoke-test output.
+
+Publisher runtime modes:
+
+- `PUBLISHER_MODE=local`: default local artifact publishing, no platform API call.
+- `PUBLISHER_MODE=dry_run`: validates connected destination, stored credential, and platform payload readiness without making a platform API call.
+- `PUBLISHER_MODE=live`: uses platform APIs only when `LIVE_PUBLISHING_ENABLED=true` is also set.
+
 Manual credential targets for local MVP:
 
 - Facebook: page ID plus page access token.

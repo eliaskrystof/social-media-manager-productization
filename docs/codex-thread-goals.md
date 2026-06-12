@@ -173,6 +173,8 @@ Start Goal M4 from docs/codex-thread-goals.md. Implement real users, onboarding,
 
 ## Goal M5: Live Publishing Pipeline
 
+Status: in progress with the gated publisher adapter layer started.
+
 Thread goal:
 
 Publish approved scheduled outputs at the correct time through the correct connected account/page/profile.
@@ -210,6 +212,14 @@ Done when:
 - Successful jobs become published and create published post records.
 - Failed jobs remain inspectable and retryable/cancellable.
 - No job publishes before approval.
+
+Implemented local behavior:
+
+- Scheduler processing now uses a shared publisher service.
+- Local mode remains the default and does not call external platform APIs.
+- Dry-run mode validates live publishing preconditions and records mapped publisher results without external calls.
+- Live mode is double-gated by `PUBLISHER_MODE=live` and `LIVE_PUBLISHING_ENABLED=true`.
+- Facebook, Instagram, and LinkedIn adapters exist for the first live publishing paths, with Instagram limited to assigned media that has a public/external image URL.
 
 Suggested opening prompt:
 

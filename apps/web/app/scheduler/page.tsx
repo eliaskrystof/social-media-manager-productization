@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getSchedulerControlPlane, type SchedulerFilters } from "@/lib/scheduler-data";
+import { getPublisherModeLabel } from "@/services/publisher";
 import {
   cancelPublicationJobAction,
   processDuePublicationJobsAction,
@@ -26,6 +27,7 @@ export default async function SchedulerPage({ searchParams }: SchedulerPageProps
   const params = await searchParams;
   const filters = normalizeFilters(params);
   const data = await getSchedulerControlPlane(filters);
+  const publisherModeLabel = getPublisherModeLabel();
 
   if (!data.ok) {
     return (
@@ -53,11 +55,12 @@ export default async function SchedulerPage({ searchParams }: SchedulerPageProps
 
       <section className="page-heading scheduler-heading">
         <div>
-          <p className="eyebrow">Milestone 3</p>
+          <p className="eyebrow">Milestone 5</p>
           <h1>Scheduler control plane</h1>
           <p className="lede">
-            Inspect scheduled publication jobs, process due local stub publishes, and review published outputs by source idea.
+            Inspect scheduled publication jobs, process due publishes, and review published outputs by source idea.
           </p>
+          <p className="lede">Publisher mode: {publisherModeLabel}.</p>
         </div>
         <form action={processDuePublicationJobsAction}>
           <button className="button" disabled={data.summary.due === 0} type="submit">
@@ -70,7 +73,7 @@ export default async function SchedulerPage({ searchParams }: SchedulerPageProps
         <article className="panel">
           <p className="label">Due now</p>
           <h2>{data.summary.due}</h2>
-          <p>Ready for the local stub worker.</p>
+          <p>Ready for the configured publisher.</p>
         </article>
         <article className="panel">
           <p className="label">Scheduled</p>
@@ -276,7 +279,7 @@ export default async function SchedulerPage({ searchParams }: SchedulerPageProps
             <article className="panel empty-state">
               <p className="label">No published outputs</p>
               <h2>No published artifacts match these filters.</h2>
-              <p>The local stub worker creates published-post records from successful due jobs.</p>
+              <p>The configured publisher creates published-post records from successful due jobs.</p>
             </article>
           )}
         </div>

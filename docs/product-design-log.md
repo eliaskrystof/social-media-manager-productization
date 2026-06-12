@@ -707,3 +707,29 @@ Revisit When:
 - Manual-token publishing tests begin in Milestone 5.
 - OAuth app ownership and provider review strategy are selected.
 - Workspace invitation and team management move into scope.
+
+## 2026-06-12: Live Publishing Is Double-Gated
+
+Decision:
+
+Milestone 5 should introduce real publisher adapters behind explicit runtime gates. The default scheduler behavior remains local, `PUBLISHER_MODE=dry_run` validates destination, credential, and payload readiness without external calls, and live platform API calls require both `PUBLISHER_MODE=live` and `LIVE_PUBLISHING_ENABLED=true`.
+
+Why:
+
+- The scheduler button can process many due jobs, so accidental live publishing must be hard to trigger.
+- M4 deliberately allowed planning and scheduling before destinations were connected, while M5 live publishing must block missing, expired, disabled, or uncredentialed destinations.
+- Dry-run gives the product a useful acceptance step before owner-provided Facebook, Instagram, and LinkedIn test accounts are used.
+- The same publication result, published post, automation run, and activity log tables should record local, dry-run, and live publisher outcomes.
+
+Outcome:
+
+- Scheduler due-job processing now calls a shared publisher service.
+- Local mode preserves the previous local artifact behavior.
+- Dry-run mode records mapped platform payload readiness without storing credentials or calling APIs.
+- Live mode includes Facebook page feed posts, Instagram public-image publishing, and LinkedIn text posts, but remains blocked unless live publishing is explicitly enabled.
+
+Revisit When:
+
+- Real platform smoke tests have been run with owner-provided test destinations.
+- Media transformation or object storage makes Instagram and LinkedIn media publishing broader than public-image handoff.
+- OAuth replaces manual local token entry.

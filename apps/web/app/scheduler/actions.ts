@@ -7,6 +7,7 @@ import { db, schema } from "@orchard/database";
 import { getCurrentUser } from "@/lib/current-user";
 import { resolveIntegrationAccountForJob } from "@/lib/connection-routing";
 import { requireWorkspaceContext } from "@/lib/workspace-context";
+import { publishPlatformOutput, type PublisherFailure } from "@/services/publisher";
 
 const processableStatuses = ["draft", "queued", "scheduled"] as const;
 const retryableStatuses = ["failed", "skipped"] as const;
@@ -51,8 +52,8 @@ export async function processPublicationJobAction(formData: FormData) {
 
   const result = await processPublicationJob(jobId, new Date());
   const messages = {
-    failed: "The local publisher recorded a failure. Check the failure details in the queue.",
-    published: "The local stub created a published post record.",
+    failed: "The publisher recorded a failure. Check the failure details in the queue.",
+    published: "The publisher created a published post record.",
     skipped: "The job was skipped because it already has a published artifact."
   };
 
@@ -94,7 +95,7 @@ export async function retryPublicationJobAction(formData: FormData) {
       entityType: "content_item",
       entityId: row.contentItem.id,
       action: "publication_job_retry_queued",
-      message: `${getOutputDisplayTitle(row.variant)} queued for local retry.`,
+      message: `${getOutputDisplayTitle(row.variant)} queued for retry.`,
       metadata: {
         platform: row.job.platform,
         platformVariantId: row.variant.id,
@@ -173,7 +174,7 @@ async function processPublicationJob(jobId: string, attemptedAt: Date): Promise<
       attemptedAt,
       currentUserId: currentUser?.id,
       errorCode: "job_not_processable",
-      errorMessage: `Job status ${row.job.status} cannot be processed by the local stub worker.`,
+      errorMessage: `Job status ${row.job.status} cannot be processed by the publisher.`,
       row
     });
   }
@@ -210,7 +211,7 @@ async function processPublicationJob(jobId: string, attemptedAt: Date): Promise<
       attemptedAt,
       currentUserId: currentUser?.id,
       errorCode: "missing_publishable_copy",
-      errorMessage: "The output has no caption or headline for the local publisher to publish.",
+      errorMessage: "The output has no caption or headline for the publisher to publish.",
       row
     });
   }
@@ -226,15 +227,44 @@ async function processPublicationJob(jobId: string, attemptedAt: Date): Promise<
   }
 
   const integrationAccount = await resolveIntegrationAccountForJob(row.brand.id, row.variant);
-  const externalPostId = `local-${row.job.id.slice(0, 8)}-${attemptedAt.getTime()}`;
-  const externalUrl = `https://example.com/${row.job.platform}/${externalPostId}`;
+  await db
+    .update(schema.publicationJobs)
+    .set({
+      integrationAccountId: integrationAccount?.id ?? row.job.integrationAccountId,
+      lastError: null,
+      queuedAt: row.job.queuedAt ?? attemptedAt,
+      startedAt: attemptedAt,
+      status: "publishing",
+      updatedAt: attemptedAt
+    })
+    .where(eq(schema.publicationJobs.id, row.job.id));
+
+  const publisherResult = await publishPlatformOutput({
+    attemptedAt,
+    brand: row.brand,
+    contentItem: row.contentItem,
+    integrationAccount,
+    job: row.job,
+    variant: row.variant
+  });
+
+  if (!publisherResult.ok) {
+    return failPublicationJob({
+      attemptedAt,
+      currentUserId: currentUser?.id,
+      errorCode: publisherResult.errorCode,
+      errorMessage: publisherResult.errorMessage,
+      publisherFailure: publisherResult,
+      row
+    });
+  }
 
   await db.transaction(async (tx) => {
     await tx
       .update(schema.publicationJobs)
       .set({
         attemptCount: row.job.attemptCount + 1,
-        integrationAccountId: integrationAccount?.id ?? row.job.integrationAccountId,
+        integrationAccountId: publisherResult.integrationAccountId,
         lastError: null,
         queuedAt: row.job.queuedAt ?? attemptedAt,
         startedAt: attemptedAt,
@@ -247,7 +277,7 @@ async function processPublicationJob(jobId: string, attemptedAt: Date): Promise<
       .update(schema.publicationJobs)
       .set({
         finishedAt: attemptedAt,
-        integrationAccountId: integrationAccount?.id ?? row.job.integrationAccountId,
+        integrationAccountId: publisherResult.integrationAccountId,
         status: "published",
         updatedAt: attemptedAt
       })
@@ -256,13 +286,9 @@ async function processPublicationJob(jobId: string, attemptedAt: Date): Promise<
     await tx.insert(schema.publicationResults).values({
       publicationJobId: row.job.id,
       platform: row.job.platform,
-      externalPostId,
-      externalUrl,
-      rawResponse: {
-        mode: "local_stub_worker",
-        integrationAccountId: integrationAccount?.id ?? row.job.integrationAccountId,
-        status: "published"
-      },
+      externalPostId: publisherResult.externalPostId,
+      externalUrl: publisherResult.externalUrl,
+      rawResponse: publisherResult.rawResponse,
       status: "succeeded"
     });
 
@@ -275,19 +301,18 @@ async function processPublicationJob(jobId: string, attemptedAt: Date): Promise<
       platform: row.job.platform,
       postType: row.variant.postType,
       status: "published",
-      externalPostId,
-      externalUrl,
+      externalPostId: publisherResult.externalPostId,
+      externalUrl: publisherResult.externalUrl,
       publishedAt: attemptedAt,
       lastSyncedAt: attemptedAt,
-      rawResponse: {
-        mode: "local_stub_worker",
-        status: "published"
-      },
+      rawResponse: publisherResult.rawResponse,
       metadata: {
         caption: row.variant.caption,
         hashtags: row.variant.hashtags,
         headline: row.variant.headline,
-        integrationAccountId: integrationAccount?.id ?? row.job.integrationAccountId,
+        integrationAccountId: publisherResult.integrationAccountId,
+        mode: publisherResult.mode,
+        provider: publisherResult.provider,
         title: getOutputDisplayTitle(row.variant)
       }
     });
@@ -295,7 +320,7 @@ async function processPublicationJob(jobId: string, attemptedAt: Date): Promise<
     await tx
       .update(schema.platformVariants)
       .set({
-        integrationAccountId: integrationAccount?.id ?? row.variant.integrationAccountId,
+        integrationAccountId: publisherResult.integrationAccountId ?? row.variant.integrationAccountId,
         status: "published",
         updatedAt: attemptedAt
       })
@@ -312,18 +337,19 @@ async function processPublicationJob(jobId: string, attemptedAt: Date): Promise<
       contentItemId: row.contentItem.id,
       platformVariantId: row.variant.id,
       publicationJobId: row.job.id,
-      runType: "local_stub_publish",
-      provider: "app_server_local",
+      runType: publisherResult.runType,
+      provider: publisherResult.provider,
       status: "succeeded",
       input: {
+        mode: publisherResult.mode,
         platform: row.job.platform,
-        integrationAccountId: integrationAccount?.id ?? row.job.integrationAccountId,
+        integrationAccountId: publisherResult.integrationAccountId,
         scheduledFor: row.job.scheduledFor?.toISOString() ?? null
       },
       output: {
-        externalPostId,
-        externalUrl,
-        integrationAccountId: integrationAccount?.id ?? row.job.integrationAccountId
+        externalPostId: publisherResult.externalPostId,
+        externalUrl: publisherResult.externalUrl,
+        integrationAccountId: publisherResult.integrationAccountId
       },
       startedAt: attemptedAt,
       finishedAt: attemptedAt
@@ -335,14 +361,16 @@ async function processPublicationJob(jobId: string, attemptedAt: Date): Promise<
       actorUserId: currentUser?.id,
       entityType: "content_item",
       entityId: row.contentItem.id,
-      action: "publication_job_stub_published",
-      message: `${getOutputDisplayTitle(row.variant)} published by local stub worker.`,
+      action: publisherResult.activityAction,
+      message: publisherResult.activityMessage,
       metadata: {
-        externalPostId,
-        externalUrl,
-        integrationAccountId: integrationAccount?.id ?? row.job.integrationAccountId,
+        externalPostId: publisherResult.externalPostId,
+        externalUrl: publisherResult.externalUrl,
+        integrationAccountId: publisherResult.integrationAccountId,
+        mode: publisherResult.mode,
         platform: row.job.platform,
         platformVariantId: row.variant.id,
+        provider: publisherResult.provider,
         publicationJobId: row.job.id
       }
     });
@@ -357,12 +385,14 @@ async function failPublicationJob({
   currentUserId,
   errorCode,
   errorMessage,
+  publisherFailure,
   row
 }: {
   attemptedAt: Date;
   currentUserId: string | undefined;
   errorCode: string;
   errorMessage: string;
+  publisherFailure?: PublisherFailure;
   row: NonNullable<Awaited<ReturnType<typeof getPublicationJobContext>>>;
 }): Promise<"failed"> {
   await db.transaction(async (tx) => {
@@ -387,8 +417,8 @@ async function failPublicationJob({
     await tx.insert(schema.publicationResults).values({
       publicationJobId: row.job.id,
       platform: row.job.platform,
-      rawResponse: {
-        mode: "local_stub_worker",
+      rawResponse: publisherFailure?.rawResponse ?? {
+        mode: "local",
         status: "failed"
       },
       status: "failed",
@@ -402,11 +432,13 @@ async function failPublicationJob({
       contentItemId: row.contentItem.id,
       platformVariantId: row.variant.id,
       publicationJobId: row.job.id,
-      runType: "local_stub_publish",
-      provider: "app_server_local",
+      runType: publisherFailure?.runType ?? "local_publish",
+      provider: publisherFailure?.provider ?? "orchard_local_publisher",
       status: "failed",
       input: {
+        mode: publisherFailure?.mode ?? "local",
         platform: row.job.platform,
+        integrationAccountId: publisherFailure?.integrationAccountId ?? row.job.integrationAccountId,
         scheduledFor: row.job.scheduledFor?.toISOString() ?? null
       },
       error: errorMessage,
@@ -420,12 +452,15 @@ async function failPublicationJob({
       actorUserId: currentUserId,
       entityType: "content_item",
       entityId: row.contentItem.id,
-      action: "publication_job_stub_failed",
+      action: "publication_job_publish_failed",
       message: errorMessage,
       metadata: {
         errorCode,
+        integrationAccountId: publisherFailure?.integrationAccountId ?? row.job.integrationAccountId,
+        mode: publisherFailure?.mode ?? "local",
         platform: row.job.platform,
         platformVariantId: row.variant.id,
+        provider: publisherFailure?.provider ?? "orchard_local_publisher",
         publicationJobId: row.job.id
       }
     });

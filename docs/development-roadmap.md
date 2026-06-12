@@ -206,6 +206,8 @@ Deferred:
 
 ## Milestone 5: Live Publishing Pipeline
 
+Status: in progress with a gated publisher adapter layer.
+
 Goal:
 
 Publish approved scheduled outputs at the correct time through the correct connected account/page/profile.
@@ -238,11 +240,23 @@ Closure:
 - Failed jobs stay inspectable with useful error details and can be retried or cancelled.
 - No job publishes before approval.
 
+Implemented local behavior:
+
+- Scheduler due-job processing now goes through a shared publisher service instead of a hardcoded local stub.
+- `PUBLISHER_MODE=local` remains the default and creates local published artifacts without external platform calls.
+- `PUBLISHER_MODE=dry_run` validates connected destination, stored credential, and platform payload requirements, then records a dry-run publication result without calling platform APIs.
+- `PUBLISHER_MODE=live` is additionally blocked unless `LIVE_PUBLISHING_ENABLED=true`, preserving approval-before-real-publishing and avoiding accidental external posts.
+- Facebook live publishing maps approved outputs to Graph API page feed/photo posts.
+- Instagram live publishing maps approved outputs with one public image URL to Graph API media container plus publish calls.
+- LinkedIn live publishing maps approved outputs to text posts through the LinkedIn Posts API and fails clearly when media is assigned.
+- Successful publisher results continue to create `publication_results` and `published_posts`; failures remain inspectable and retryable through the scheduler.
+
 Deferred:
 
 - Advanced media transformations.
 - Bulk publishing optimizations.
 - Full production deployment hardening.
+- OAuth credential acquisition and real platform acceptance testing with owner-provided test accounts.
 
 ## Milestone 6: Published Library And Basic Performance Visibility
 
