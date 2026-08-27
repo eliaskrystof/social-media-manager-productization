@@ -227,6 +227,45 @@ Suggested opening prompt:
 Start Goal M5 from docs/codex-thread-goals.md. Implement the live publishing pipeline platform by platform, beginning with Facebook. Preserve approval-before-publish and idempotent publication jobs.
 ```
 
+## Goal M5.5: Recurring Stories Pilot
+
+Priority: main near-term product direction before completing the broader social media manager MVP.
+
+Thread goal:
+
+Build a narrow mini app inside Orchard for recurring promotional Stories on owned company accounts. Keep it manual-first, reliable, and operationally visible; do not expand into AI generation, broad content planning, or multi-client OAuth polish yet.
+
+Primary docs:
+
+- `docs/development-roadmap.md`
+- `docs/product-design-log.md`
+- `docs/target-data-model.md`
+- `docs/architecture-decisions.md`
+- `CHANGELOG.md`
+
+In scope:
+
+- Brand-scoped recurring Story campaigns.
+- Manual campaign setup with media/public media URL, platform, active date range, repeat days/times, approval, pause/resume, and end/cancel controls.
+- A due-campaign processor that creates per-occurrence `publication_jobs`, advances `next_publish_at`, and does not publish unapproved campaigns.
+- Reuse existing users, workspaces, brands, connector records, publisher gates, publication results, and published-post logs.
+- Instagram Story image publishing path first, with Facebook Story support after API validation.
+- Local and dry-run modes before live publishing; live mode must remain explicitly gated.
+
+Done when:
+
+- A logged-in user can create, approve, activate, pause, and resume a recurring Story campaign for their brand.
+- Due campaigns generate publication jobs and update their next run or end state safely.
+- Due Story jobs can be processed through the existing scheduler/publisher flow.
+- The UI shows active campaigns, next run, latest publish result, and failures clearly enough for the company pilot.
+- Typecheck and lint pass for code changes.
+
+Suggested opening prompt:
+
+```text
+Start Goal M5.5 from docs/codex-thread-goals.md. Build the recurring Stories pilot as the main priority before broader MVP polish. Keep the scope manual-first and company-account focused: campaign overview, repeat rules, due-campaign job creation, pause/resume, and Instagram Story image publishing readiness behind existing publisher gates.
+```
+
 ## Goal M6: Published Library And Basic Performance Visibility
 
 Thread goal:

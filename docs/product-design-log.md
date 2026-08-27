@@ -735,3 +735,37 @@ Revisit When:
 - Media transformation or object storage makes Instagram and LinkedIn media publishing broader than public-image handoff.
 - A production worker or cron scheduler replaces manual due-job processing as the default path, keeping the scheduler button as a fallback and recovery control.
 - OAuth replaces manual local token entry.
+
+## 2026-08-28: Prioritize Recurring Stories Pilot Before Broad MVP
+
+Decision:
+
+Before finishing the broader social media manager application, build a narrow mini app inside Orchard for recurring Stories on owned company accounts.
+
+Why:
+
+- Repeating feed posts is less compelling because feed posts remain visible and can clutter a page.
+- Stories are time-limited, so recurring promotional reminders fit the format naturally.
+- The company page pilot does not need production OAuth, broad multi-client onboarding, AI generation, or analytics to validate the core value.
+- The existing app already has the useful foundations: local users, workspaces, brands, connector records, scheduler jobs, publisher gates, publication results, and published-post logs.
+- Keeping the pilot inside Orchard avoids throwing away that foundation while still allowing the UI to be much narrower than the current broad content editor.
+
+Alternatives Considered:
+
+- Use only n8n/Google Sheets as a cron-driven pilot.
+- Build a separate standalone recurring Stories app.
+- Continue toward the full AI social media manager MVP before testing recurring Stories.
+
+Outcome:
+
+- Treat recurring Stories as the main near-term product priority.
+- Add a Milestone 5.5 recurring Stories pilot before broad MVP polish, analytics, or AI expansion.
+- Keep the first workflow manual-first: create a campaign, assign media/public media URL, set active dates and repeat times, approve/activate, process due occurrences, log outcomes, and allow pause/resume.
+- Start with Instagram Story image readiness, then validate Facebook Story support.
+- Defer Reels, feed reposting, imported post duplication, AI creative rotation, production OAuth polish, and engagement analytics.
+
+Revisit When:
+
+- The company account has run real recurring Story campaigns through the pilot.
+- Meta Story publishing constraints require a different media-storage or publishing approach.
+- The manual workflow proves reliable enough that AI variants, creative rotation, or OAuth onboarding become the next bottleneck.

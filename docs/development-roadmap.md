@@ -30,6 +30,21 @@ The MVP is functional when a user can:
 
 Basic engagement visibility is desirable for MVP if platform APIs make it practical, but it should not block the first live publishing MVP. It becomes required for the first analytics milestone after MVP.
 
+## Current Product Priority
+
+Before completing the broader social media manager MVP, prioritize a narrow mini app inside Orchard for recurring Stories on owned company accounts. The initial goal is not AI generation or broad multi-platform campaign management; it is a reliable manual overview and trigger for repeating time-limited promotional Stories.
+
+The first pilot should focus on:
+
+- manually created recurring Story campaigns,
+- one owned company brand/page/account,
+- Instagram Stories first, then Facebook Stories,
+- manual credentials or existing local connector records before production OAuth,
+- a clear campaign overview with next run, active date range, status, and recent failures,
+- a dependable due-campaign processor that creates publication jobs and preserves approval-before-publish.
+
+Feed posts, Reels, AI generation, imported post duplication, analytics, and polished multi-client onboarding should stay secondary until this pilot proves the core recurring Story workflow.
+
 ## Milestone 1: Local Orchard Skeleton
 
 Status: complete.
@@ -259,6 +274,43 @@ Deferred:
 - Production scheduler automation, where a worker or cron process picks up due jobs automatically and the scheduler action remains an operator fallback.
 - Full production deployment hardening.
 - OAuth credential acquisition and real platform acceptance testing with owner-provided test accounts.
+
+## Milestone 5.5: Recurring Stories Pilot
+
+Priority: main near-term product direction before the broad MVP polish and analytics milestones.
+
+Goal:
+
+Create a narrow mini app inside Orchard that works as a manual control plane and reliable trigger for recurring promotional Stories on owned company accounts.
+
+In scope:
+
+- Brand-scoped recurring Story campaign creation.
+- Manual campaign fields: title, platform, media/public media URL, optional caption/metadata, active date range, repeat days/times, and status.
+- Campaign statuses for draft, approved, active, paused, ended, failed, and cancelled.
+- Due-campaign processor that creates per-occurrence `publication_jobs` and advances `next_publish_at`.
+- Reuse the existing publisher service, publication logs, published-post artifacts, connector routing, and live publishing gates.
+- Instagram Story image path first; Facebook Story image path next if API validation is successful.
+- Manual credentials/local connector records are acceptable for the company pilot.
+- Campaign overview showing active campaigns, next run, last publish result, recent failure, and pause/resume controls.
+- Approval-before-publish remains mandatory.
+
+Closure:
+
+- A user can create and approve a recurring Instagram Story campaign for an owned brand.
+- The scheduler can identify due Story campaigns, create publication jobs, and advance the next run without duplicating the campaign manually.
+- Due Story jobs publish in local/dry-run mode and are ready for live mode behind the existing gates.
+- Published and failed attempts are visible from the campaign overview and existing scheduler/log surfaces.
+- Campaigns stop after their end date and can be paused/resumed safely.
+
+Deferred:
+
+- AI generation and creative rotation.
+- Reels.
+- Feed-post repost automation.
+- External post URL import/duplication.
+- Production OAuth and multi-client onboarding polish.
+- Engagement analytics.
 
 ## Milestone 6: Published Library And Basic Performance Visibility
 
