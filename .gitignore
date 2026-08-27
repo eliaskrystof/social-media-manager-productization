@@ -46,3 +46,4 @@ n8n-data/
 # Generated exports / local artifacts
 exports/
 artifacts/
+legacy-multimarket-split/
